@@ -1,25 +1,28 @@
 /**
- * BridgeEngine — deterministic financial gap resolver.
+ * BridgeEngine — deterministic, explainable financial gap resolver.
  *
  * Priority order (never changes):
  *   1. Fee waivers
  *   2. Free alternatives
- *   3. Discounts & institutional assistance
+ *   3. Discounts
  *   4. Equipment borrowing
- *   5. Grants
- *   6. Sponsor funding — only for what is left
+ *   5. Institutional assistance
+ *   6. Educational grants
+ *   7. Sponsor funding — only for the remaining shortfall
  *
- * No AI API is used. Every recommendation comes from rule matching against the
- * seeded knowledge base and carries a human-readable explanation.
+ * Double counting is impossible by construction: every reduction is capped at
+ * what is still unpaid on its specific expense line AND at the overall gap, and
+ * each knowledge-base source can be applied to an expense only once.
  */
 import type {
   Alternative,
   EligibilityProfile,
-  EngineStepKind,
+  EducationLevel,
   Expense,
   ExpenseCategory,
   Grant,
   OpportunityCategory,
+  ReductionKind,
   Resource,
   Waiver,
 } from "./types";
@@ -27,6 +30,7 @@ import type {
 export interface EngineInput {
   category: OpportunityCategory;
   country: string;
+  level: EducationLevel;
   expenses: Expense[];
   studentFunds: number;
   priorAssistance: number;
@@ -40,21 +44,28 @@ export interface EngineKnowledge {
   resources: Resource[];
 }
 
+export type PhaseKind = ReductionKind | "sponsor";
+
 export interface EngineFinding {
   id: string;
-  kind: EngineStepKind;
+  kind: PhaseKind;
   sourceId: string;
   title: string;
-  provider?: string;
+  provider: string;
   amount: number;
   expenseId?: string;
   expenseLabel?: string;
-  reasons: string[];
+  why: string[];
+  eligibility: string[];
+  documents: string[];
+  instructions: string[];
+  processingDays: number;
+  deadlineDays: number;
 }
 
 export interface EnginePhase {
   priority: number;
-  kind: EngineStepKind;
+  kind: PhaseKind;
   label: string;
   question: string;
   findings: EngineFinding[];
@@ -73,24 +84,36 @@ export interface EnginePlan {
   remainingByExpense: Record<string, number>;
 }
 
-const money = (n: number) => `$${Math.round(n * 100) / 100}`;
+export const PHASE_LABELS: Record<PhaseKind, string> = {
+  waiver: "Fee waiver",
+  alternative: "Free alternative",
+  discount: "Discount",
+  borrow: "Equipment borrowing",
+  institutional: "Institutional assistance",
+  grant: "Educational grant",
+  sponsor: "Sponsor funding",
+};
+
 const round = (n: number) => Math.round(n * 100) / 100;
+const money = (n: number) => `$${round(n)}`;
 
 const PROFILE_LABELS: Record<keyof EligibilityProfile, string> = {
-  lowIncome: "you indicated a household income below the local threshold",
+  lowIncome: "you reported a household income below the local threshold",
   publicSchool: "you attend a public school",
-  firstGeneration: "you are a first-generation applicant",
+  firstGeneration: "you would be the first in your family at university",
   hasSchoolLetter: "your school can provide a supporting letter",
 };
 
-const EXPENSE_LABELS: Record<ExpenseCategory, string> = {
+const CAT: Record<ExpenseCategory, string> = {
   registration: "registration",
-  travel: "travel",
-  accommodation: "accommodation",
+  examination: "examination",
   equipment: "equipment",
-  materials: "educational materials",
+  transportation: "transportation",
+  accommodation: "accommodation",
   food: "food",
   documentation: "documentation",
+  materials: "learning materials",
+  technology: "technology",
   other: "other",
 };
 
@@ -102,45 +125,36 @@ export function requirementReasons(requires: Partial<EligibilityProfile>) {
   return (Object.keys(requires) as (keyof EligibilityProfile)[]).filter((k) => requires[k]).map((k) => PROFILE_LABELS[k]);
 }
 
-function countryMatches(countries: string[], country: string) {
-  return countries.includes("Global") || countries.includes(country);
-}
-
-function keywordMatch(text: string, keywords: string[]) {
-  const t = text.toLowerCase();
-  return keywords.find((k) => t.includes(k.toLowerCase()));
-}
-
 export function waiverValue(w: Waiver, base: number) {
   const raw = w.savingsType === "fixed" ? w.savings : (base * w.savings) / 100;
   return round(Math.min(raw, w.maxSavings ?? Infinity, base));
 }
+
+const countryOk = (countries: string[], c: string) => countries.includes("Global") || countries.includes(c);
+const keywordHit = (text: string, keywords: string[]) => keywords.find((k) => text.toLowerCase().includes(k.toLowerCase()));
 
 export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): EnginePlan {
   const totalCost = round(input.expenses.reduce((s, e) => s + e.amount, 0));
   const funds = round(Math.min(input.studentFunds + input.priorAssistance, totalCost));
   const initialGap = round(Math.max(totalCost - funds, 0));
   const remaining: Record<string, number> = Object.fromEntries(input.expenses.map((e) => [e.id, e.amount]));
+  const used = new Set<string>(); // sourceId:expenseId — one application per source per line
   let gap = initialGap;
-  const phases: EnginePhase[] = [];
   let seq = 0;
+  const phases: EnginePhase[] = [];
 
-  const take = (expense: Expense, raw: number) => {
-    const amt = round(Math.min(raw, remaining[expense.id], gap));
+  const take = (sourceId: string, e: Expense, raw: number) => {
+    const key = `${sourceId}:${e.id}`;
+    if (used.has(key)) return 0;
+    const amt = round(Math.min(raw, remaining[e.id], gap));
     if (amt <= 0) return 0;
-    remaining[expense.id] = round(remaining[expense.id] - amt);
+    used.add(key);
+    remaining[e.id] = round(remaining[e.id] - amt);
     gap = round(gap - amt);
     return amt;
   };
 
-  const phase = (
-    priority: number,
-    kind: EngineStepKind,
-    label: string,
-    question: string,
-    run: () => EngineFinding[],
-    emptyNote: string,
-  ) => {
+  const phase = (priority: number, kind: PhaseKind, label: string, question: string, run: () => EngineFinding[], empty: string) => {
     const gapBefore = gap;
     const findings = gap > 0 ? run() : [];
     const total = findings.reduce((s, f) => s + f.amount, 0);
@@ -152,135 +166,117 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
       findings,
       gapBefore,
       gapAfter: gap,
-      note:
-        gapBefore <= 0
-          ? "Gap already closed — nothing more to look for."
-          : findings.length
-            ? `Reduced the gap by ${money(total)}.`
-            : emptyNote,
+      note: gapBefore <= 0 ? "Gap already closed — skipped." : findings.length ? `Gap reduced by ${money(total)}` : empty,
     });
   };
 
-  // 1. Fee waivers
-  phase(1, "waiver", "Fee waivers", "Can any required fee be waived?", () => {
+  const fromWaivers = (kind: Waiver["kind"]) => () => {
     const out: EngineFinding[] = [];
-    for (const w of kb.waivers.filter((w) => w.kind === "waiver")) {
-      if (!w.categories.includes(input.category)) continue;
-      if (!countryMatches(w.countries, input.country)) continue;
+    for (const w of kb.waivers.filter((x) => x.kind === kind)) {
+      if (!w.categories.includes(input.category) || !countryOk(w.countries, input.country) || !w.levels.includes(input.level)) continue;
       if (!meetsRequirements(input.eligibility, w.requires)) continue;
       for (const e of input.expenses) {
         if (!w.expenseCategories.includes(e.category) || remaining[e.id] <= 0) continue;
-        const amt = take(e, waiverValue(w, remaining[e.id]));
+        const base = kind === "waiver" ? remaining[e.id] : e.amount; // percentage discounts apply to the list price
+        const amt = take(w.id, e, waiverValue(w, base));
         if (amt > 0)
           out.push({
             id: `f${++seq}`,
-            kind: "waiver",
+            kind: kind === "waiver" ? "waiver" : kind === "discount" ? "discount" : "institutional",
             sourceId: w.id,
             title: w.name,
             provider: w.provider,
             amount: amt,
             expenseId: e.id,
             expenseLabel: e.label,
-            reasons: [
-              `It applies to ${input.category.replace("-", " ")} ${EXPENSE_LABELS[e.category]} fees`,
-              w.countries.includes("Global") ? "It is available in every country" : `It is offered in ${input.country}`,
+            why: [
+              `Applies to ${CAT[e.category]} costs for ${input.category.replace("-", " ")} opportunities`,
+              w.countries.includes("Global") ? "Available in every country" : `Offered in ${input.country}`,
               ...requirementReasons(w.requires),
             ],
+            eligibility: w.eligibility,
+            documents: w.documents,
+            instructions: w.instructions,
+            processingDays: w.processingDays,
+            deadlineDays: w.deadlineDays,
           });
       }
     }
     return out;
-  }, "No matching fee waiver in the knowledge base.");
+  };
 
-  // 2. Free alternatives
+  phase(1, "waiver", "Fee waivers", "Can any required fee be waived?", fromWaivers("waiver"), "No applicable fee waiver found");
+
   phase(2, "alternative", "Free alternatives", "Is there a free way to meet the same requirement?", () => {
     const out: EngineFinding[] = [];
     for (const a of kb.alternatives) {
       for (const e of input.expenses) {
         if (!a.replaces.includes(e.category) || remaining[e.id] <= 0) continue;
-        const hit = keywordMatch(e.label, a.keywords);
+        const hit = keywordHit(e.label, a.keywords);
         if (!hit) continue;
-        const amt = take(e, a.saving === "full" ? remaining[e.id] : a.saving);
+        const amt = take(a.id, e, remaining[e.id]);
         if (amt > 0)
           out.push({
             id: `f${++seq}`,
             kind: "alternative",
             sourceId: a.id,
             title: a.name,
+            provider: a.provider,
             amount: amt,
             expenseId: e.id,
             expenseLabel: e.label,
-            reasons: [`"${e.label}" matches "${hit}"`, a.description],
+            why: [`“${e.label}” can be met for free (matched “${hit}”)`, a.description],
+            eligibility: a.eligibility,
+            documents: a.documents,
+            instructions: a.instructions,
+            processingDays: a.processingDays,
+            deadlineDays: a.deadlineDays,
           });
       }
     }
     return out;
-  }, "Every listed expense is a genuine requirement with no free substitute.");
+  }, "Every listed expense is a genuine requirement");
 
-  // 3. Discounts & institutional assistance
-  phase(3, "discount", "Discounts & institutional help", "Do discounts or school programmes apply?", () => {
-    const out: EngineFinding[] = [];
-    for (const w of kb.waivers.filter((w) => w.kind !== "waiver")) {
-      if (!w.categories.includes(input.category)) continue;
-      if (!countryMatches(w.countries, input.country)) continue;
-      if (!meetsRequirements(input.eligibility, w.requires)) continue;
-      for (const e of input.expenses) {
-        if (!w.expenseCategories.includes(e.category) || remaining[e.id] <= 0) continue;
-        const base = e.amount; // percent discounts apply to the list price
-        const amt = take(e, waiverValue(w, base));
-        if (amt > 0)
-          out.push({
-            id: `f${++seq}`,
-            kind: "discount",
-            sourceId: w.id,
-            title: w.name,
-            provider: w.provider,
-            amount: amt,
-            expenseId: e.id,
-            expenseLabel: e.label,
-            reasons: [
-              w.kind === "institutional" ? "Offered directly by your verifying institution" : "Published student discount",
-              `Covers ${EXPENSE_LABELS[e.category]} for ${input.category.replace("-", " ")} opportunities`,
-              ...requirementReasons(w.requires),
-            ],
-          });
-      }
-    }
-    return out;
-  }, "No discount or institutional programme matched.");
+  phase(3, "discount", "Discounts", "Do any published student discounts apply?", fromWaivers("discount"), "No discount matched");
 
-  // 4. Equipment borrowing
-  phase(4, "borrow", "Borrow, don't buy", "Can equipment or materials be borrowed?", () => {
+  phase(4, "borrow", "Equipment borrowing", "Can equipment or materials be borrowed instead?", () => {
     const out: EngineFinding[] = [];
     for (const e of input.expenses) {
-      if (!["equipment", "materials"].includes(e.category) || remaining[e.id] <= 0) continue;
-      const r = kb.resources.find((r) => r.available > 0 && keywordMatch(e.label, r.keywords));
+      if (!["equipment", "materials", "technology"].includes(e.category) || remaining[e.id] <= 0) continue;
+      const r = kb.resources.find((x) => x.available > 0 && keywordHit(e.label, x.keywords));
       if (!r) continue;
-      const amt = take(e, remaining[e.id]);
+      const amt = take(r.id, e, remaining[e.id]);
       if (amt > 0)
         out.push({
           id: `f${++seq}`,
           kind: "borrow",
           sourceId: r.id,
           title: `Borrow: ${r.name}`,
+          provider: "Resource Rescue lending library",
           amount: amt,
           expenseId: e.id,
           expenseLabel: e.label,
-          reasons: [`${r.available} of ${r.total} available to reserve`, `Loan term: ${r.loanTerm}`, "Reused equipment avoids a purchase entirely"],
+          why: [`${r.available} of ${r.total} available to reserve`, "Borrowing avoids the purchase entirely"],
+          eligibility: ["Student at a partner institution"],
+          documents: ["Student ID at pickup"],
+          instructions: ["Reserve the item in Resource Rescue.", "Collect it from the school office on your pickup date.", `Return it at the end of the loan (${r.loanTerm.toLowerCase()}).`],
+          processingDays: 1,
+          deadlineDays: 7,
         });
     }
     return out;
-  }, "No equipment purchase that could be borrowed instead.");
+  }, "No purchase that could be borrowed instead");
 
-  // 5. Grants
-  phase(5, "grant", "Grants", "Do any small grants cover what's left?", () => {
+  phase(5, "institutional", "Institutional assistance", "Does the student's institution run a programme for this?", fromWaivers("institutional"), "No institutional programme matched");
+
+  phase(6, "grant", "Educational grants", "Do any small grants cover what's left?", () => {
     const out: EngineFinding[] = [];
     for (const g of kb.grants) {
       if (!meetsRequirements(input.eligibility, g.requires)) continue;
       let budget = g.maxAmount;
       for (const e of input.expenses) {
         if (!g.expenseCategories.includes(e.category) || remaining[e.id] <= 0 || budget <= 0) continue;
-        const amt = take(e, Math.min(budget, remaining[e.id]));
+        const amt = take(g.id, e, Math.min(budget, remaining[e.id]));
         budget -= amt;
         if (amt > 0)
           out.push({
@@ -292,20 +288,24 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
             amount: amt,
             expenseId: e.id,
             expenseLabel: e.label,
-            reasons: [`Covers ${EXPENSE_LABELS[e.category]} up to ${money(g.maxAmount)}`, ...requirementReasons(g.requires)],
+            why: [`Covers ${CAT[e.category]} costs up to ${money(g.maxAmount)}`, ...requirementReasons(g.requires)],
+            eligibility: g.eligibility,
+            documents: g.documents,
+            instructions: g.instructions,
+            processingDays: g.processingDays,
+            deadlineDays: g.deadlineDays,
           });
       }
     }
     return out;
-  }, "No grant matched the remaining expense types.");
+  }, "No grant matched the remaining costs");
 
-  // 6. Sponsor funding for the remainder only
   const sponsorAmount = gap;
   phases.push({
-    priority: 6,
+    priority: 7,
     kind: "sponsor",
-    label: "Targeted sponsor request",
-    question: "What still needs funding?",
+    label: "Sponsor funding",
+    question: "What genuinely still needs funding?",
     findings:
       sponsorAmount > 0
         ? [
@@ -314,23 +314,23 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
               kind: "sponsor",
               sourceId: "sponsor",
               title: `Request ${money(sponsorAmount)} from verified sponsors`,
+              provider: "BridgeFund sponsor network",
               amount: sponsorAmount,
-              reasons: [
-                `Only the remaining ${money(sponsorAmount)} is requested — not the full ${money(totalCost)}`,
-                "The request is verified by your institution before sponsors see it",
-              ],
+              why: [`Only the remaining ${money(sponsorAmount)} is requested — not the original ${money(initialGap)} gap`, "Every other option was checked first"],
+              eligibility: ["Need verified by your institution"],
+              documents: ["Proof of enrollment", "Official cost confirmation"],
+              instructions: ["Submit the request for verification.", "Your institution verifies it privately.", "Verified sponsors see only your goal, the amount and the deadline."],
+              processingDays: 3,
+              deadlineDays: 0,
             },
           ]
         : [],
     gapBefore: gap,
     gapAfter: gap,
-    note: sponsorAmount > 0 ? `Sponsors are asked for ${money(sponsorAmount)} instead of ${money(initialGap)}.` : "No sponsor funding needed — the gap is closed.",
+    note: sponsorAmount > 0 ? `Sponsors asked for ${money(sponsorAmount)} instead of ${money(initialGap)}` : "No sponsor funding needed",
   });
 
-  const reductionsTotal = round(initialGap - sponsorAmount);
-  return { totalCost, studentFunds: funds, initialGap, phases, reductionsTotal, sponsorAmount, remainingByExpense: remaining };
+  return { totalCost, studentFunds: funds, initialGap, phases, reductionsTotal: round(initialGap - sponsorAmount), sponsorAmount, remainingByExpense: remaining };
 }
 
-export function planFindings(plan: EnginePlan) {
-  return plan.phases.filter((p) => p.kind !== "sponsor").flatMap((p) => p.findings);
-}
+export const planFindings = (plan: EnginePlan) => plan.phases.filter((p) => p.kind !== "sponsor").flatMap((p) => p.findings);

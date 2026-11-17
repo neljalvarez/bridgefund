@@ -2,12 +2,14 @@ export type Role = "student" | "sponsor" | "institution";
 
 export type ExpenseCategory =
   | "registration"
-  | "travel"
-  | "accommodation"
+  | "examination"
   | "equipment"
-  | "materials"
+  | "transportation"
+  | "accommodation"
   | "food"
   | "documentation"
+  | "materials"
+  | "technology"
   | "other";
 
 export type OpportunityCategory =
@@ -20,6 +22,8 @@ export type OpportunityCategory =
   | "technology"
   | "course";
 
+export type EducationLevel = "secondary" | "pre-university" | "undergraduate" | "vocational";
+
 export interface Expense {
   id: string;
   label: string;
@@ -29,6 +33,13 @@ export interface Expense {
   confirmed: boolean;
 }
 
+export interface EligibilityProfile {
+  lowIncome: boolean;
+  publicSchool: boolean;
+  firstGeneration: boolean;
+  hasSchoolLetter: boolean;
+}
+
 export interface Student {
   id: string;
   firstName: string;
@@ -36,17 +47,11 @@ export interface Student {
   country: string;
   city: string;
   grade: string;
+  level: EducationLevel;
   institutionId: string;
   goal: string;
-  /** Simulated eligibility signals used by BridgeEngine (never shown to sponsors). */
+  /** Simulated eligibility signals used by BridgeEngine — never shown to sponsors. */
   eligibility: EligibilityProfile;
-}
-
-export interface EligibilityProfile {
-  lowIncome: boolean;
-  publicSchool: boolean;
-  firstGeneration: boolean;
-  hasSchoolLetter: boolean;
 }
 
 export interface Institution {
@@ -55,6 +60,8 @@ export interface Institution {
   type: "School" | "University" | "Nonprofit";
   country: string;
   city: string;
+  /** Simulated assistance fund held by the institution. */
+  fund: number;
 }
 
 export interface Opportunity {
@@ -63,12 +70,10 @@ export interface Opportunity {
   title: string;
   provider: string;
   category: OpportunityCategory;
-  deadline: string; // ISO date
+  deadline: string; // ISO
   institutionId: string;
   expenses: Expense[];
-  /** Money the student can already put toward this opportunity. */
   studentFunds: number;
-  /** Assistance already received from elsewhere. */
   priorAssistance: number;
   outcome: string;
   createdAt: string;
@@ -78,21 +83,24 @@ export type RequestStatus =
   | "Draft"
   | "Submitted"
   | "Under Review"
+  | "Additional Information Required"
   | "Verified"
   | "Partially Funded"
   | "Fully Funded"
   | "Completed"
-  | "Declined";
+  | "Rejected";
 
-export type VerificationMethod = "school-letter" | "counselor-call" | "document-review" | "institution-portal";
+export type ReductionKind = "waiver" | "alternative" | "discount" | "borrow" | "institutional" | "grant";
 
 export interface Reduction {
   id: string;
-  kind: EngineStepKind;
+  kind: ReductionKind;
   sourceId: string;
   title: string;
   amount: number;
   expenseId?: string;
+  /** Estimated until the verifying institution confirms it. */
+  confirmed: boolean;
 }
 
 export interface StatusEvent {
@@ -107,55 +115,58 @@ export interface FundingRequest {
   ref: string;
   studentId: string;
   opportunityId: string;
+  institutionId: string;
   purpose: string;
-  /** Total cost of the expenses covered by this request. */
   totalCost: number;
-  /** Student funds + prior assistance applied. */
   studentFunds: number;
-  /** Reductions found by BridgeEngine or assigned by an institution. */
   reductions: Reduction[];
   /** Amount requested from sponsors / institution funds after reductions. */
   amount: number;
   funded: number;
   deadline: string;
   expenses: Expense[];
-  reason: string;
+  explanation: string;
   documents: { name: string; attached: boolean }[];
-  verification: VerificationMethod;
   status: RequestStatus;
   infoRequested?: string;
   history: StatusEvent[];
   createdAt: string;
 }
 
-export interface Waiver {
+/** Shared metadata every recommendation source carries, so each one can explain itself. */
+export interface ProgramMeta {
+  eligibility: string[];
+  documents: string[];
+  instructions: string[];
+  processingDays: number;
+  deadlineDays: number;
+}
+
+export interface Waiver extends ProgramMeta {
   id: string;
   name: string;
   provider: string;
-  countries: string[]; // ["Global"] for any
+  countries: string[]; // ["Global"] = any
+  levels: EducationLevel[];
   categories: OpportunityCategory[];
   expenseCategories: ExpenseCategory[];
   savingsType: "fixed" | "percent";
   savings: number;
   maxSavings?: number;
-  eligibility: string[];
   requires: Partial<EligibilityProfile>;
-  deadlineDays: number; // relative to seed date
-  documents: string[];
-  instructions: string[];
   kind: "waiver" | "discount" | "institutional";
 }
 
-export interface Alternative {
+export interface Alternative extends ProgramMeta {
   id: string;
   name: string;
+  provider: string;
   replaces: ExpenseCategory[];
   keywords: string[];
   description: string;
-  saving: "full" | number; // full = replaces the expense entirely
 }
 
-export interface Grant {
+export interface Grant extends ProgramMeta {
   id: string;
   name: string;
   provider: string;
@@ -165,15 +176,7 @@ export interface Grant {
   description: string;
 }
 
-export type ResourceType =
-  | "calculator"
-  | "laptop"
-  | "textbook"
-  | "lab-equipment"
-  | "stem-kit"
-  | "free-resource"
-  | "school-equipment"
-  | "connectivity";
+export type ResourceType = "calculator" | "laptop" | "textbook" | "lab-equipment" | "engineering" | "exam-prep" | "school-equipment";
 
 export interface Resource {
   id: string;
@@ -188,20 +191,30 @@ export interface Resource {
   keywords: string[];
 }
 
+export type ReservationStatus = "Reserved" | "Collected" | "Returned" | "Cancelled";
+
 export interface Reservation {
   id: string;
   resourceId: string;
   studentId: string;
   pickupDate: string;
-  status: "Reserved" | "Collected" | "Returned";
+  status: ReservationStatus;
   createdAt: string;
-  by: Role;
+}
+
+export interface Sponsor {
+  id: string;
+  name: string;
+  type: "Individual" | "Foundation" | "Company";
+  balance: number;
+  startingBalance: number;
 }
 
 export interface Contribution {
   id: string;
-  sponsorName: string;
-  requestId: string | null; // null = shared pool
+  sponsorId: string | null;
+  sourceLabel: string;
+  requestId: string | null; // null = to the shared pool
   amount: number;
   at: string;
   source: "sponsor" | "pool" | "institution";
@@ -213,6 +226,7 @@ export interface DistributionEvent {
   label: string;
   amount: number;
   requestRef?: string;
+  institutionId?: string;
   kind: "funds" | "waiver" | "resource" | "completion" | "pool";
 }
 
@@ -226,20 +240,19 @@ export interface Notification {
   read: boolean;
 }
 
+export interface Activity {
+  id: string;
+  role: Role | "system";
+  text: string;
+  at: string;
+}
+
 export interface CalculatorScenario {
   id: string;
   name: string;
-  lines: { id: string; category: ExpenseCategory; label: string; amount: number; confirmed: boolean }[];
+  category: OpportunityCategory;
+  lines: Partial<Record<ExpenseCategory, number>>;
   funds: number;
-  category?: OpportunityCategory;
-}
-
-export interface DemoState {
-  stage: number;
-  scanned: boolean;
-  engineRun: boolean;
-  approved: boolean;
-  contributed: boolean;
 }
 
 export interface AppState {
@@ -247,9 +260,10 @@ export interface AppState {
   seededAt: string;
   role: Role;
   currentStudentId: string;
-  sponsor: { name: string; balance: number; startingBalance: number };
+  currentSponsorId: string;
+  currentInstitutionId: string;
+  sponsors: Sponsor[];
   pool: number;
-  institutionFunds: number;
   students: Student[];
   institutions: Institution[];
   opportunities: Opportunity[];
@@ -259,21 +273,13 @@ export interface AppState {
   contributions: Contribution[];
   distribution: DistributionEvent[];
   notifications: Notification[];
+  activity: Activity[];
   savedWaivers: string[];
-  savedOpportunities: string[];
+  savedNeeds: string[];
+  reminders: string[];
   scenarios: CalculatorScenario[];
   milestones: { id: string; at: string; label: string }[];
+  profile: { displayName: string; email: string; emailUpdates: boolean; deadlineReminders: boolean };
   onboarded: boolean;
-  sound: boolean;
-  demo: DemoState;
+  demo: { stage: number; scanned: boolean };
 }
-
-export type EngineStepKind =
-  | "start"
-  | "student-funds"
-  | "waiver"
-  | "alternative"
-  | "discount"
-  | "borrow"
-  | "grant"
-  | "sponsor";

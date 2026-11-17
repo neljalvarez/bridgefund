@@ -1,47 +1,47 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
-const token = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
+const c = (v: string) => `hsl(var(--${v}) / <alpha-value>)`;
 
 const config: Config = {
   darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
+    container: { center: true, padding: "1.5rem", screens: { "2xl": "1280px" } },
     extend: {
       colors: {
-        bg: token("bg"),
-        surface: token("surface"),
-        raised: token("raised"),
-        ink: token("text"),
-        muted: token("muted"),
-        line: token("line"),
-        forest: token("forest"),
-        gold: token("gold"),
-        terra: token("terra"),
-        terraink: token("terra-ink"),
-        sage: token("sage"),
-        onforest: token("on-forest"),
+        border: c("border"),
+        input: c("input"),
+        ring: c("ring"),
+        background: c("background"),
+        foreground: c("foreground"),
+        primary: { DEFAULT: c("primary"), foreground: c("primary-foreground"), dark: c("primary-dark"), light: c("primary-light") },
+        secondary: { DEFAULT: c("secondary"), foreground: c("secondary-foreground") },
+        muted: { DEFAULT: c("muted"), foreground: c("muted-foreground") },
+        accent: { DEFAULT: c("accent"), foreground: c("accent-foreground") },
+        destructive: { DEFAULT: c("destructive"), foreground: c("destructive-foreground") },
+        warning: { DEFAULT: c("warning"), foreground: c("warning-foreground") },
+        card: { DEFAULT: c("card"), foreground: c("card-foreground") },
+        popover: { DEFAULT: c("popover"), foreground: c("popover-foreground") },
+        chart: { 1: c("chart-1"), 2: c("chart-2"), 3: c("chart-3"), 4: c("chart-4"), 5: c("chart-5") },
       },
+      borderRadius: { lg: "var(--radius)", md: "calc(var(--radius) - 2px)", sm: "calc(var(--radius) - 4px)" },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "Inter", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
-        pixel: ["'BF Pixel'", "var(--font-geist-mono)", "monospace"],
       },
       boxShadow: {
-        offset: "4px 4px 0 0 rgb(var(--c-shadow))",
-        "offset-sm": "2px 2px 0 0 rgb(var(--c-shadow))",
-        "offset-lg": "6px 6px 0 0 rgb(var(--c-shadow))",
+        card: "0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.04)",
+        elevated: "0 12px 32px -12px rgb(16 24 40 / 0.18), 0 2px 6px -2px rgb(16 24 40 / 0.06)",
       },
       keyframes: {
-        blink: { "0%,49%": { opacity: "1" }, "50%,100%": { opacity: "0" } },
-        float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-3px)" } },
+        "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
+        "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
       },
-      animation: {
-        blink: "blink 1s steps(1) infinite",
-        float: "float 2.4s steps(4) infinite",
-      },
+      animation: { "accordion-down": "accordion-down 0.2s ease-out", "accordion-up": "accordion-up 0.2s ease-out" },
     },
   },
-  plugins: [],
+  plugins: [animate],
 };
 
 export default config;

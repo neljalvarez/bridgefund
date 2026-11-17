@@ -2,11 +2,11 @@
 
 **Small gaps. Big futures.**
 
-BridgeFund helps financially disadvantaged students get past the *small* financial barriers that stand between them and life-changing educational opportunities: exam fees, application fees, competition registration, equipment, textbooks, transport to interviews, internship travel, certification fees and internet access.
+Students who qualify for an opportunity are often stopped by something small: an exam fee, a university application fee, a competition registration, a bus ticket or a calculator. BridgeFund finds those barriers and **reduces them before anyone is asked for money**. It checks fee waivers, free alternatives, discounts, equipment the student can borrow, institutional assistance and grants. Only after all of that does it connect the student with verified sponsors, and only for the amount still left.
 
-It is **not** a scholarship directory, a budgeting app, a lender or a generic crowdfunding site. BridgeFund identifies the exact barrier, then finds the cheapest combination of solutions to remove it. It looks for waivers, free alternatives, discounts, borrowable equipment and grants first, and asks sponsors **only for what is left**.
+BridgeFund is not a scholarship directory, a crowdfunding site, a budgeting app or a lender.
 
-> ⚠️ **Competition prototype.** Every student, institution, sponsor, programme, waiver, amount and outcome in this repository is fictional demonstration data. Payments, verification and authentication are simulated, and no real money moves. Final eligibility for any real waiver must be confirmed by the institution that offers it.
+> ⚠️ **Competition prototype.** Every student, institution, sponsor, programme, waiver, amount and outcome in this repository is fictional demonstration data. Sign-in, verification and transactions are simulated, and no real money moves. Final eligibility for any real waiver is always decided by the organisation that offers it.
 
 ---
 
@@ -16,133 +16,124 @@ It is **not** a scholarship directory, a budgeting app, a lender or a generic cr
 git clone https://github.com/neljalvarez/bridgefund.git
 cd bridgefund
 npm install
-npm run dev          # http://localhost:3000
+npm run dev            # → http://localhost:3000
 ```
 
-Other scripts:
-
-| Command | What it does |
+| Script | Purpose |
 | --- | --- |
-| `npm run build` | Production build (all routes prerender) |
+| `npm run dev` | Development server |
+| `npm run build` | Production build (all pages prerender) |
 | `npm start` | Serve the production build |
 | `npm run typecheck` | TypeScript check |
-| `npm test` | Unit tests for BridgeEngine and Smart Allocation (Node ≥ 22.6, uses built-in type stripping) |
+| `npm test` | Unit tests for BridgeEngine and Smart Impact Allocation (Node ≥ 22.6) |
 
-Requirements: Node.js 18.18+ (Node 22 recommended). It needs no API keys, no database and no paid services.
+You need Node.js 18.18 or newer; Node 22 is recommended. The app needs no API keys, database or paid services. Demo data lives in the browser's `localStorage` under `bridgefund-state`.
 
 ## Deploy to Vercel
 
-1. Push this repository to GitHub (already done if you're reading this there).
-2. In Vercel choose **Add New → Project**, import `neljalvarez/bridgefund`.
-3. Keep the defaults: framework **Next.js**, build command `next build`, output auto-detected.
-4. Click **Deploy**. You don't need to set any environment variables.
+1. In Vercel, choose **Add New → Project** and import `neljalvarez/bridgefund`.
+2. Keep the defaults: framework **Next.js**, build command `next build`.
+3. Click **Deploy**. You don't need to set any environment variables.
 
-Or from the CLI: `npx vercel --prod`.
+Or use the CLI: `npx vercel --prod`.
 
-## Judge demo: the 2-minute walkthrough
+## Presenting the competition demo
 
-Open **Judge demo** in the top bar (or go to `/demo`). Each stage has a button that lets the judge perform the action. **Do it for me** performs it automatically, **Next** advances, and the ← → arrow keys also work.
+Click **Launch Interactive Demo** (on the landing page or in the app header), or go to `/demo`. Each scene has a real button that performs the action. **Do it for me** runs the action for you, **Next** moves on, and the ← → keys also work. The top bar has **Restart Demo**, which resets all data to the starting state, and **Exit Demo**.
 
-| Stage | What happens | Role shown |
-| --- | --- | --- |
-| 1. Meet the student | Amina (fictional) has earned a seat on a $180 certification exam. She has saved $70. | Student |
-| 2. Identify the barrier | The Financial Barrier Scanner calculates the **$110** shortfall, the urgency and the line items. | Student |
-| 3. Activate BridgeEngine | Six priorities are checked in order. A **$50** fee waiver is found and the gap falls to **$60**. The reduced request is submitted. | Student |
-| 4. Institutional verification | Amina's school reviews the private details and approves the request. | Institution |
-| 5. Sponsor assistance | The sponsor contributes $60 from a $500 simulated pool. The balance animates to **$440**. | Sponsor |
-| 6. Opportunity unlocked | The last planks of the bridge drop in, the student walks across, and the gap shows **$0**. | Student |
-| 7. Demonstrate impact | The impact receipt shows $180 = $70 student + $50 waiver + $60 sponsor. | Sponsor |
+| # | Scene | What to show | Talking point |
+| --- | --- | --- | --- |
+| 1 | Student problem | Amina, a fictional student, needs **$180** for a certification exam. She has **$70**, which leaves a **$110** gap. | The barrier is small, specific and urgent. |
+| 2 | Financial analysis | Run the **Barrier Scanner**. It shows the total cost, available funds, the shortfall, urgency and expense categories. | “I can't afford it” becomes an exact number. |
+| 3 | BridgeEngine | **Activate BridgeEngine.** Seven priorities animate in order and a **$50 fee waiver** cuts the gap from $110 to **$60**. Open “Why was this recommended?” and submit the request. | Costs are reduced before anyone is asked to fund. Every recommendation explains itself, and savings are marked *estimated*. |
+| 4 | Verification | The institution view. **Review and verify** the request. This confirms the waiver and publishes the $60 need. | The verifier sees the private details. Sponsors never do. |
+| 5 | Funding | The sponsor view. **Contribute $60** and the simulated balance goes from **$500 to $440**. | Contributions can never exceed the remaining gap. |
+| 6 | Opportunity secured | Amina's view shows “**Your opportunity is now fully funded.**” with personal funds $70, fee waiver $50, sponsor $60 and a remaining gap of **$0**. | Every source adds up and nothing is counted twice. |
+| 7 | Impact | The impact receipt. Optionally press **Institution confirms payment** to add the completion date. | Sponsors see exactly what their money did. |
 
-**Restart** resets all demo data, and **Exit demo** returns to the landing page. Every demo action also updates the real student, sponsor and institution dashboards, so judges can leave the walkthrough at any point and explore.
+**Suggested script (about 2 minutes):** spend about 15 seconds on each of scenes 1–2, about 30 seconds on scene 3, and about 15 seconds on each of scenes 4–7. Then use the **role switcher** in the header to show that the student, institution and sponsor dashboards all reflect what you just did.
 
-A **Reset demo** button (↺) in the top bar restores everything to its starting state at any time.
+## Features
 
-## What's inside
-
-### Three roles, switchable instantly
-Use the role switcher in the top bar. No accounts are needed.
-
-- **Student**: Amina, Grade 12, Northfield Community School (fictional)
-- **Sponsor**: Juniper Demo Fund, with a $500 simulated balance
-- **Institution**: Verification desk for a network of 13 fictional partner institutions
+**Three connected roles.** You can switch between Student, Sponsor and Institution at any time, and every action updates all three views. A simulated sign-in at `/signin` lets you pick a demo account. Institutions can switch between 13 fictional institutional accounts, and sponsors between three funding pools.
 
 ### Student
-- **Quest journal** (`/student`): active opportunities, total barriers, amount covered, remaining gap, deadlines, recommended assistance, application status and goal milestones. An animated pixel bridge is the main progress visual, and each plank's colour shows where that part of the money came from.
-- **Financial Barrier Scanner** (`/student/scanner`): six-question wizard with dynamic add/remove expenses that produces a barrier report (total, available, gap, urgency, breakdown).
-- **Opportunity Cost Calculator** (`/student/calculator`): compare up to four opportunities across eight cost categories. It separates confirmed and estimated costs, shows the gap after BridgeEngine, picks the "most accessible" option and exports to CSV.
-- **BridgeEngine** (`/student/engine`): the flagship feature (see below). The plan runs as a step-by-step animation with a "Why was this recommended?" explanation for every match.
-- **Fee Waiver Finder** (`/student/waivers`): search, filters by country, category and type, an eligibility questionnaire, saved waivers, documents and how-to-apply steps.
-- **Resource Rescue** (`/student/resources`): reserve calculators, laptops, lab kits, textbooks and other items. Shows availability, a waitlist and the money saved.
-- **Emergency funding requests** (`/student/requests`): purpose, exact amount, deadline, expense breakdown, a private reason, document placeholders and a verification method. Requests move through Draft → Submitted → Under Review → Verified → Partially Funded → Fully Funded → Completed.
-- **Deadline calendar** (`/student/calendar`): opportunity, funding, saved-waiver and pickup deadlines.
-- **Opportunity Passport** (`/student/passport`): pixel-art achievement stamps for educational progress, never for hardship or the amount of money received.
+- **Dashboard** (`/student`). Shows active opportunities, total required expenses, available funds, remaining gap, potential and confirmed savings, assistance received, deadlines, recommended actions, recent activity and application progress. It also has a breakdown of where each opportunity's funding came from and a timeline of financial assistance.
+- **Financial Barrier Scanner** (`/student/scanner`). A six-step questionnaire covering opportunity type, institution, deadline, expenses (added one by one), funds and existing assistance, and eligibility. It produces a professional barrier report with a live preview from BridgeEngine.
+- **BridgeEngine** (`/student/engine`). An animated, explainable plan with a running financial breakdown (see below).
+- **Assistance requests** (`/student/requests`). Each request has a purpose, exact amount, deadline, breakdown, private explanation, document placeholders and a verifying institution. Requests move through **Draft → Submitted → Under Review → Additional Information Required → Verified → Partially Funded → Fully Funded → Completed**.
+- **Opportunity cost calculator** (`/student/calculator`). Compares up to three opportunities across eight cost categories and shows total cost, available assistance, out-of-pocket cost, remaining gap and an affordability chart.
+- **Fee waiver finder** (`/student/waivers`). Filter by country, opportunity type, education level, eligibility, deadline and estimated savings, and save waivers. A personalised eligibility assessment labels each result *likely*, *check requirements* or *not available*, and never guarantees eligibility.
+- **Resource Rescue** (`/student/resources`). Search and filter by category and location, then reserve an item and track it from Reserved to Collected to Returned. Each item shows how much borrowing saves.
+- **Opportunity tracker** (`/student/tracker`). A calendar view, per-deadline reminders, documents still required, money saved and personal milestones.
 
 ### Sponsor
-- **Verified needs marketplace** (`/sponsor`): filter by category, country, remaining gap, deadline, urgency and institution. Contribute to a specific need or to the shared pool. The marketplace has no popularity rankings.
-- **Smart Impact Allocation** (`/sponsor/allocate`): transparent suggestions ranked by urgency, then the amount needed to complete a request, then existing assistance. Every line can be edited before confirming.
-- **My impact** (`/sponsor/contributions`) and **impact receipts** (`/receipt/[id]`). Receipts can be printed or downloaded as standalone HTML.
+- **Dashboard** (`/sponsor`). Shows total contributions, expenses covered, students supported, completed requests and pending contributions. It includes Recharts charts of impact by category and contribution status, a filterable history, impact receipts and the shared opportunity pool.
+- **Opportunity marketplace** (`/sponsor/marketplace`). Filter by category, financial gap, location, deadline, institution and urgency, and save needs. Each need has its own detail page at `/sponsor/marketplace/[id]`. Needs are **never ranked by popularity**.
+- **Smart impact allocation** (`/sponsor/allocate`). Enter a budget and get recommendations ranked by urgency, then by the ability to fully cover an expense, then by assistance already received. Each recommendation shows its reasoning, and every amount can be edited before confirming. Institutions keep final approval.
+- **Impact receipts** (`/receipt/[id]`). Show the contribution, the expense it covered, an anonymous recipient reference, verification status, completion date, a breakdown and the educational outcome. They can be printed or downloaded as HTML.
 
 ### Institution
-- **Verification desk** (`/institution`): verification queue, approve, decline, request information, assign fee waivers, reserve resources, allocate the institution fund or shared pool, confirm completed assistance, resource inventory and distribution history.
-- **Financial Barrier Heatmap** (`/institution/heatmap`): aggregated analytics only. It covers an expense-type × country heat grid, most frequent categories, average gap before and after BridgeEngine, upcoming deadlines, where assistance came from, unresolved requests and opportunities supported.
+- **Dashboard** (`/institution`). Includes the verification queue, approved assistance, available funds and shared pool, upcoming deadlines, inventory summary, distribution history and unresolved barriers. From here an institution can approve or reject a request, ask for more documentation, verify a need (which confirms the estimated savings), assign fee waivers, reserve equipment, allocate funding and confirm that assistance was completed.
+- **Lending inventory** (`/institution/resources`). Add items, adjust quantities and manage active loans.
+- **Barrier analytics** (`/institution/analytics`). Aggregated charts with date and category filters. Analytics never expose an individual student.
 
-### Everywhere
-Interactive onboarding, functional notifications for each role, global search (`⌘K` / `Ctrl+K` or `/`), filters and sorting, dark mode, optional 8-bit sound effects (off by default and generated with WebAudio, so no audio files are needed), loading and empty states, keyboard navigation with a skip link and focus-trapped dialogs, a responsive mobile menu, and inline form validation.
+### Across the app
+Global search (`⌘K` / `Ctrl+K`), a notification center for each role, deadline reminders, saved items, activity history (`/activity`), profile settings (`/settings`) and dark mode. Pages load with skeleton screens and fade in on navigation. Dialogs trap keyboard focus and there is a skip-to-content link. Layouts are responsive, and **Reset demo** is in the account menu and in settings.
 
-## BridgeEngine: how recommendations are made
+## BridgeEngine
 
-`src/lib/engine.ts` is a **deterministic** rules engine that works against the seeded knowledge base in `src/lib/knowledge.ts`. No AI API is involved. It always runs in this order and stops once the gap reaches $0:
+`src/lib/engine.ts` contains a deterministic rules engine. It runs against the seeded knowledge base in `src/lib/knowledge.ts` and uses no AI API. It always runs in this order and stops early once the gap is closed:
 
-1. **Fee waivers**: match by opportunity category, expense type, country and eligibility profile
-2. **Free alternatives**: keyword match on expense labels (e.g. "transcript" → free digital transcript)
-3. **Discounts and institutional assistance**
-4. **Equipment borrowing**: matched against the live resource inventory, and reserved automatically when the plan is applied
-5. **Grants**: capped by each grant's maximum
-6. **Sponsor funding**: only for the remainder
+1. Fee waivers
+2. Free alternatives
+3. Discounts
+4. Equipment borrowing, checked against the live lending inventory and reserved automatically when a plan is applied
+5. Institutional assistance
+6. Educational grants
+7. Sponsor funding, for the remaining shortfall only
 
-Every finding carries human-readable reasons. Reductions are capped at both the expense amount and the remaining gap, so a plan never over-reduces.
+Every recommendation includes **why it was recommended, eligibility requirements, expected savings, application instructions, required documents, estimated processing time and the relevant deadline**.
 
-`src/lib/allocation.ts` implements Smart Impact Allocation. Both modules are pure functions covered by `tests/engine.test.ts`.
+**Estimated vs. confirmed.** Savings that BridgeEngine finds are labelled *Estimated* until the verifying institution approves the request. At that point they become *Confirmed*. Bars, receipts and breakdowns show the two states differently.
 
-## Privacy and dignity by design
-- Sponsors see the educational goal, the verified amount, the deadline and the potential outcome. **They never see** the reason, documents or household circumstances.
-- Funds are paid by the verifying institution **directly to the provider**. Students never receive cash.
-- Analytics are aggregated, and the heatmap shows counts rather than individual records.
-- Students are never charged, and the platform has no loans, interest or hidden fees.
+**No double counting.** Each source can reduce a given expense line only once. Every reduction is capped at the unpaid amount of its line and at the overall gap. Re-running BridgeEngine replaces earlier estimates rather than adding to them, and contributions can never exceed a request's remaining gap. The tests in `tests/engine.test.ts` check these rules, including the demo case: $180 total, $70 from the student, a $50 waiver, $60 requested.
 
 ## Project structure
 
 ```
 src/
-  app/                      Next.js App Router pages
-    page.tsx                Landing page
-    demo/                   Judge demo mode
-    student/…               Student role pages
-    sponsor/…               Sponsor role pages
-    institution/…           Institution role pages
-    receipt/[id]/           Printable impact receipt
-    business/               Business model
+  app/
+    (marketing)/          Landing page, /business, /signin (top navigation + footer)
+    (app)/                Authenticated-style app with sidebar shell
+      student/ sponsor/ institution/ settings/ activity/ notifications/ receipt/[id]/
+    demo/                 Launch Interactive Demo (7 scenes)
   components/
-    layout/                 Top bar, role switcher, search, notifications, onboarding
-    pixel/                  Pixel sprites and the animated bridge
-    landing/  student/  sponsor/  institution/  demo/
-    ui/                     Window panels, buttons, stats, charts, modal, toasts
+    ui/                   shadcn/ui components (Radix + Tailwind)
+    app/                  Sidebar shell, role switcher, ⌘K search, notification center
+    marketing/            Landing-page sections
+    shared/               Stat cards, status badges, gap breakdown, request breakdown, chart tooltip
+    student/ sponsor/ institution/ demo/
   lib/
-    types.ts                Domain model
-    knowledge.ts            Seeded waivers, alternatives, grants (fictional)
-    seed.ts                 Fictional students, institutions, requests, resources
-    engine.ts               BridgeEngine
-    allocation.ts           Smart Impact Allocation
-    actions.ts              Pure state transitions shared by every role
-    selectors.ts            Derived data (progress, verified needs…)
-    store.tsx               React context + localStorage persistence
-tests/                      Node test runner unit tests
+    types.ts              Domain model
+    knowledge.ts          Seeded waivers, alternatives and grants (fictional)
+    seed.ts               15 fictional students, 13 institutions, 3 sponsor pools, 14 requests, 13 resources
+    engine.ts             BridgeEngine
+    allocation.ts         Smart Impact Allocation
+    actions.ts            Pure state transitions shared by every role
+    selectors.ts          Consistent derived figures (one breakdown used everywhere)
+    store.tsx             React context + localStorage persistence
+tests/                    Node test runner unit tests
 ```
 
-State persists in `localStorage` under `bridgefund-demo-state`. Deadlines are generated relative to the day the demo is seeded, so the walkthrough always has upcoming dates.
+## Tech stack
+Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui (Radix primitives) · Lucide icons · Framer Motion · Recharts · Sonner · cmdk · Geist.
 
-## Tech
-Next.js 15 (App Router) · TypeScript · Tailwind CSS · Framer Motion · Lucide icons · Geist Sans/Mono · Jersey 10 pixel font (SIL Open Font License, self-hosted in `public/fonts`).
+## Principles
+- Students never pay to request essential assistance.
+- The app offers no loans, interest or predatory mechanisms.
+- Money is paid directly to providers, never to students as cash.
+- Sponsors see goals, amounts, deadlines and outcomes, never personal circumstances.
+- All simulated data is clearly labelled. The app makes no claims of real impact, testimonials or partnerships.
 
-## Design language
-The design is a vintage handheld and retro-OS look combined with an editorial fintech layout. It uses warm parchment `#F5F0E1`, forest green `#294C3D`, muted gold `#D8AA55`, terracotta `#C97052`, dark ink `#232824` and soft sage `#BCC9B6`, with thin dark borders, offset shadows, window panels, chunky progress bars and pixel sprites drawn as SVG.
+The previous vintage-styled prototype is preserved on the `vintage-prototype` branch.

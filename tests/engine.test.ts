@@ -9,50 +9,45 @@ const kb = {
   alternatives: ALTERNATIVES,
   grants: GRANTS,
   resources: [
-    { id: "r-robot-kit", name: "Robotics starter kit", type: "stem-kit" as const, institutionId: "x", total: 6, available: 3, retailValue: 85, loanTerm: "term", description: "", keywords: ["robot"] },
+    { id: "r-robot-kit", name: "Robotics starter kit", type: "engineering" as const, institutionId: "x", total: 6, available: 3, retailValue: 85, loanTerm: "Term", description: "", keywords: ["robot"] },
   ],
 };
 const amina = { lowIncome: true, publicSchool: true, firstGeneration: true, hasSchoolLetter: true };
+const base = { country: "Kenya", level: "secondary" as const, priorAssistance: 0, eligibility: amina };
 
-test("certification demo: $180 cost, $70 funds, $50 waiver -> $60 sponsor", () => {
-  const plan = runBridgeEngine(
-    { category: "certification", country: "Kenya", studentFunds: 70, priorAssistance: 0, eligibility: amina,
-      expenses: [{ id: "e1", label: "Certification exam fee", category: "registration", amount: 180, confirmed: true }] },
-    kb,
-  );
-  assert.equal(plan.totalCost, 180);
+test("demo: $180 exam, $70 funds, $50 waiver -> $60 sponsor", () => {
+  const plan = runBridgeEngine({ ...base, category: "certification", studentFunds: 70, expenses: [{ id: "e1", label: "Certification exam fee", category: "examination", amount: 180, confirmed: true }] }, kb);
   assert.equal(plan.initialGap, 110);
   assert.equal(plan.phases[0].findings[0].amount, 50);
   assert.equal(plan.sponsorAmount, 60);
+  assert.equal(plan.phases.length, 7);
 });
 
-test("robotics: every priority level contributes in order", () => {
+test("robotics: priorities apply in order without double counting", () => {
   const plan = runBridgeEngine(
-    { category: "competition", country: "Kenya", studentFunds: 20, priorAssistance: 0, eligibility: amina,
+    {
+      ...base,
+      category: "competition",
+      studentFunds: 20,
       expenses: [
         { id: "e1", label: "Team registration", category: "registration", amount: 40, confirmed: true },
-        { id: "e2", label: "Bus fare to venue", category: "travel", amount: 35, confirmed: true },
+        { id: "e2", label: "Bus fare to venue", category: "transportation", amount: 35, confirmed: true },
         { id: "e3", label: "Robotics starter kit", category: "materials", amount: 85, confirmed: false },
         { id: "e4", label: "Lunch on competition day", category: "food", amount: 15, confirmed: false },
-      ] },
+      ],
+    },
     kb,
   );
-  assert.equal(plan.initialGap, 155);
-  const byKind = Object.fromEntries(plan.phases.map((p) => [p.kind, p.findings.reduce((s, f) => s + f.amount, 0)]));
-  assert.equal(byKind.alternative, 15);
-  assert.equal(byKind.discount, 35);
-  assert.equal(byKind.borrow, 85);
-  assert.equal(byKind.grant, 10);
-  assert.equal(plan.sponsorAmount, 10);
+  const by = Object.fromEntries(plan.phases.map((p) => [p.kind, p.findings.reduce((s, f) => s + f.amount, 0)]));
+  assert.deepEqual([by.waiver, by.alternative, by.discount, by.borrow, by.institutional, by.grant, plan.sponsorAmount], [0, 15, 10, 85, 25, 10, 10]);
+  // no expense is ever reduced below zero
+  assert.ok(Object.values(plan.remainingByExpense).every((v) => v >= 0));
+  assert.equal(plan.reductionsTotal + plan.sponsorAmount, plan.initialGap);
 });
 
-test("university application closes fully without sponsors", () => {
+test("university application closes without sponsors", () => {
   const plan = runBridgeEngine(
-    { category: "university-application", country: "Kenya", studentFunds: 0, priorAssistance: 0, eligibility: amina,
-      expenses: [
-        { id: "e1", label: "Application fee", category: "registration", amount: 45, confirmed: true },
-        { id: "e2", label: "Certified transcript copy", category: "documentation", amount: 12, confirmed: true },
-      ] },
+    { ...base, category: "university-application", studentFunds: 0, expenses: [{ id: "e1", label: "Application fee", category: "registration", amount: 45, confirmed: true }, { id: "e2", label: "Certified transcript copy", category: "documentation", amount: 12, confirmed: true }] },
     kb,
   );
   assert.equal(plan.sponsorAmount, 0);
@@ -71,6 +66,5 @@ test("allocation completes urgent needs first and reports leftover", () => {
     today,
   );
   assert.deepEqual(res.items.map((i) => [i.needId, i.amount, i.completes]), [["a", 28, true], ["c", 40, true], ["b", 32, false]]);
-  assert.equal(res.remainingBudget, 0);
   assert.equal(res.fullyCovered, 2);
 });

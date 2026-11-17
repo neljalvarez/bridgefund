@@ -1,129 +1,149 @@
 "use client";
 
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, CheckCircle2, Clock } from "lucide-react";
 import type { AppState, Contribution } from "@/lib/types";
-import { institutionOf, oppOf, studentOf } from "@/lib/selectors";
 import { remainingOf } from "@/lib/actions";
+import { institutionOf, oppOf } from "@/lib/selectors";
 import { fmtDateLong, usd } from "@/lib/format";
-import { LogoMark } from "@/components/layout/Logo";
+import { Card } from "@/components/ui/card";
+import { LogoMark } from "@/components/shared/Logo";
+
+const anonRef = (requestId: string) => {
+  let h = 0;
+  for (const ch of requestId) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return `STU-${h.toString(36).toUpperCase().slice(0, 5).padStart(5, "0")}`;
+};
 
 export function receiptData(state: AppState, c: Contribution) {
   const r = state.requests.find((x) => x.id === c.requestId)!;
   const opp = oppOf(state, r.opportunityId);
-  const st = studentOf(state, r.studentId);
-  const inst = institutionOf(state, st?.institutionId ?? "");
-  const others = state.contributions.filter((x) => x.requestId === r.id && x.id !== c.id);
-  const number = `IR-${r.ref.replace("BF-", "")}-${c.id.slice(-4).toUpperCase()}`;
-  const status = r.status === "Completed" ? "Completed — paid to provider" : r.status === "Fully Funded" ? "Fully funded — awaiting provider payment confirmation" : `${r.status} — ${usd(remainingOf(r))} still needed`;
-  const lines = [
-    { label: "Total educational cost", amount: r.totalCost, kind: "total" as const },
-    { label: "Student's own contribution", amount: -r.studentFunds, kind: "minus" as const },
-    ...r.reductions.map((x) => ({ label: x.title, amount: -x.amount, kind: "minus" as const })),
-    ...others.map((x) => ({ label: `Other support · ${x.sponsorName}`, amount: -x.amount, kind: "minus" as const })),
-    { label: `This contribution · ${c.sponsorName}`, amount: -c.amount, kind: "this" as const },
+  const inst = institutionOf(state, r.institutionId);
+  const completedAt = r.status === "Completed" ? r.history.findLast((h) => h.status === "Completed")?.at : undefined;
+  const verifiedAt = r.history.find((h) => h.status === "Verified")?.at;
+  const lines: { label: string; amount: number; kind: "total" | "minus" | "this" }[] = [
+    { label: "Total educational cost", amount: r.totalCost, kind: "total" },
+    { label: "Student's personal funds", amount: r.studentFunds, kind: "minus" },
+    ...r.reductions.map((x) => ({ label: `${x.title}${x.confirmed ? "" : " (estimated)"}`, amount: x.amount, kind: "minus" as const })),
+    ...state.contributions.filter((x) => x.requestId === r.id && x.id !== c.id).map((x) => ({ label: `Other assistance · ${x.sourceLabel}`, amount: x.amount, kind: "minus" as const })),
+    { label: `This contribution · ${c.sourceLabel}`, amount: c.amount, kind: "this" },
   ];
-  return { r, opp, st, inst, number, status, lines, remaining: remainingOf(r) };
+  return {
+    r,
+    opp,
+    inst,
+    number: `IR-${r.ref.replace("BF-", "")}-${c.id.slice(-4).toUpperCase()}`,
+    anon: `${r.ref} · ${anonRef(r.id)}`,
+    completedAt,
+    verifiedAt,
+    lines,
+    remaining: remainingOf(r),
+  };
 }
 
 export function ImpactReceipt({ state, contribution: c }: { state: AppState; contribution: Contribution }) {
   const d = receiptData(state, c);
   return (
-    <article className="panel mx-auto max-w-2xl bg-surface print:shadow-none" aria-label="Impact receipt">
-      <header className="flex items-start justify-between gap-4 border-b-2 border-line p-5">
+    <Card className="mx-auto max-w-2xl overflow-hidden print:border-0 print:shadow-none">
+      <div className="flex items-start justify-between gap-4 border-b p-6">
         <div className="flex items-center gap-3">
-          <LogoMark size={36} />
+          <LogoMark className="h-9 w-9" />
           <div>
-            <p className="font-pixel text-xl leading-none">BridgeFund</p>
-            <p className="text-xs text-muted">Digital impact receipt</p>
+            <p className="text-lg font-semibold tracking-tight">BridgeFund</p>
+            <p className="text-xs text-muted-foreground">Digital impact receipt</p>
           </div>
         </div>
-        <div className="text-right text-xs">
-          <p className="font-mono">{d.number}</p>
-          <p className="text-muted">{fmtDateLong(c.at)}</p>
-        </div>
-      </header>
-
-      <div className="grid gap-4 border-b-2 border-dashed border-line/40 p-5 sm:grid-cols-[1fr_auto]">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">Educational expense covered</p>
-          <p className="font-pixel text-2xl leading-tight">{d.r.purpose}</p>
-          <p className="mt-1 text-sm text-muted">{d.r.expenses.map((e) => e.label).join(" · ")}</p>
-        </div>
-        <div className="text-right">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">Amount contributed</p>
-          <p className="font-pixel text-4xl text-forest">{usd(c.amount)}</p>
+        <div className="text-right text-xs text-muted-foreground">
+          <p className="font-mono text-foreground">{d.number}</p>
+          <p>Issued {fmtDateLong(c.at)}</p>
         </div>
       </div>
 
-      <dl className="grid gap-4 p-5 text-sm sm:grid-cols-2">
+      <div className="grid gap-6 p-6 sm:grid-cols-[1fr_auto]">
         <div>
-          <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">Verified recipient reference</dt>
-          <dd className="flex items-center gap-1.5 font-mono">
-            <BadgeCheck size={14} className="text-forest" /> {d.r.ref}-{d.st?.initials}
+          <p className="text-xs text-muted-foreground">Educational expense covered</p>
+          <p className="mt-1 text-xl font-semibold tracking-tight">{d.r.purpose}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{d.r.expenses.map((e) => e.label).join(" · ")}</p>
+        </div>
+        <div className="sm:text-right">
+          <p className="text-xs text-muted-foreground">Contribution amount</p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight text-primary tabular">{usd(c.amount)}</p>
+        </div>
+      </div>
+
+      <dl className="grid gap-5 border-t p-6 text-sm sm:grid-cols-2">
+        <div>
+          <dt className="text-xs text-muted-foreground">Anonymous recipient reference</dt>
+          <dd className="mt-1 font-mono">{d.anon}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Verification status</dt>
+          <dd className="mt-1 flex items-center gap-1.5">
+            <BadgeCheck className="h-4 w-4 text-primary" /> Verified by {d.inst?.name}
+            {d.verifiedAt && <span className="text-muted-foreground">· {fmtDateLong(d.verifiedAt)}</span>}
           </dd>
-          <dd className="text-xs text-muted">Verified by {d.inst?.name}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">Completion status</dt>
-          <dd className="font-semibold">{d.status}</dd>
+          <dt className="text-xs text-muted-foreground">Completion date</dt>
+          <dd className="mt-1 flex items-center gap-1.5">
+            {d.completedAt ? (
+              <>
+                <CheckCircle2 className="h-4 w-4 text-primary" /> {fmtDateLong(d.completedAt)}
+              </>
+            ) : (
+              <>
+                <Clock className="h-4 w-4 text-warning" /> {d.r.status === "Fully Funded" ? "Awaiting payment to provider" : `${d.r.status} — ${usd(d.remaining)} still needed`}
+              </>
+            )}
+          </dd>
         </div>
         <div>
-          <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">Educational outcome</dt>
-          <dd>{d.opp?.outcome ?? d.r.purpose}</dd>
-        </div>
-        <div>
-          <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">Date of assistance</dt>
-          <dd>{fmtDateLong(c.at)}</dd>
+          <dt className="text-xs text-muted-foreground">Educational outcome</dt>
+          <dd className="mt-1">{d.opp?.outcome ?? d.r.purpose}</dd>
         </div>
       </dl>
 
-      <div className="border-t-2 border-line p-5">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">Breakdown of funds</p>
+      <div className="border-t p-6">
+        <p className="mb-3 text-xs text-muted-foreground">Breakdown of assistance</p>
         <table className="w-full text-sm">
           <tbody>
             {d.lines.map((l, i) => (
-              <tr key={i} className={`border-b border-line/15 ${l.kind === "this" ? "bg-gold/25 font-semibold" : ""}`}>
-                <td className="px-1 py-1.5">{l.label}</td>
-                <td className={`px-1 py-1.5 text-right font-mono ${l.kind === "total" ? "font-semibold" : ""}`}>{l.kind === "total" ? usd(l.amount) : `−${usd(-l.amount)}`}</td>
+              <tr key={i} className={l.kind === "this" ? "bg-primary-light/60 font-medium" : "border-b"}>
+                <td className="px-2 py-2">{l.label}</td>
+                <td className="px-2 py-2 text-right tabular">{l.kind === "total" ? usd(l.amount) : `−${usd(l.amount)}`}</td>
               </tr>
             ))}
             <tr>
-              <td className="px-1 py-2 font-semibold">Remaining financial gap</td>
-              <td className="px-1 py-2 text-right font-pixel text-xl">{usd(d.remaining)}</td>
+              <td className="px-2 pt-3 font-semibold">Remaining financial gap</td>
+              <td className="px-2 pt-3 text-right text-lg font-semibold tabular">{usd(d.remaining)}</td>
             </tr>
           </tbody>
         </table>
-        <p className="mt-3 text-xs text-muted">Funds are paid by the verifying institution directly to the provider. No cash is transferred to students.</p>
+        <p className="mt-4 text-xs text-muted-foreground">Funds are paid by the verifying institution directly to the provider. No cash is transferred to students.</p>
       </div>
-
-      <footer className="border-t-2 border-line bg-raised/50 px-5 py-3 text-[11px] text-muted">
-        Demonstration receipt generated by a competition prototype. All people, institutions and amounts are fictional. Not a tax document.
-      </footer>
-    </article>
+      <div className="border-t bg-muted/40 px-6 py-3 text-[11px] text-muted-foreground">Demonstration receipt from a competition prototype. All people, institutions and amounts are fictional; no real money was transferred. Not a tax document.</div>
+    </Card>
   );
 }
 
 export function receiptHtml(state: AppState, c: Contribution) {
   const d = receiptData(state, c);
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
-  const rows = d.lines
-    .map((l) => `<tr${l.kind === "this" ? ' class="this"' : ""}><td>${esc(l.label)}</td><td class="r">${l.kind === "total" ? usd(l.amount) : "−" + usd(-l.amount)}</td></tr>`)
-    .join("");
+  const rows = d.lines.map((l) => `<tr${l.kind === "this" ? ' class="this"' : ""}><td>${esc(l.label)}</td><td class="r">${l.kind === "total" ? usd(l.amount) : "−" + usd(l.amount)}</td></tr>`).join("");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>BridgeFund impact receipt ${d.number}</title><style>
-body{font-family:system-ui,sans-serif;background:#F5F0E1;color:#232824;padding:32px}
-.card{max-width:640px;margin:auto;background:#FBF8EF;border:2px solid #232824;box-shadow:4px 4px 0 #232824;padding:24px}
-h1{font-size:20px;margin:0}small,.m{color:#5C635A}.big{font-size:32px;color:#294C3D;font-weight:700}
-table{width:100%;border-collapse:collapse;margin-top:12px}td{padding:6px 4px;border-bottom:1px solid #ddd}.r{text-align:right;font-family:monospace}.this{background:#f1e2c0;font-weight:600}
-dl{display:grid;grid-template-columns:1fr 1fr;gap:12px}dt{font-size:11px;text-transform:uppercase;color:#5C635A}dd{margin:0}
-</style></head><body><div class="card">
-<h1>BridgeFund — Digital impact receipt</h1><small>${d.number} · ${fmtDateLong(c.at)}</small>
+body{font-family:Inter,system-ui,sans-serif;background:#F8FAFC;color:#101828;padding:40px}
+.c{max-width:640px;margin:auto;background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:28px}
+.m{color:#667085;font-size:12px}h1{font-size:18px;margin:0}h2{font-size:20px;margin:4px 0}.big{font-size:30px;font-weight:600;color:#126B54}
+dl{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}dt{font-size:12px;color:#667085}dd{margin:4px 0 0}
+table{width:100%;border-collapse:collapse}td{padding:8px 6px;border-bottom:1px solid #E4E7EC;font-size:14px}.r{text-align:right}.this{background:#E7F4EF;font-weight:600}
+</style></head><body><div class="c">
+<h1>BridgeFund — Digital impact receipt</h1><p class="m">${d.number} · issued ${fmtDateLong(c.at)}</p>
 <p class="m">Educational expense covered</p><h2>${esc(d.r.purpose)}</h2>
-<p class="m">Amount contributed</p><div class="big">${usd(c.amount)}</div>
-<dl><div><dt>Verified recipient reference</dt><dd>${d.r.ref}-${d.st?.initials ?? ""} (verified by ${esc(d.inst?.name ?? "")})</dd></div>
-<div><dt>Completion status</dt><dd>${esc(d.status)}</dd></div>
-<div><dt>Educational outcome</dt><dd>${esc(d.opp?.outcome ?? d.r.purpose)}</dd></div>
-<div><dt>Date of assistance</dt><dd>${fmtDateLong(c.at)}</dd></div></dl>
+<p class="m">Contribution amount</p><div class="big">${usd(c.amount)}</div>
+<dl><div><dt>Anonymous recipient reference</dt><dd>${d.anon}</dd></div>
+<div><dt>Verification status</dt><dd>Verified by ${esc(d.inst?.name ?? "")}</dd></div>
+<div><dt>Completion date</dt><dd>${d.completedAt ? fmtDateLong(d.completedAt) : "Awaiting payment to provider"}</dd></div>
+<div><dt>Educational outcome</dt><dd>${esc(d.opp?.outcome ?? d.r.purpose)}</dd></div></dl>
 <table>${rows}<tr><td><b>Remaining financial gap</b></td><td class="r"><b>${usd(d.remaining)}</b></td></tr></table>
-<p class="m" style="font-size:11px;margin-top:16px">Demonstration receipt generated by a competition prototype. All people, institutions and amounts are fictional. Not a tax document.</p>
+<p class="m" style="margin-top:20px">Demonstration receipt from a competition prototype. All people, institutions and amounts are fictional; no real money was transferred. Not a tax document.</p>
 </div></body></html>`;
 }
