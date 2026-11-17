@@ -8,7 +8,7 @@ import type { Resource, ResourceType } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { reserveResource, updateReservation } from "@/lib/actions";
 import { institutionOf } from "@/lib/selectors";
-import { RESOURCE_LABEL, fmtDate, isoDaysFromNow, sum, usd } from "@/lib/format";
+import { RESOURCE_LABEL, fmtDate, isoDaysFromNow, sum, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,11 +34,11 @@ function Rescue() {
   const mine = state.reservations.filter((r) => r.studentId === state.currentStudentId);
   const value = (id: string) => state.resources.find((x) => x.id === id)?.retailValue ?? 0;
   const saved = sum(mine.filter((r) => r.status !== "Cancelled").map((r) => value(r.resourceId)));
-  const locations = [...new Set(state.resources.map((r) => institutionOf(state, r.institutionId)?.country ?? ""))].sort();
+  const locations = [...new Set(state.resources.map((r) => institutionOf(state, r.institutionId)?.city ?? ""))].sort();
   const list = state.resources.filter((r) => {
     const inst = institutionOf(state, r.institutionId);
     if (type !== "all" && r.type !== type) return false;
-    if (loc !== "all" && inst?.country !== loc) return false;
+    if (loc !== "all" && inst?.city !== loc) return false;
     if (q && !`${r.name} ${r.description} ${inst?.name} ${inst?.city}`.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
   });
@@ -56,8 +56,8 @@ function Rescue() {
           <Label htmlFor="rq" className="text-xs text-muted-foreground">
             Search
           </Label>
-          <Search className="pointer-events-none absolute bottom-2.5 left-3 h-4 w-4 text-muted-foreground" />
-          <Input id="rq" className="mt-1.5 pl-9" placeholder="Calculator, laptop, microscope…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Search className="pointer-events-none absolute bottom-2.5 start-3 h-4 w-4 text-muted-foreground" />
+          <Input id="rq" className="mt-1.5 ps-9" placeholder="Calculator, laptop, microscope…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <div className="md:w-56">
           <Label className="text-xs text-muted-foreground">Category</Label>
@@ -119,7 +119,7 @@ function Rescue() {
                     <span>
                       <strong className="tabular">{r.available}</strong> of {r.total} available · {r.loanTerm}
                     </span>
-                    <span className="font-medium text-primary">Saves {usd(r.retailValue)}</span>
+                    <span className="font-medium text-primary">Saves {aed(r.retailValue)}</span>
                   </div>
                   <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary">
                     <div className={cn("h-full", r.available ? "bg-primary" : "bg-warning")} style={{ width: `${(r.available / r.total) * 100}%` }} />
@@ -155,7 +155,7 @@ function Rescue() {
                     ))}
                   </ol>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs text-primary">{rv.status !== "Cancelled" ? `Saved ${usd(res?.retailValue ?? 0)}` : "Cancelled"}</span>
+                    <span className="text-xs text-primary">{rv.status !== "Cancelled" ? `Saved ${aed(res?.retailValue ?? 0)}` : "Cancelled"}</span>
                     <span className="flex gap-1">
                       {rv.status === "Reserved" && (
                         <>
@@ -194,7 +194,7 @@ function Rescue() {
             <Input id="pickup" type="date" className="mt-1.5" min={isoDaysFromNow(0).slice(0, 10)} value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
           <p className="flex items-center gap-2 rounded-lg bg-primary-light/60 p-3 text-sm">
-            <CheckCircle2 className="h-4 w-4 text-primary" /> Estimated saving vs. buying new: <strong>{usd(reserving?.retailValue ?? 0)}</strong>
+            <CheckCircle2 className="h-4 w-4 text-primary" /> Estimated saving vs. buying new: <strong>{aed(reserving?.retailValue ?? 0)}</strong>
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setReserving(null)}>
@@ -203,7 +203,7 @@ function Rescue() {
             <Button
               onClick={() => {
                 if (!reserving) return;
-                dispatch(reserveResource(reserving.id, state.currentStudentId, new Date(`${date}T12:00:00`).toISOString()), { success: "Reserved", description: `You saved about ${usd(reserving.retailValue)} by borrowing.` });
+                dispatch(reserveResource(reserving.id, state.currentStudentId, new Date(`${date}T12:00:00`).toISOString()), { success: "Reserved", description: `You saved about ${aed(reserving.retailValue)} by borrowing.` });
                 setReserving(null);
               }}
             >

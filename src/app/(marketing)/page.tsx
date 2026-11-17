@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, Check, HandCoins, ScanSearch, Scissors } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { HandCoins, ScanSearch, Scissors } from "lucide-react";
 import { DemoBadge } from "@/components/shared/kit";
 import { HeroPreview } from "@/components/marketing/HeroPreview";
+import { Hero } from "@/components/marketing/Hero";
 import { GapDemo } from "@/components/marketing/GapDemo";
 
 const STEPS = [
@@ -17,26 +17,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden">
         <div className="bg-grid absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" aria-hidden />
         <div className="container grid items-center gap-12 py-16 md:py-28 lg:grid-cols-[1.1fr_1fr]">
-          <div>
-            <h1 className="text-[2.6rem] font-semibold leading-[1.05] tracking-tight sm:text-6xl">
-              Small costs shouldn&apos;t stop <span className="text-primary">big futures.</span>
-            </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">BridgeFund cuts the cost of an exam, application or trip first — then sponsors cover only what&apos;s left.</p>
-            <div className="mt-8">
-              <Button asChild size="lg">
-                <Link href="/demo">
-                  See how it works <ArrowRight />
-                </Link>
-              </Button>
-            </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              {["Free for students", "No loans", "Verified by schools"].map((x) => (
-                <li key={x} className="flex items-center gap-1.5">
-                  <Check className="h-4 w-4 text-primary" /> {x}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <Hero />
           <HeroPreview />
         </div>
       </section>
@@ -73,12 +54,12 @@ export default function LandingPage() {
 
       <section id="impact" className="scroll-mt-20 border-t py-20 md:py-24">
         <div className="container">
-          <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">Every sponsor dollar goes further</h2>
+          <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">Every sponsor dirham goes further</h2>
           <dl className="mx-auto mt-14 grid max-w-4xl gap-10 text-center sm:grid-cols-3">
             {[
-              { v: "$60", l: "asked, not $110", s: "for Amina's exam" },
-              { v: "1.83x", l: "impact multiplier", s: "barriers resolved per sponsor dollar" },
-              { v: "2x", l: "more students", s: "from the same $500 budget" },
+              { v: "AED 150", l: "asked, not AED 450", s: "for Mariam's STEM competition" },
+              { v: "3.00x", l: "impact multiplier", s: "barriers resolved per sponsor dirham" },
+              { v: "3x", l: "more students", s: "from the same AED 1,000 budget" },
             ].map((x) => (
               <div key={x.l}>
                 <dt className="sr-only">{x.l}</dt>

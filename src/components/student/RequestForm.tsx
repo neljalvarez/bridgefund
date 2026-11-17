@@ -6,7 +6,7 @@ import type { Expense } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { createRequest } from "@/lib/actions";
 import { currentStudent } from "@/lib/selectors";
-import { daysUntil, usd } from "@/lib/format";
+import { daysUntil, aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +47,7 @@ export function RequestForm({ open, onOpenChange }: { open: boolean; onOpenChang
     const amt = Number(amount);
     if (!purpose.trim()) e.purpose = "Describe the educational purpose.";
     if (!(amt > 0)) e.amount = "Enter the exact amount required.";
-    else if (total > 0 && amt > total) e.amount = `Can't exceed your expense total of ${usd(total)}.`;
+    else if (total > 0 && amt > total) e.amount = `Can't exceed your expense total of ${aed(total)}.`;
     if (!deadline) e.deadline = "Add the deadline.";
     else if (daysUntil(new Date(`${deadline}T12:00:00`).toISOString()) < 0) e.deadline = "That deadline has passed.";
     if (!expenses.length || expenses.some((x) => !x.label.trim() || !(x.amount > 0))) e.expenses = "List each expense with a description and amount.";
@@ -106,7 +106,7 @@ export function RequestForm({ open, onOpenChange }: { open: boolean; onOpenChang
               <FieldError>{errors.purpose}</FieldError>
             </div>
             <div>
-              <Label htmlFor="rf-amount">Exact amount (USD)</Label>
+              <Label htmlFor="rf-amount">Exact amount (AED)</Label>
               <Input id="rf-amount" className="mt-1.5 tabular" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={!!errors.amount} />
               <FieldError>{errors.amount}</FieldError>
             </div>
@@ -117,7 +117,7 @@ export function RequestForm({ open, onOpenChange }: { open: boolean; onOpenChang
             </div>
           </div>
           <div>
-            <p className="mb-1.5 text-sm font-medium">Financial breakdown {total > 0 && <span className="font-normal text-muted-foreground">· total {usd(total)}</span>}</p>
+            <p className="mb-1.5 text-sm font-medium">Financial breakdown {total > 0 && <span className="font-normal text-muted-foreground">· total {aed(total)}</span>}</p>
             <ExpenseEditor expenses={expenses} onChange={setExpenses} idPrefix="rf" />
             <FieldError>{errors.expenses}</FieldError>
           </div>

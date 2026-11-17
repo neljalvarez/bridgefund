@@ -9,7 +9,7 @@ import { saveScenarios } from "@/lib/actions";
 import { currentStudent } from "@/lib/selectors";
 import { runBridgeEngine } from "@/lib/engine";
 import { ALTERNATIVES, GRANTS, WAIVERS } from "@/lib/knowledge";
-import { EXPENSE_LABEL, OPP_CATEGORIES, OPP_LABEL, uid, usd } from "@/lib/format";
+import { EXPENSE_LABEL, OPP_CATEGORIES, OPP_LABEL, uid, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,7 @@ export default function CalculatorPage() {
           {
             category: s.category,
             country: student.country,
+            emirate: student.emirate,
             level: student.level,
             studentFunds: s.funds,
             priorAssistance: 0,
@@ -81,7 +82,7 @@ export default function CalculatorPage() {
             <Button variant="outline" onClick={() => setScenarios(fromJournal())}>
               <Copy /> Load my opportunities
             </Button>
-            <Button disabled={scenarios.length >= 3} onClick={() => setScenarios([...scenarios, { id: uid("sc"), name: `Opportunity ${scenarios.length + 1}`, category: "examination", funds: 0, lines: {} }])}>
+            <Button disabled={scenarios.length >= 3} onClick={() => setScenarios([...scenarios, { id: uid("sc"), name: `Opportunity ${scenarios.length + 1}`, category: "stem-competition", funds: 0, lines: {} }])}>
               <Plus /> Add opportunity
             </Button>
           </>
@@ -126,11 +127,11 @@ export default function CalculatorPage() {
                   <label key={c} className="flex items-center justify-between gap-3 text-sm">
                     <span className="text-muted-foreground">{EXPENSE_LABEL[c]}</span>
                     <span className="relative w-28">
-                      <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                      <span className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">AED</span>
                       <Input
                         aria-label={`${EXPENSE_LABEL[c]} for ${s.name}`}
                         inputMode="decimal"
-                        className="h-8 pl-5 text-right tabular"
+                        className="h-8 ps-10 text-end tabular"
                         value={s.lines[c] || ""}
                         placeholder="0"
                         onChange={(e) => update(s.id, (x) => ({ ...x, lines: { ...x.lines, [c]: Number(e.target.value.replace(/[^\d.]/g, "")) || 0 } }))}
@@ -141,26 +142,26 @@ export default function CalculatorPage() {
                 <label className="flex items-center justify-between gap-3 border-t pt-3 text-sm font-medium">
                   Your available funds
                   <span className="relative w-28">
-                    <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                    <Input aria-label={`Available funds for ${s.name}`} inputMode="decimal" className="h-8 pl-5 text-right tabular" value={s.funds || ""} placeholder="0" onChange={(e) => update(s.id, (x) => ({ ...x, funds: Number(e.target.value.replace(/[^\d.]/g, "")) || 0 }))} />
+                    <span className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">AED</span>
+                    <Input aria-label={`Available funds for ${s.name}`} inputMode="decimal" className="h-8 ps-10 text-end tabular" value={s.funds || ""} placeholder="0" onChange={(e) => update(s.id, (x) => ({ ...x, funds: Number(e.target.value.replace(/[^\d.]/g, "")) || 0 }))} />
                   </span>
                 </label>
                 <dl className="mt-3 space-y-1.5 rounded-lg bg-muted/50 p-3 text-sm">
                   <div className="flex justify-between">
                     <dt>Total cost</dt>
-                    <dd className="font-semibold tabular">{usd(r.total)}</dd>
+                    <dd className="font-semibold tabular">{aed(r.total)}</dd>
                   </div>
                   <div className="flex justify-between text-primary">
                     <dt>Available assistance (est.)</dt>
-                    <dd className="tabular">−{usd(r.assistance)}</dd>
+                    <dd className="tabular">−{aed(r.assistance)}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt>Out-of-pocket</dt>
-                    <dd className="tabular">{usd(r.outOfPocket)}</dd>
+                    <dd className="tabular">{aed(r.outOfPocket)}</dd>
                   </div>
                   <div className="flex justify-between border-t pt-1.5 font-semibold">
                     <dt>Remaining funding gap</dt>
-                    <dd className="tabular">{usd(r.gap)}</dd>
+                    <dd className="tabular">{aed(r.gap)}</dd>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <dt>Affordability</dt>

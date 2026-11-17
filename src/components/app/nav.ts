@@ -40,7 +40,7 @@ export const ROLE_NAV: Record<Role, { section: (typeof SECTIONS)[number]; items:
       section: "Find Assistance",
       items: [
         { href: "/student/engine", label: "Get assistance", icon: Sparkles, description: "BridgeEngine: from costs to a funded request" },
-        { href: "/student/waivers", label: "Fee waivers", icon: Ticket, description: "Waivers and discounts you may qualify for" },
+        { href: "/student/waivers", label: "Opportunities", icon: Ticket, description: "UAE competitions, internships and cost help" },
       ],
     },
     { section: "My Opportunities", items: [{ href: "/student/requests", label: "My requests", icon: FileText, description: "Track every request" }] },
@@ -88,7 +88,7 @@ export const ACCOUNT_NAV: NavItem[] = [
 ];
 
 export const ROLE_META: Record<Role, { label: string; persona: string; home: string; icon: LucideIcon; description: string }> = {
-  student: { label: "Student", persona: "Amina Y.", home: "/student", icon: GraduationCap, description: "Identify barriers and request assistance" },
-  sponsor: { label: "Sponsor", persona: "Juniper Demo Fund", home: "/sponsor", icon: HandCoins, description: "Fund verified educational needs" },
+  student: { label: "Student", persona: "Mariam A.", home: "/student", icon: GraduationCap, description: "Identify barriers and request assistance" },
+  sponsor: { label: "Sponsor", persona: "Ghaf Community Fund", home: "/sponsor", icon: HandCoins, description: "Fund verified educational needs" },
   institution: { label: "Institution", persona: "Verification team", home: "/institution", icon: Building2, description: "Verify requests and allocate assistance" },
 };

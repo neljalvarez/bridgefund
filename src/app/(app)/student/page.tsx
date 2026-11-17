@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Plus } from "lucide-react";
-import { useStore } from "@/lib/store";
+import { useStore, useT } from "@/lib/store";
 import { currentStudent, studentOverview } from "@/lib/selectors";
 import { assessDeadline, RISK_ORDER } from "@/lib/deadline";
-import { fmtDate, fmtDateTime, relDays, timeAgo, usd } from "@/lib/format";
+import { fmtDate, fmtDateTime, relDays, timeAgo, aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, StatCard, StatusBadge } from "@/components/shared/kit";
@@ -14,6 +14,7 @@ import { DeadlineRiskPanel, RiskBadge } from "@/components/shared/DeadlineRisk";
 
 export default function StudentDashboard() {
   const { state } = useStore();
+  const tr = useT();
   const student = currentStudent(state);
   const ov = studentOverview(state);
   const active = [...ov.active].sort((a, b) => a.opp.deadline.localeCompare(b.opp.deadline));
@@ -28,7 +29,7 @@ export default function StudentDashboard() {
   const action = info
     ? { title: `Send the documents your school asked for`, text: `${info.ref} · ${info.purpose}`, href: "/student/requests", cta: "Respond" }
     : unplanned
-      ? { title: `Close the ${usd(unplanned.remaining)} gap for ${unplanned.opp.title}`, text: "BridgeEngine finds savings before asking anyone for money.", href: `/student/engine?opp=${unplanned.opp.id}`, cta: "Get assistance" }
+      ? { title: `Close the ${aed(unplanned.remaining)} gap for ${unplanned.opp.title}`, text: "BridgeEngine finds savings before asking anyone for money.", href: `/student/engine?opp=${unplanned.opp.id}`, cta: "Get assistance" }
       : draft
         ? { title: `Submit your draft request`, text: `${draft.ref} · ${draft.purpose}`, href: `/student/engine?opp=${draft.opportunityId}`, cta: "Review and submit" }
         : { title: "Track your requests", text: "We'll notify you when anything changes.", href: "/student/requests", cta: "View requests" };
@@ -44,12 +45,12 @@ export default function StudentDashboard() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-muted-foreground">Hi {student.firstName}</p>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">Your dashboard</h1>
+          <p className="text-sm text-muted-foreground">{tr("Hi")} {student.firstName}</p>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{tr("Your dashboard")}</h1>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/student/scanner">
-            <Plus /> Add opportunity
+            <Plus /> {tr("Add opportunity")}
           </Link>
         </Button>
       </div>
@@ -77,7 +78,7 @@ export default function StudentDashboard() {
       <DashboardFocus
         figures={[
           { label: "Remaining gap", value: ov.remaining, tone: ov.remaining > 0 ? "warning" : "primary", sub: `across ${active.length} opportunit${active.length === 1 ? "y" : "ies"}` },
-          { label: "Assistance found", value: ov.savings + ov.assistance, tone: "primary", sub: `${usd(ov.confirmedSavings + ov.assistance)} confirmed` },
+          { label: "Assistance found", value: ov.savings + ov.assistance, tone: "primary", sub: `${aed(ov.confirmedSavings + ov.assistance)} confirmed` },
           { label: "Next deadline", value: next ? fmtDate(next.opp.deadline, { month: "short", day: "numeric" }) : "—", sub: next ? `${next.opp.title} · ${relDays(next.opp.deadline)}` : "No upcoming deadlines" },
         ]}
         action={action}
@@ -85,9 +86,9 @@ export default function StudentDashboard() {
 
       <Card className="mt-8">
         <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle>Your opportunities</CardTitle>
+          <CardTitle>{tr("Your opportunities")}</CardTitle>
           <Link href="/student/tracker" className="text-sm font-medium text-primary hover:underline">
-            Calendar
+            {tr("Calendar")}
           </Link>
         </CardHeader>
         {ordered.length === 0 ? (
@@ -114,7 +115,7 @@ export default function StudentDashboard() {
                   right={
                     <>
                       {p.request && <StatusBadge status={p.request.status} className="hidden md:inline-flex" />}
-                      <span className="w-16 text-right font-semibold tabular">{p.remaining > 0 ? usd(p.remaining) : "Funded"}</span>
+                      <span className="w-16 text-end font-semibold tabular">{p.remaining > 0 ? aed(p.remaining) : "Funded"}</span>
                     </>
                   }
                 />
@@ -128,7 +129,7 @@ export default function StudentDashboard() {
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard label="Total cost" value={ov.total} />
           <StatCard label="Your own funds" value={ov.personal} />
-          <StatCard label="Savings found" value={ov.savings} tone="primary" hint={`${usd(ov.confirmedSavings)} confirmed`} />
+          <StatCard label="Savings found" value={ov.savings} tone="primary" hint={`${aed(ov.confirmedSavings)} confirmed`} />
           <StatCard label="Sponsor help received" value={ov.assistance} />
         </div>
         {risks.length > 0 && (
@@ -158,10 +159,10 @@ export default function StudentDashboard() {
               {timeline.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Starts when you submit a request.</p>
               ) : (
-                <ol className="relative space-y-4 border-l pl-5">
+                <ol className="relative space-y-4 border-s ps-5">
                   {timeline.map((t, i) => (
                     <li key={i} className="relative">
-                      <span className="absolute -left-[25px] top-1 h-2.5 w-2.5 rounded-full border-2 border-card bg-primary" />
+                      <span className="absolute -start-[25px] top-1 h-2.5 w-2.5 rounded-full border-2 border-card bg-primary" />
                       <p className="text-sm">
                         <span className="font-medium">{t.ref}</span> · {t.note}
                       </p>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Receipt } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { contributeToPool, currentSponsor } from "@/lib/actions";
-import { fmtDate, usd } from "@/lib/format";
+import { fmtDate, aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -60,11 +60,11 @@ export default function SponsorContributionsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="pl-5">Date</TableHead>
+                    <TableHead className="ps-5">Date</TableHead>
                     <TableHead>Need</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-end">Amount</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="pr-5 text-right">Receipt</TableHead>
+                    <TableHead className="pe-5 text-end">Receipt</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -72,11 +72,11 @@ export default function SponsorContributionsPage() {
                     const r = state.requests.find((x) => x.id === c.requestId);
                     return (
                       <TableRow key={c.id}>
-                        <TableCell className="pl-5 text-muted-foreground">{fmtDate(c.at)}</TableCell>
+                        <TableCell className="ps-5 text-muted-foreground">{fmtDate(c.at)}</TableCell>
                         <TableCell className="max-w-[240px] truncate">{r ? `${r.ref} · ${r.purpose}` : "Shared opportunity pool"}</TableCell>
-                        <TableCell className="text-right font-medium tabular">{usd(c.amount)}</TableCell>
+                        <TableCell className="text-end font-medium tabular">{aed(c.amount)}</TableCell>
                         <TableCell>{r ? <StatusBadge status={r.status} /> : <span className="text-xs text-muted-foreground">Pooled</span>}</TableCell>
-                        <TableCell className="pr-5 text-right">
+                        <TableCell className="pe-5 text-end">
                           {r && (
                             <Button asChild variant="ghost" size="sm">
                               <Link href={`/receipt/${c.id}`}>
@@ -97,14 +97,14 @@ export default function SponsorContributionsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Shared opportunity pool</CardTitle>
-              <CardDescription>Schools use it for their most urgent needs. Balance {usd(state.pool)}.</CardDescription>
+              <CardDescription>Schools use it for their most urgent needs. Balance {aed(state.pool)}.</CardDescription>
             </CardHeader>
             <CardContent>
               <form
                 className="flex gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (!poolErr) dispatch(contributeToPool(poolV), { success: `${usd(poolV)} added to the shared pool` });
+                  if (!poolErr) dispatch(contributeToPool(poolV), { success: `${aed(poolV)} added to the shared pool` });
                 }}
               >
                 <Input aria-label="Pool contribution" className="tabular" inputMode="decimal" value={poolAmt} onChange={(e) => setPoolAmt(e.target.value.replace(/[^\d.]/g, ""))} />

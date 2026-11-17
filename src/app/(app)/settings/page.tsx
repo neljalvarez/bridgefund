@@ -100,8 +100,8 @@ export default function SettingsPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Region and language</CardTitle>
-            <CardDescription>Display preferences for global use. Calculations always run in USD; converted amounts use illustrative fixed rates, not live exchange rates.</CardDescription>
+            <CardTitle>Currency and language</CardTitle>
+            <CardDescription>Display preferences for global use. Everything is calculated in AED. Other currencies are for display only.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
@@ -118,7 +118,7 @@ export default function SettingsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Amount input fields remain in USD.</p>
+              <p className="text-xs text-muted-foreground">Amounts you type are always in AED.</p>
             </div>
             <div className="space-y-1.5">
               <Label>Interface language</Label>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Preview: navigation only. Full translation would be reviewed per market.</p>
+              <p className="text-xs text-muted-foreground">Arabic switches the layout to right-to-left. Core screens are translated.</p>
             </div>
           </CardContent>
         </Card>

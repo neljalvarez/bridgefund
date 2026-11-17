@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { remainingOf } from "@/lib/actions";
 import { inInstitutionScope, oppOf } from "@/lib/selectors";
-import { EXPENSE_LABEL, OPP_LABEL, daysUntil, sum, usd } from "@/lib/format";
+import { EXPENSE_LABEL, OPP_LABEL, daysUntil, sum, aed } from "@/lib/format";
 import { daysBetween } from "@/lib/allocation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
         <StatCard label="Average sponsor ask" value={avgAsk} tone="primary" hint={avgGap ? `${Math.round((1 - avgAsk / avgGap) * 100)}% smaller` : undefined} />
         <StatCard label="Total expenses reduced" value={reduced} tone="primary" />
         <StatCard label="Opportunities funded" value={reqs.filter((r) => ["Fully Funded", "Completed"].includes(r.status)).length} money={false} />
-        <StatCard label="Impact multiplier" value={fmtMultiplier(impact.multiplier)} tone="primary" hint={impact.sponsor > 0 ? `${usd(impact.resolved)} resolved ÷ ${usd(impact.sponsor)} sponsor funds` : "No sponsor funds used yet"} />
+        <StatCard label="Impact multiplier" value={fmtMultiplier(impact.multiplier)} tone="primary" hint={impact.sponsor > 0 ? `${aed(impact.resolved)} resolved ÷ ${aed(impact.sponsor)} sponsor funds` : "No sponsor funds used yet"} />
       </div>
 
       <Card className="mt-6">
@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
               <BarChart data={multByCat} margin={{ left: -10 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" interval={0} {...axis} />
-                <YAxis {...axis} tickFormatter={(v) => usd(v)} width={70} />
+                <YAxis {...axis} tickFormatter={(v) => aed(v)} width={70} />
                 <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
                 <Bar dataKey="resolved" name="Barriers resolved" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} maxBarSize={36} />
                 <Bar dataKey="sponsor" name="Sponsor funding used" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} maxBarSize={36} />
@@ -180,7 +180,7 @@ export default function AnalyticsPage() {
                 <li key={a.name} className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full" style={{ background: PIE[i % PIE.length] }} />
                   <span className="text-muted-foreground">{a.name}</span>
-                  <span className="ml-auto font-medium tabular">{usd(a.value)}</span>
+                  <span className="ms-auto font-medium tabular">{aed(a.value)}</span>
                 </li>
               ))}
             </ul>

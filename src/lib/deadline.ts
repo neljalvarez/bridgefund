@@ -5,7 +5,7 @@
  */
 import type { AppState, FundingRequest, Opportunity } from "./types";
 import { daysBetween } from "./allocation";
-import { usd } from "./format";
+import { aed } from "./format";
 
 export type RiskLevel = "Deadline passed" | "Critical" | "At risk" | "Watch" | "On track" | "Secured";
 
@@ -44,7 +44,7 @@ export function assessDeadline(state: AppState, opp: Opportunity, r: FundingRequ
   const estDays = steps.reduce((s, x) => s + x.days, 0);
 
   const alternatives: string[] = [];
-  if (gap > 0 && inst && inst.fund >= gap) alternatives.push(`${inst.name}'s emergency fund (${usd(inst.fund)} available) could cover the remaining ${usd(gap)} within ~2 days, pending staff approval.`);
+  if (gap > 0 && inst && inst.fund >= gap) alternatives.push(`${inst.name}'s emergency fund (${aed(inst.fund)} available) could cover the remaining ${aed(gap)} within ~2 days, pending staff approval.`);
   if (gap > 0) alternatives.push("Ask the provider for a short payment extension — many exam boards and universities allow a few extra days on request.");
   if (pendingSavings.length) alternatives.push("If a pending waiver can't process in time, the institution can pay the fee now and claim the waiver as a reimbursement.");
   if (opp.expenses.some((e) => ["equipment", "materials", "technology"].includes(e.category))) alternatives.push("Borrow equipment from Resource Rescue instead of waiting for funds to buy it.");

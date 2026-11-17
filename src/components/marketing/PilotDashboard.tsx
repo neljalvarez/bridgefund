@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ClipboardList, Pencil } from "lucide-react";
+import { ClipboardList, Download, Pencil } from "lucide-react";
+import { downloadCsv, feedbackRows, pilotRows } from "@/lib/csv";
 import { Hydrated, useStore } from "@/lib/store";
 import { setPilot } from "@/lib/actions";
 import { fmtDateTime } from "@/lib/format";
@@ -68,9 +69,17 @@ function Dashboard() {
           <CardDescription className="mt-1">{empty ? "No pilot has started. This dashboard is ready to track verified results once one does." : `Last updated ${fmtDateTime(p.updatedAt!)} · entered manually, stored in this browser`}</CardDescription>
         </div>
         {!editing && (
-          <Button variant="outline" size="sm" onClick={open}>
-            <Pencil /> {empty ? "Record results" : "Update"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="ghost" size="sm" onClick={() => downloadCsv("bridgefund-pilot-metrics.csv", pilotRows(state))}>
+              <Download /> Metrics CSV
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => downloadCsv("bridgefund-feedback.csv", feedbackRows(state))}>
+              <Download /> Feedback CSV ({state.feedback.length})
+            </Button>
+            <Button variant="outline" size="sm" onClick={open}>
+              <Pencil /> {empty ? "Record results" : "Update"}
+            </Button>
+          </div>
         )}
       </CardHeader>
       <CardContent>

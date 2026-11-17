@@ -111,3 +111,15 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Right-to-left (Arabic) */
+[dir="rtl"] .lucide-arrow-right,
+[dir="rtl"] .lucide-arrow-left,
+[dir="rtl"] .lucide-chevron-right,
+[dir="rtl"] .lucide-chevron-left,
+[dir="rtl"] .lucide-arrow-up-right {
+  transform: scaleX(-1);
+}
+[dir="rtl"] body {
+  letter-spacing: 0;
+}

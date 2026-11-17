@@ -6,7 +6,7 @@ import { useStore } from "@/lib/store";
 import { assignMatch } from "@/lib/actions";
 import { findMatches, type MatchKind, type MatchSuggestion } from "@/lib/matching";
 import { studentOf } from "@/lib/selectors";
-import { fmtDateTime, usd } from "@/lib/format";
+import { fmtDateTime, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +63,7 @@ export default function MatchingPage() {
                       <Badge variant="accent">
                         <K.icon /> {K.label}
                       </Badge>
-                      <span className="text-sm font-semibold text-primary tabular">−{usd(m.amount)}</span>
+                      <span className="text-sm font-semibold text-primary tabular">−{aed(m.amount)}</span>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">

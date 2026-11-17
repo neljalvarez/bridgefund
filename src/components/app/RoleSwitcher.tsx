@@ -34,7 +34,7 @@ export function RoleSwitcher({ className, onSwitch, stacked }: { className?: str
           >
             <m.icon className="h-3.5 w-3.5" aria-hidden />
             {m.label}
-            {stacked && <span className="ml-auto text-xs font-normal text-muted-foreground">{m.persona}</span>}
+            {stacked && <span className="ms-auto text-xs font-normal text-muted-foreground">{m.persona}</span>}
           </button>
         );
       })}

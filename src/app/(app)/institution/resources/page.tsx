@@ -6,7 +6,7 @@ import type { ResourceType } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { addResource, adjustInventory, updateReservation } from "@/lib/actions";
 import { institutionOf, studentOf } from "@/lib/selectors";
-import { RESOURCE_LABEL, fmtDate, sum, usd } from "@/lib/format";
+import { RESOURCE_LABEL, fmtDate, sum, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,11 +51,11 @@ export default function InventoryPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="pl-5">Item</TableHead>
+                <TableHead className="ps-5">Item</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Held by</TableHead>
-                <TableHead className="text-right">Value</TableHead>
-                <TableHead className="pr-5 text-right">Available / total</TableHead>
+                <TableHead className="text-end">Value</TableHead>
+                <TableHead className="pe-5 text-end">Available / total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -63,15 +63,15 @@ export default function InventoryPage() {
                 const Icon = RESOURCE_ICON[r.type];
                 return (
                   <TableRow key={r.id}>
-                    <TableCell className="pl-5">
+                    <TableCell className="ps-5">
                       <span className="flex items-center gap-2.5 font-medium">
                         <Icon className="h-4 w-4 text-muted-foreground" /> {r.name}
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{RESOURCE_LABEL[r.type]}</TableCell>
                     <TableCell className="text-muted-foreground">{institutionOf(state, r.institutionId)?.name}</TableCell>
-                    <TableCell className="text-right tabular">{usd(r.retailValue)}</TableCell>
-                    <TableCell className="pr-5">
+                    <TableCell className="text-end tabular">{aed(r.retailValue)}</TableCell>
+                    <TableCell className="pe-5">
                       <span className="flex items-center justify-end gap-2">
                         <Button variant="outline" size="icon" className="h-7 w-7" aria-label={`Remove one ${r.name}`} disabled={r.available === 0} onClick={() => dispatch(adjustInventory(r.id, -1))}>
                           <Minus />
@@ -174,7 +174,7 @@ export default function InventoryPage() {
               <Input id="ri-qty" className="mt-1.5 tabular" inputMode="numeric" value={form.total} onChange={(e) => setForm({ ...form, total: e.target.value.replace(/\D/g, "") })} />
             </div>
             <div>
-              <Label htmlFor="ri-val">Retail value (USD)</Label>
+              <Label htmlFor="ri-val">Retail value (AED)</Label>
               <Input id="ri-val" className="mt-1.5 tabular" inputMode="decimal" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value.replace(/[^\d.]/g, "") })} />
             </div>
           </div>

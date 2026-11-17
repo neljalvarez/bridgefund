@@ -6,7 +6,7 @@ import { CalendarClock } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { remainingOf } from "@/lib/actions";
 import { inInstitutionScope } from "@/lib/selectors";
-import { PENDING_STATUSES, daysUntil, fmtDate, relDays, usd } from "@/lib/format";
+import { PENDING_STATUSES, daysUntil, fmtDate, relDays, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,7 +23,7 @@ function Dashboard() {
   const completed = scoped.filter((r) => r.status === "Completed").sort((a, b) => b.deadline.localeCompare(a.deadline));
   const unresolved = scoped.filter((r) => !["Completed", "Rejected", "Draft"].includes(r.status));
   const focused = state.requests.find((r) => r.id === focus);
-  const [tab, setTab] = useState(focused && !PENDING_STATUSES.includes(focused.status) ? "approved" : "queue");
+  const [tab, setTab] = useState(params.get("tab") ?? (focused ? (focused.status === "Completed" ? "completed" : !PENDING_STATUSES.includes(focused.status) ? "approved" : "queue") : "queue"));
   const upcoming = unresolved.filter((r) => daysUntil(r.deadline) >= 0 && daysUntil(r.deadline) <= 21).sort((a, b) => a.deadline.localeCompare(b.deadline));
   const history = state.distribution.filter((d) => state.currentInstitutionId === "all" || d.institutionId === state.currentInstitutionId);
   const instName = state.currentInstitutionId === "all" ? "Partner network" : state.institutions.find((i) => i.id === state.currentInstitutionId)?.name;
@@ -61,14 +61,14 @@ function Dashboard() {
                 {history.slice(0, 30).map((d) => (
                   <li key={d.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                     <span className="min-w-0">
-                      <Badge variant={d.kind === "completion" ? "success" : d.kind === "waiver" ? "accent" : "neutral"} className="mr-2 capitalize">
+                      <Badge variant={d.kind === "completion" ? "success" : d.kind === "waiver" ? "accent" : "neutral"} className="me-2 capitalize">
                         {d.kind}
                       </Badge>
                       {d.label}
                       {d.requestRef && <span className="text-muted-foreground"> · {d.requestRef}</span>}
                     </span>
-                    <span className="shrink-0 text-right">
-                      <span className="font-medium tabular">{usd(d.amount)}</span>
+                    <span className="shrink-0 text-end">
+                      <span className="font-medium tabular">{aed(d.amount)}</span>
                       <span className="block text-xs text-muted-foreground">{fmtDate(d.at)}</span>
                     </span>
                   </li>
@@ -91,13 +91,13 @@ function Dashboard() {
                 <button
                   key={r.id}
                   type="button"
-                  className="block w-full text-left text-sm hover:underline"
+                  className="block w-full text-start text-sm hover:underline"
                   onClick={() => {
                     setTab(PENDING_STATUSES.includes(r.status) ? "queue" : "approved");
                     setTimeout(() => document.getElementById(`req-${r.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
                   }}
                 >
-                  <span className="font-medium">{r.ref}</span> · {usd(remainingOf(r))} remaining
+                  <span className="font-medium">{r.ref}</span> · {aed(remainingOf(r))} remaining
                   <span className="block text-xs text-muted-foreground">
                     {r.status} · {relDays(r.deadline)}
                   </span>

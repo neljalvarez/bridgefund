@@ -1,5 +1,7 @@
 "use client";
 
+import { anonId } from "@/lib/uae";
+
 import Link from "next/link";
 import { useState } from "react";
 import { BadgeCheck, Bookmark, BookmarkCheck, CalendarClock, MapPin } from "lucide-react";
@@ -7,7 +9,7 @@ import type { FundingRequest } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { remainingOf, toggleSavedNeed } from "@/lib/actions";
 import { institutionOf, oppOf, studentOf } from "@/lib/selectors";
-import { OPP_LABEL, fmtDate, relDays, urgencyOf, usd } from "@/lib/format";
+import { OPP_LABEL, fmtDate, relDays, urgencyOf, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -38,9 +40,9 @@ export function NeedCard({ r }: { r: FundingRequest }) {
           {r.purpose}
         </Link>
         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-          <span>{st?.firstName}</span>
+          <span>{st ? anonId(st.id) : ""}</span>
           <span className="flex items-center gap-0.5">
-            <MapPin className="h-3 w-3" /> {st?.city}, {st?.country}
+            <MapPin className="h-3 w-3" /> {st?.emirate}
           </span>
           {opp && <span>· {OPP_LABEL[opp.category]}</span>}
         </p>
@@ -48,9 +50,9 @@ export function NeedCard({ r }: { r: FundingRequest }) {
         <div className="mt-4 flex items-end justify-between gap-2">
           <div>
             <p className="text-xs text-muted-foreground">Amount remaining</p>
-            <p className="text-2xl font-semibold tracking-tight tabular">{usd(remaining)}</p>
+            <p className="text-2xl font-semibold tracking-tight tabular">{aed(remaining)}</p>
           </div>
-          <div className="text-right text-xs text-muted-foreground">
+          <div className="text-end text-xs text-muted-foreground">
             <UrgencyBadge label={urgencyOf(r.deadline).label} />
             <p className="mt-1 flex items-center justify-end gap-1">
               <CalendarClock className="h-3 w-3" /> {fmtDate(r.deadline)} · {relDays(r.deadline)}
@@ -59,7 +61,7 @@ export function NeedCard({ r }: { r: FundingRequest }) {
         </div>
         <Progress value={r.amount ? (r.funded / r.amount) * 100 : 0} className="mt-3" />
         <p className="mt-1.5 text-xs text-muted-foreground">
-          {usd(r.funded)} of {usd(r.amount)} verified requirement funded
+          {aed(r.funded)} of {aed(r.amount)} verified requirement funded
         </p>
       </div>
       <div className={cn("flex items-center justify-between gap-2 border-t px-5 py-3")}>

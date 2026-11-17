@@ -21,6 +21,9 @@ import { CommandSearch } from "./CommandSearch";
 import { NotificationCenter } from "./NotificationCenter";
 import { useTheme } from "./useTheme";
 import { t } from "@/lib/i18n";
+import { LanguageToggle } from "./LanguageToggle";
+import { FeedbackButton } from "./FeedbackButton";
+import { useT } from "@/lib/store";
 
 function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -42,7 +45,7 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
         >
           <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden />
           {tr(label)}
-          {!!badge && <span className="ml-auto rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">{badge}</span>}
+          {!!badge && <span className="ms-auto rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">{badge}</span>}
         </Link>
       </li>
     );
@@ -105,6 +108,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { state, dispatch, reset } = useStore();
+  const tr = useT();
   const { dark, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -121,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-64 border-r bg-card/60 px-3 py-5 lg:block">
+      <aside className="no-print fixed inset-y-0 start-0 z-30 hidden w-64 border-e bg-card/60 px-3 py-5 lg:block">
         <SidebarBody role={role} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -134,7 +138,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      <div className="lg:pl-64 print:pl-0">
+      <div className="lg:ps-64 print:ps-0">
         <header className="no-print sticky top-0 z-20 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
           <div className="flex h-14 items-center gap-2 px-4 md:px-6">
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
@@ -146,16 +150,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="flex h-9 w-full max-w-sm items-center gap-2 rounded-md border bg-card px-3 text-sm text-muted-foreground shadow-sm transition-colors hover:border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Search className="h-4 w-4" aria-hidden />
-              <span className="truncate">Search…</span>
-              <kbd className="ml-auto hidden rounded border bg-muted px-1.5 font-mono text-[10px] sm:inline">⌘K</kbd>
+              <span className="truncate">{tr("Search…")}</span>
+              <kbd className="ms-auto hidden rounded border bg-muted px-1.5 font-mono text-[10px] sm:inline">⌘K</kbd>
             </button>
-            <div className="ml-auto flex items-center gap-1.5">
+            <div className="ms-auto flex items-center gap-1.5">
               <RoleSwitcher className="hidden md:flex" />
-              <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
+              <Button asChild size="sm" className="ms-1 hidden sm:inline-flex">
                 <Link href="/demo">
-                  <PlayCircle /> Launch Interactive Demo
+                  <PlayCircle /> {tr("Launch Interactive Demo")}
                 </Link>
               </Button>
+              <LanguageToggle className="hidden md:inline-flex" />
+              <FeedbackButton />
               <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex" aria-label="Presentation mode" title="Presentation mode">
                 <Link href="/present">
                   <Presentation />
@@ -233,7 +239,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 export function ShellSkeleton() {
   return (
     <div className="min-h-screen bg-background" aria-busy="true" aria-label="Loading">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r bg-card/60 px-4 py-5 lg:block">
+      <aside className="fixed inset-y-0 start-0 hidden w-64 border-e bg-card/60 px-4 py-5 lg:block">
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 animate-pulse rounded-lg bg-muted" />
           <div className="h-4 w-24 animate-pulse rounded bg-muted" />
@@ -244,7 +250,7 @@ export function ShellSkeleton() {
           ))}
         </div>
       </aside>
-      <div className="lg:pl-64">
+      <div className="lg:ps-64">
         <div className="h-14 border-b" />
         <div className="mx-auto max-w-[1240px] space-y-6 px-6 py-8">
           <div className="h-8 w-64 animate-pulse rounded-md bg-muted" />

@@ -74,9 +74,9 @@ export function suggestAllocation(needs: AllocNeed[], budget: number, today: Dat
       left = Math.round((left - r.remaining) * 100) / 100;
       const reasons = [
         r.days <= 0 ? "Deadline is today" : `Deadline in ${r.days} day${r.days === 1 ? "" : "s"} (${urgencyTier(r.days).label.toLowerCase()} urgency)`,
-        `$${r.remaining} is exactly what completes this request`,
+        `AED ${r.remaining} is exactly what completes this request`,
       ];
-      if (r.need.funded > 0) reasons.push(`$${r.need.funded} already secured from other sponsors`);
+      if (r.need.funded > 0) reasons.push(`AED ${r.need.funded} already secured from other sponsors`);
       items.push({ needId: r.need.id, amount: r.remaining, completes: true, rank: i + 1, reasons });
     }
   });
@@ -93,7 +93,7 @@ export function suggestAllocation(needs: AllocNeed[], budget: number, today: Dat
         rank: ranked.indexOf(next) + 1,
         reasons: [
           `Highest-ranked need not yet covered (deadline in ${next.days} days)`,
-          `Partial support: $${Math.round((next.remaining - amt) * 100) / 100} would still remain`,
+          `Partial support: AED ${Math.round((next.remaining - amt) * 100) / 100} would still remain`,
         ],
       });
     }
@@ -154,11 +154,11 @@ export function planAllocation(needs: AllocNeed[], budget: number, today: Date, 
     if (r.remaining <= left + 1e-9) {
       left = Math.round((left - r.remaining) * 100) / 100;
       const reasons = [
-        approach === "most" ? `Among the smallest remaining gaps (${usd0(r.remaining)})` : `Deadline in ${r.days} day${r.days === 1 ? "" : "s"} (${urgencyTier(r.days).label.toLowerCase()} urgency)`,
-        `${usd0(r.remaining)} completes this request`,
+        approach === "most" ? `Among the smallest remaining gaps (${aed0(r.remaining)})` : `Deadline in ${r.days} day${r.days === 1 ? "" : "s"} (${urgencyTier(r.days).label.toLowerCase()} urgency)`,
+        `${aed0(r.remaining)} completes this request`,
       ];
       if (approach === "category") reasons.unshift(`Matches your focus: ${category}`);
-      if (r.need.funded > 0) reasons.push(`${usd0(r.need.funded)} already secured from others`);
+      if (r.need.funded > 0) reasons.push(`${aed0(r.need.funded)} already secured from others`);
       items.push({ needId: r.need.id, amount: r.remaining, completes: true, rank: i + 1, reasons });
     }
   });
@@ -167,7 +167,7 @@ export function planAllocation(needs: AllocNeed[], budget: number, today: Date, 
     if (next) {
       const amt = Math.round(Math.min(left, next.remaining) * 100) / 100;
       left = Math.round((left - amt) * 100) / 100;
-      items.push({ needId: next.need.id, amount: amt, completes: false, rank: ordered.indexOf(next) + 1, reasons: [`Partial support for the next need in line`, `${usd0(Math.round((next.remaining - amt) * 100) / 100)} would still remain`] });
+      items.push({ needId: next.need.id, amount: amt, completes: false, rank: ordered.indexOf(next) + 1, reasons: [`Partial support for the next need in line`, `${aed0(Math.round((next.remaining - amt) * 100) / 100)} would still remain`] });
     }
   }
 
@@ -187,4 +187,4 @@ export function planAllocation(needs: AllocNeed[], budget: number, today: Date, 
   };
 }
 
-const usd0 = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+const aed0 = (n: number) => `AED ${n.toLocaleString("en-AE", { maximumFractionDigits: 2 })}`;

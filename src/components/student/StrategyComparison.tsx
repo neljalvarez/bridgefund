@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AlertTriangle, Check, ChevronDown, Clock, Gauge, Info, ShieldCheck, Sparkles } from "lucide-react";
 import type { StrategyComparison as Comparison, Strategy } from "@/lib/optimizer";
 import type { StrategyId } from "@/lib/types";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { fmtMultiplier } from "@/lib/impact";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +28,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
   const [open, setOpen] = useState(selected);
   return (
     <Card className={cn("flex flex-col transition-shadow", selected ? "ring-2 ring-primary" : "hover:shadow-elevated")}>
-      <button type="button" onClick={onSelect} disabled={!onSelect} className="flex flex-1 flex-col justify-start p-5 text-left focus-visible:outline-none disabled:cursor-default" aria-pressed={selected}>
+      <button type="button" onClick={onSelect} disabled={!onSelect} className="flex flex-1 flex-col justify-start p-5 text-start focus-visible:outline-none disabled:cursor-default" aria-pressed={selected}>
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -49,9 +49,9 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
           )}
         </div>
         <div className="mt-4 grid grid-cols-3 gap-3 border-t pt-4">
-          <Metric label="Student pays" value={usd(s.studentPays)} />
-          <Metric label="Sponsors asked" value={usd(s.sponsorNeeded)} />
-          <Metric label="Cost reductions" value={usd(s.costReductions)} tone="good" />
+          <Metric label="Student pays" value={aed(s.studentPays)} />
+          <Metric label="Sponsors asked" value={aed(s.sponsorNeeded)} />
+          <Metric label="Cost reductions" value={aed(s.costReductions)} tone="good" />
           <Metric label="Time to secure" value={`~${s.daysToSecure} days`} tone={s.meetsDeadline ? undefined : "warn"} hint={`${Math.max(daysLeft, 0)} days left`} />
           <Metric label="Est. likelihood" value={pct(s.likelihood)} hint="before deadline" />
           <Metric label="Impact multiplier" value={fmtMultiplier(s.multiplier)} tone="good" />
@@ -73,7 +73,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
       </button>
       <div className="border-t">
         <button type="button" className="flex w-full items-center justify-between px-5 py-2.5 text-xs font-medium text-muted-foreground hover:text-foreground" onClick={() => setOpen(!open)} aria-expanded={open}>
-          How this covers {usd(s.totalCost)} <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+          How this covers {aed(s.totalCost)} <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
         </button>
         {open && (
           <div className="space-y-1.5 px-5 pb-4 text-sm">
@@ -85,7 +85,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
                     {l.status}
                   </Badge>
                 </span>
-                <span className="shrink-0 tabular">{usd(l.amount)}</span>
+                <span className="shrink-0 tabular">{aed(l.amount)}</span>
               </div>
             ))}
             {s.notes.length > 0 && (

@@ -12,20 +12,22 @@ import { DemoBadge } from "@/components/shared/kit";
 import { MoreDetails } from "@/components/shared/Focus";
 import { ChartTooltip } from "@/components/shared/ChartTooltip";
 
-const DEFAULTS: BizInput = { clients: 12, price: 250, programs: 2, programFee: 400, opex: 7000, requestsPerClient: 15, verificationCost: 2.5, cac: 800 };
+const DEFAULTS: BizInput = { clients: 10, price: 950, programs: 2, programFee: 1500, opex: 30000, requestsPerClient: 15, verificationCost: 9, cac: 3000, licences: 1, licenceFee: 2500 };
 
 const FIELDS: { key: keyof BizInput; label: string; prefix?: string; help: string }[] = [
-  { key: "clients", label: "Institutional clients (start)", help: "Schools, colleges and nonprofits subscribed" },
-  { key: "price", label: "Subscription per institution / month", prefix: "$", help: "Hypothetical; a free tier would remain for under-resourced schools" },
+  { key: "clients", label: "School & university clients (start)", help: "Subscribed schools and universities" },
+  { key: "price", label: "Subscription per school / month", prefix: "AED", help: "Hypothetical; a free tier would remain for under-resourced schools" },
   { key: "programs", label: "Sponsored programmes (start)", help: "Ring-fenced CSR or foundation programmes" },
-  { key: "programFee", label: "Programme management fee / month", prefix: "$", help: "Charged to the sponsor, never deducted from aid" },
-  { key: "opex", label: "Fixed operating expenses / month", prefix: "$", help: "Team, hosting, support, compliance" },
-  { key: "verificationCost", label: "Verification cost per request", prefix: "$", help: "Document checks, storage, payment processing" },
+  { key: "programFee", label: "Programme management fee / month", prefix: "AED", help: "Charged to the sponsor, never deducted from aid" },
+  { key: "licences", label: "Institutional licences (start)", help: "Nonprofits or university offices running their own programmes" },
+  { key: "licenceFee", label: "Licence fee / month", prefix: "AED", help: "Hypothetical" },
+  { key: "opex", label: "Fixed operating expenses / month", prefix: "AED", help: "Team, hosting, support, compliance" },
+  { key: "verificationCost", label: "Verification cost per request", prefix: "AED", help: "Document checks, storage, payment processing" },
   { key: "requestsPerClient", label: "Verified requests per institution / month", help: "Drives variable verification cost" },
-  { key: "cac", label: "Acquisition cost per new institution", prefix: "$", help: "Sales, onboarding and training" },
+  { key: "cac", label: "Acquisition cost per new institution", prefix: "AED", help: "Sales, onboarding and training" },
 ];
 
-const fmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const fmt = (n: number) => `AED ${Math.round(n).toLocaleString("en-AE")}`;
 const axis = { fontSize: 12, stroke: "hsl(var(--muted-foreground))", tickLine: false, axisLine: false } as const;
 
 export function BusinessSimulator() {
@@ -48,7 +50,7 @@ export function BusinessSimulator() {
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle>Assumptions</CardTitle>
-            <CardDescription className="mt-1">All hypothetical, in USD</CardDescription>
+            <CardDescription className="mt-1">All hypothetical, in AED</CardDescription>
           </div>
           <Button variant="ghost" size="sm" onClick={() => setV(DEFAULTS)}>
             <RotateCcw /> Reset
@@ -61,12 +63,12 @@ export function BusinessSimulator() {
                 {f.label}
               </label>
               <div className="relative mt-1">
-                {f.prefix && <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{f.prefix}</span>}
+                {f.prefix && <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{f.prefix}</span>}
                 <Input
                   id={`biz-${f.key}`}
                   inputMode="decimal"
-                  className={cn("tabular", f.prefix && "pl-6")}
-                  value={String(v[f.key])}
+                  className={cn("tabular", f.prefix && "ps-12")}
+                  value={String(v[f.key] ?? 0)}
                   onChange={(e) => {
                     const n = Number(e.target.value.replace(/[^\d.]/g, ""));
                     setV({ ...v, [f.key]: Number.isFinite(n) ? Math.min(n, 1_000_000) : 0 });
@@ -163,7 +165,7 @@ export function BusinessSimulator() {
 
         <MoreDetails title="Model and limitations">
           <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-            <p>Revenue = institutions × subscription + programmes × management fee. Costs = fixed operating expenses + institutions × requests × verification cost + new institutions × acquisition cost. Break-even institutions = (fixed costs − programme revenue) ÷ (subscription − verification cost per institution).</p>
+            <p>Revenue = clients × subscription + programmes × management fee + licences × licence fee. Costs = fixed operating expenses + institutions × requests × verification cost + new institutions × acquisition cost. Break-even institutions = (fixed costs − programme revenue) ÷ (subscription − verification cost per institution).</p>
             <p>Students are never charged — requesting assistance is free under every scenario. No figure here reflects real customers, contracts or revenue; pricing would be validated during the pilot.</p>
           </div>
         </MoreDetails>

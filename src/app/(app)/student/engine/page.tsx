@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Plus, Save, Send, ShieldCheck } from "lucide-react";
-import { useStore } from "@/lib/store";
-import { applyStrategy, remainingOf } from "@/lib/actions";
-import { planFor, strategiesFor } from "@/lib/plan";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Plus, Save, Send, ShieldCheck } from "lucide-react";
+import { useStore, useT } from "@/lib/store";
+import { Checkbox } from "@/components/ui/checkbox";
+import { applyStrategy, giveGuardianConsent, remainingOf } from "@/lib/actions";
+import { planFor, strategiesFor, tipsFor } from "@/lib/plan";
 import type { StrategyId } from "@/lib/types";
 import { requestForOpp } from "@/lib/selectors";
-import { fmtDateLong, relDays, usd } from "@/lib/format";
+import { fmtDateLong, relDays, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +25,7 @@ const STEPS = ["Costs", "Solutions", "Savings", "Request", "Track"] as const;
 const LOCKED = ["Submitted", "Under Review", "Additional Information Required", "Verified", "Partially Funded", "Fully Funded", "Completed", "Rejected"];
 
 function Stepper({ step, reached, go }: { step: number; reached: number; go: (n: number) => void }) {
+  const tr = useT();
   return (
     <ol className="mb-8 grid grid-cols-5 gap-2" aria-label="Assistance journey">
       {STEPS.map((label, i) => {
@@ -32,13 +34,13 @@ function Stepper({ step, reached, go }: { step: number; reached: number; go: (n:
         const current = n === step;
         return (
           <li key={label}>
-            <button type="button" disabled={n > reached} onClick={() => go(n)} aria-current={current ? "step" : undefined} className="group w-full text-left disabled:cursor-default focus-visible:outline-none">
+            <button type="button" disabled={n > reached} onClick={() => go(n)} aria-current={current ? "step" : undefined} className="group w-full text-start disabled:cursor-default focus-visible:outline-none">
               <span className={cn("block h-1 rounded-full transition-colors", done || current ? "bg-primary" : "bg-secondary")} />
               <span className={cn("mt-2 flex items-center gap-1.5 text-xs sm:text-sm", current ? "font-medium text-foreground" : done ? "text-foreground" : "text-muted-foreground")}>
                 <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold", done ? "bg-primary text-primary-foreground" : current ? "border-2 border-primary text-primary" : "border text-muted-foreground")}>
                   {done ? <Check className="h-3 w-3" /> : n}
                 </span>
-                <span className={cn("truncate", !current && "hidden sm:inline")}>{label}</span>
+                <span className={cn("truncate", !current && "hidden sm:inline")}>{tr(label)}</span>
               </span>
             </button>
           </li>
@@ -49,11 +51,12 @@ function Stepper({ step, reached, go }: { step: number; reached: number; go: (n:
 }
 
 function Footer({ back, children }: { back?: () => void; children: React.ReactNode }) {
+  const tr = useT();
   return (
     <div className="mt-8 flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
       {back ? (
         <Button variant="ghost" onClick={back}>
-          <ArrowLeft /> Back
+          <ArrowLeft /> {tr("Back")}
         </Button>
       ) : (
         <span />
@@ -79,6 +82,11 @@ function Journey() {
   const plan = useMemo(() => (opp ? planFor(state, opp) : null), [opp, state]);
   const cmp = useMemo(() => (opp ? strategiesFor(state, opp) : null), [opp, state]);
   const [choice, setChoice] = useState<StrategyId | null>(null);
+  const [consent, setConsent] = useState(false);
+  const tr = useT();
+  const student = state.students.find((x) => x.id === state.currentStudentId)!;
+  const minor = student.age < 18;
+  const tips = opp ? tipsFor(state, opp) : [];
   const chosen = cmp?.strategies.find((x) => x.id === (choice ?? existing?.strategy ?? cmp.recommended)) ?? cmp?.strategies[0];
 
   useEffect(() => {
@@ -101,6 +109,10 @@ function Journey() {
 
   const submit = (send: boolean) => {
     dispatch(applyStrategy(opp.id, chosen, send), send ? { success: "Request submitted", description: "Your school will verify it next." } : { info: "Saved as a draft" });
+    if (send && minor && consent) dispatch((s) => {
+      const r = s.requests.find((x) => x.opportunityId === opp.id && x.status !== "Rejected");
+      return r ? giveGuardianConsent(r.id)(s) : s;
+    });
     go(5);
   };
 
@@ -150,7 +162,7 @@ function Journey() {
           {step === 1 && (
             <section aria-labelledby="s1">
               <h2 id="s1" className="text-xl font-semibold tracking-tight">
-                What does it cost?
+                {tr("What does it cost?")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">Every expense, minus what you already have.</p>
               <div className="mt-6 grid gap-6 md:grid-cols-[1fr_260px]">
@@ -161,24 +173,24 @@ function Journey() {
                         <span>
                           {e.label} {!e.confirmed && <span className="text-xs text-muted-foreground">(estimate)</span>}
                         </span>
-                        <span className="tabular">{usd(e.amount)}</span>
+                        <span className="tabular">{aed(e.amount)}</span>
                       </div>
                     ))}
                     <div className="flex justify-between gap-3 px-5 py-3 text-muted-foreground">
                       <span>Your own funds</span>
-                      <span className="tabular">−{usd(plan.studentFunds)}</span>
+                      <span className="tabular">−{aed(plan.studentFunds)}</span>
                     </div>
                   </CardContent>
                 </Card>
                 <div className="rounded-xl border bg-card p-5">
-                  <p className="text-[13px] font-medium text-muted-foreground">Your gap</p>
-                  <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{usd(plan.initialGap)}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">of {usd(plan.totalCost)} total</p>
+                  <p className="text-[13px] font-medium text-muted-foreground">{tr("Your gap")}</p>
+                  <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{aed(plan.initialGap)}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">of {aed(plan.totalCost)} total</p>
                 </div>
               </div>
               <Footer>
                 <Button size="lg" onClick={() => go(2)} disabled={plan.initialGap <= 0}>
-                  Find solutions <ArrowRight />
+                  {tr("Find solutions")} <ArrowRight />
                 </Button>
               </Footer>
             </section>
@@ -193,9 +205,27 @@ function Journey() {
               <div className="mt-6">
                 <EngineRun plan={plan} runKey={runKey} seededAt={state.seededAt} speed={700} />
               </div>
+              {tips.length > 0 && (
+                <div className="mt-6 rounded-xl border p-5">
+                  <p className="font-medium">{tr("Also worth checking")}</p>
+                  <p className="text-sm text-muted-foreground">Real UAE programmes BridgeEngine can&apos;t price in advance. Not counted as savings.</p>
+                  <ul className="mt-3 divide-y">
+                    {tips.map((a) => (
+                      <li key={a.id} className="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="min-w-0 text-sm">
+                          <span className="font-medium">{a.name}</span> <span className="text-muted-foreground">· {a.benefit}</span>
+                        </span>
+                        <a href={a.url} target="_blank" rel="noopener noreferrer" className="flex shrink-0 items-center gap-1 text-sm font-medium text-primary hover:underline">
+                          Official page <ArrowUpRight className="h-3.5 w-3.5" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <Footer back={() => go(1)}>
                 <Button size="lg" onClick={() => go(3)}>
-                  Compare plans <ArrowRight />
+                  {tr("Compare plans")} <ArrowRight />
                 </Button>
               </Footer>
             </section>
@@ -204,7 +234,7 @@ function Journey() {
           {step === 3 && (
             <section aria-labelledby="s3">
               <h2 id="s3" className="text-xl font-semibold tracking-tight">
-                Choose how to close the gap
+                {tr("Choose how to close the gap")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">Three plans built from the savings you qualify for. Estimates, never guarantees.</p>
               <div className="mt-6">
@@ -221,36 +251,45 @@ function Journey() {
           {step === 4 && (
             <section aria-labelledby="s4">
               <h2 id="s4" className="text-xl font-semibold tracking-tight">
-                Request what&apos;s left
+                {tr("Request what's left")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">Your school checks it privately before sponsors see it.</p>
               <div className="mt-6 grid gap-6 md:grid-cols-[1fr_280px]">
                 <Card>
                   <CardContent className="space-y-1 p-5 text-sm">
-                    <Row label="Total cost" value={usd(plan.totalCost)} />
-                    <Row label="Your own funds" value={`−${usd(chosen.studentPays)}`} muted />
+                    <Row label="Total cost" value={aed(plan.totalCost)} />
+                    <Row label="Your own funds" value={`−${aed(chosen.studentPays)}`} muted />
                     {chosen.lines
                       .filter((l) => l.kind !== "student" && l.kind !== "sponsor")
                       .map((l) => (
-                        <Row key={l.label} label={l.label} value={`−${usd(l.amount)}`} tone tag={l.status} />
+                        <Row key={l.label} label={l.label} value={`−${aed(l.amount)}`} tone tag={l.status} />
                       ))}
                   </CardContent>
                 </Card>
                 <div className="rounded-xl border border-primary/25 bg-primary-light/50 p-5 dark:bg-primary/10">
-                  <p className="text-[13px] font-medium text-primary">You&apos;ll request</p>
-                  <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{usd(chosen.sponsorNeeded)}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">instead of {usd(plan.initialGap)}</p>
+                  <p className="text-[13px] font-medium text-primary">{tr("You'll request")}</p>
+                  <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{aed(chosen.sponsorNeeded)}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">instead of {aed(plan.initialGap)}</p>
                   <p className="mt-4 flex gap-2 text-xs text-muted-foreground">
                     <ShieldCheck className="h-4 w-4 shrink-0 text-primary" /> Free to request. Money goes to the provider, never as a loan.
                   </p>
                 </div>
               </div>
+              {minor && (
+                <label className="mt-6 flex items-start gap-3 rounded-xl border p-4 text-sm">
+                  <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-0.5" />
+                  <span>
+                    <span className="font-medium">My parent or guardian agrees to this request.</span>
+                    <span className="block text-muted-foreground">Required because you&apos;re {student.age}. Your school confirms it before anything is shared (simulated).</span>
+                  </span>
+                </label>
+              )}
               <Footer back={() => go(3)}>
                 <Button variant="outline" size="lg" onClick={() => submit(false)}>
-                  <Save /> Save draft
+                  <Save /> {tr("Save draft")}
                 </Button>
-                <Button size="lg" onClick={() => submit(true)}>
-                  <Send /> Submit request
+                <Button size="lg" onClick={() => submit(true)} disabled={minor && !consent}>
+                  <Send /> {tr("Submit request")}
                 </Button>
               </Footer>
             </section>
@@ -259,12 +298,12 @@ function Journey() {
           {step === 5 && (
             <section aria-labelledby="s5">
               <h2 id="s5" className="text-xl font-semibold tracking-tight">
-                Track the outcome
+                {tr("Track the outcome")}
               </h2>
               {existing ? (
                 <>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {existing.ref} · {remainingOf(existing) > 0 ? `${usd(remainingOf(existing))} still to secure` : "Fully covered"}
+                    {existing.ref} · {remainingOf(existing) > 0 ? `${aed(remainingOf(existing))} still to secure` : "Fully covered"}
                   </p>
                   <Card className="mt-6">
                     <CardContent className="space-y-6 p-5">
@@ -308,11 +347,12 @@ function Row({ label, value, muted, tone, tag }: { label: string; value: string;
 }
 
 export default function GetAssistancePage() {
+  const tr = useT();
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">Get assistance</h1>
-        <p className="mt-1 text-[15px] text-muted-foreground">From cost to covered in five steps.</p>
+        <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{tr("Get assistance")}</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">{tr("From cost to covered in five steps.")}</p>
       </div>
       <Suspense>
         <Journey />

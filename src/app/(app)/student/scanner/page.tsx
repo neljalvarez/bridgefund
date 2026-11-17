@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, BookmarkPlus, Check, FileText, Sparkles, Wand2 } from "lucide-react";
 import type { EligibilityProfile, Expense, OpportunityCategory } from "@/lib/types";
@@ -10,7 +10,7 @@ import { addOpportunity, setEligibility } from "@/lib/actions";
 import { currentStudent } from "@/lib/selectors";
 import { runBridgeEngine } from "@/lib/engine";
 import { ALTERNATIVES, GRANTS, WAIVERS } from "@/lib/knowledge";
-import { EXPENSE_LABEL, OPP_CATEGORIES, OPP_LABEL, daysUntil, fmtDateLong, isoDaysFromNow, uid, urgencyOf, usd } from "@/lib/format";
+import { EXPENSE_LABEL, OPP_CATEGORIES, OPP_LABEL, daysUntil, fmtDateLong, isoDaysFromNow, uid, urgencyOf, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,17 +23,19 @@ import { ExpenseEditor } from "@/components/student/ExpenseEditor";
 
 const STEPS = ["Opportunity", "Institution", "Deadline", "Expenses", "Funds", "Eligibility"] as const;
 const ELIG: { key: keyof EligibilityProfile; q: string }[] = [
-  { key: "lowIncome", q: "My household income is below my country's low-income threshold" },
+  { key: "lowIncome", q: "My family needs financial help with this cost" },
   { key: "publicSchool", q: "I attend (or graduated from) a public school" },
   { key: "firstGeneration", q: "I would be the first in my family to attend university" },
   { key: "hasSchoolLetter", q: "A teacher or counselor can write a short supporting letter" },
 ];
 
-export default function ScannerPage() {
+function Scanner() {
   const { state, dispatch } = useStore();
   const router = useRouter();
   const student = currentStudent(state);
-  const blank = { category: "examination" as OpportunityCategory, title: "", provider: "", institutionId: student.institutionId, deadline: "", expenses: [] as Expense[], funds: "", assistance: "", eligibility: student.eligibility, outcome: "" };
+  const params = useSearchParams();
+  const fromFinder = (params.get("category") as OpportunityCategory | null) ?? undefined;
+  const blank = { category: fromFinder ?? ("stem-competition" as OpportunityCategory), title: params.get("title") ?? "", provider: params.get("provider") ?? "", institutionId: student.institutionId, deadline: params.get("deadline") ?? "", expenses: [] as Expense[], funds: "", assistance: "", eligibility: student.eligibility, outcome: "" };
   const [f, setF] = useState(blank);
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -50,7 +52,7 @@ export default function ScannerPage() {
     () =>
       f.expenses.length
         ? runBridgeEngine(
-            { category: f.category, country: inst?.country ?? student.country, level: student.level, expenses: f.expenses.filter((e) => e.amount > 0), studentFunds: Number(f.funds) || 0, priorAssistance: Number(f.assistance) || 0, eligibility: f.eligibility },
+            { category: f.category, country: inst?.country ?? student.country, emirate: student.emirate, level: student.level, expenses: f.expenses.filter((e) => e.amount > 0), studentFunds: Number(f.funds) || 0, priorAssistance: Number(f.assistance) || 0, eligibility: f.eligibility },
             { waivers: WAIVERS, alternatives: ALTERNATIVES, grants: GRANTS, resources: state.resources },
           )
         : null,
@@ -68,7 +70,7 @@ export default function ScannerPage() {
       if (!f.expenses.length) e.expenses = "Add at least one required expense.";
       else if (f.expenses.some((x) => !x.label.trim() || !(x.amount > 0))) e.expenses = "Every expense needs a description and an amount above $0.";
     }
-    if (i === 4 && f.funds !== "" && isNaN(Number(f.funds))) e.funds = "Enter a number — $0 is fine.";
+    if (i === 4 && f.funds !== "" && isNaN(Number(f.funds))) e.funds = "Enter a number — AED 0 is fine.";
     setErrors(e);
     return !Object.keys(e).length;
   };
@@ -82,17 +84,17 @@ export default function ScannerPage() {
   const example = () => {
     setF({
       ...blank,
-      category: "certification",
-      title: "Cloud Fundamentals certification exam",
-      provider: "Open Skills Certification Board",
+      category: "robotics",
+      title: "Robotics club regional event",
+      provider: "Robotics event (example)",
       deadline: isoDaysFromNow(15).slice(0, 10),
       expenses: [
-        { id: uid("e"), label: "Certification exam fee", category: "examination", amount: 150, confirmed: true },
-        { id: uid("e"), label: "Official practice test pack", category: "materials", amount: 30, confirmed: false },
-        { id: uid("e"), label: "Bus fare to test centre", category: "transportation", amount: 12, confirmed: false },
+        { id: uid("e"), label: "Robot parts", category: "equipment", amount: 300, confirmed: false },
+        { id: uid("e"), label: "Reference books", category: "materials", amount: 60, confirmed: false },
+        { id: uid("e"), label: "Transport to the venue", category: "transportation", amount: 80, confirmed: false },
       ],
-      funds: "40",
-      outcome: "A cloud credential for entry-level IT support roles.",
+      funds: "100",
+      outcome: "Compete with the school robotics club.",
     });
     setErrors({});
     setStep(STEPS.length - 1);
@@ -128,7 +130,7 @@ export default function ScannerPage() {
             <ol className="mb-8 grid grid-cols-6 gap-1.5" aria-label="Scanner progress">
               {STEPS.map((s, i) => (
                 <li key={s}>
-                  <button type="button" disabled={i > step && !done} onClick={() => { setDone(false); setStep(i); }} className="w-full text-left disabled:cursor-default" aria-current={i === step && !done ? "step" : undefined}>
+                  <button type="button" disabled={i > step && !done} onClick={() => { setDone(false); setStep(i); }} className="w-full text-start disabled:cursor-default" aria-current={i === step && !done ? "step" : undefined}>
                     <span className={cn("block h-1 rounded-full", i < step || done ? "bg-primary" : i === step ? "bg-primary/50" : "bg-secondary")} />
                     <span className={cn("mt-1.5 hidden text-[11px] sm:block", i === step && !done ? "font-medium text-foreground" : "text-muted-foreground")}>{s}</span>
                   </button>
@@ -143,8 +145,8 @@ export default function ScannerPage() {
                     <Check className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-lg font-semibold">Barrier identified: {usd(shortfall)} shortfall</p>
-                    <p className="text-sm text-muted-foreground">{preview && preview.reductionsTotal > 0 ? `BridgeEngine has already spotted up to ${usd(preview.reductionsTotal)} in potential savings.` : "Next, BridgeEngine will look for ways to reduce this cost."}</p>
+                    <p className="text-lg font-semibold">Barrier identified: {aed(shortfall)} shortfall</p>
+                    <p className="text-sm text-muted-foreground">{preview && preview.reductionsTotal > 0 ? `BridgeEngine has already spotted up to ${aed(preview.reductionsTotal)} in potential savings.` : "Next, BridgeEngine will look for ways to reduce this cost."}</p>
                   </div>
                 </div>
                 <div>
@@ -211,7 +213,7 @@ export default function ScannerPage() {
                           <SelectContent>
                             {state.institutions.map((i) => (
                               <SelectItem key={i.id} value={i.id}>
-                                {i.name} — {i.city}, {i.country}
+                                {i.name} — {i.city}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -239,12 +241,12 @@ export default function ScannerPage() {
                         <h2 className="text-xl font-semibold">What can you already afford?</h2>
                         <div className="grid gap-3 sm:grid-cols-2">
                           <div>
-                            <Label htmlFor="funds">Available personal funds (USD)</Label>
+                            <Label htmlFor="funds">Available personal funds (AED)</Label>
                             <Input id="funds" className="mt-1.5 tabular" inputMode="decimal" value={f.funds} onChange={(e) => set({ funds: e.target.value.replace(/[^\d.]/g, "") })} placeholder="0" autoFocus />
                             <FieldError>{errors.funds}</FieldError>
                           </div>
                           <div>
-                            <Label htmlFor="assist">Existing financial assistance (USD)</Label>
+                            <Label htmlFor="assist">Existing financial assistance (AED)</Label>
                             <Input id="assist" className="mt-1.5 tabular" inputMode="decimal" value={f.assistance} onChange={(e) => set({ assistance: e.target.value.replace(/[^\d.]/g, "") })} placeholder="0" />
                           </div>
                         </div>
@@ -303,7 +305,7 @@ export default function ScannerPage() {
               ].map(([l, v, c]) => (
                 <div key={l as string} className="rounded-lg bg-muted/50 p-3">
                   <p className="text-[11px] text-muted-foreground">{l}</p>
-                  <p className={cn("mt-0.5 text-lg font-semibold tabular", c as string)}>{usd(v as number)}</p>
+                  <p className={cn("mt-0.5 text-lg font-semibold tabular", c as string)}>{aed(v as number)}</p>
                 </div>
               ))}
             </div>
@@ -317,7 +319,7 @@ export default function ScannerPage() {
                     <li key={c}>
                       <div className="flex justify-between text-sm">
                         <span>{EXPENSE_LABEL[c as keyof typeof EXPENSE_LABEL]}</span>
-                        <span className="tabular">{usd(v)}</span>
+                        <span className="tabular">{aed(v)}</span>
                       </div>
                       <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
                         <motion.div className="h-full bg-primary" animate={{ width: `${total ? (v / total) * 100 : 0}%` }} />
@@ -335,17 +337,17 @@ export default function ScannerPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Confirmed vs estimated costs</span>
                 <span className="tabular">
-                  {usd(f.expenses.filter((e) => e.confirmed).reduce((a, e) => a + e.amount, 0))} / {usd(f.expenses.filter((e) => !e.confirmed).reduce((a, e) => a + e.amount, 0))}
+                  {aed(f.expenses.filter((e) => e.confirmed).reduce((a, e) => a + e.amount, 0))} / {aed(f.expenses.filter((e) => !e.confirmed).reduce((a, e) => a + e.amount, 0))}
                 </span>
               </div>
               <div className="flex justify-between font-semibold">
                 <span>Estimated assistance required</span>
-                <span className="tabular">{usd(shortfall)}</span>
+                <span className="tabular">{aed(shortfall)}</span>
               </div>
               {preview && preview.reductionsTotal > 0 && (
                 <div className="flex justify-between text-primary">
                   <span>After BridgeEngine (preview)</span>
-                  <span className="font-semibold tabular">{usd(preview.sponsorAmount)}</span>
+                  <span className="font-semibold tabular">{aed(preview.sponsorAmount)}</span>
                 </div>
               )}
             </div>
@@ -353,5 +355,13 @@ export default function ScannerPage() {
         </Card>
       </div>
     </>
+  );
+}
+
+export default function ScannerPage() {
+  return (
+    <Suspense>
+      <Scanner />
+    </Suspense>
   );
 }

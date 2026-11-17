@@ -10,7 +10,7 @@ import { VerificationPanel } from "./VerificationPanel";
 import { institutionOf, oppOf, studentOf } from "@/lib/selectors";
 import { WAIVERS } from "@/lib/knowledge";
 import { waiverValue } from "@/lib/engine";
-import { LEVEL_LABEL, fmtDate, isoDaysFromNow, relDays, urgencyOf, usd } from "@/lib/format";
+import { LEVEL_LABEL, fmtDate, isoDaysFromNow, relDays, urgencyOf, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
   const suggested = waiver ? Math.min(waiverValue(waiver, base || remaining), remaining) : 0;
   const fundsAvail = source === "pool" ? state.pool : inst?.fund ?? 0;
   const fundAmt = Number(amount);
-  const fundErr = !(fundAmt > 0) ? "Enter an amount." : fundAmt > remaining ? `Only ${usd(remaining)} remains — contributions can't exceed the gap.` : fundAmt > fundsAvail ? "Not enough in this fund." : null;
+  const fundErr = !(fundAmt > 0) ? "Enter an amount." : fundAmt > remaining ? `Only ${aed(remaining)} remains — contributions can't exceed the gap.` : fundAmt > fundsAvail ? "Not enough in this fund." : null;
 
   const checks = verificationChecks(state, r);
   const openIssues = checks.filter((c) => c.status !== "pass").length + (r.flags ?? []).filter((f) => !f.resolved).length;
@@ -65,7 +65,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
 
   return (
     <Card id={`req-${r.id}`} className={cn("overflow-hidden", highlight && "ring-2 ring-primary/50")}>
-      <button type="button" onClick={() => setOpen(!open)} className="flex w-full flex-col gap-3 p-4 text-left transition-colors hover:bg-muted/30 sm:flex-row sm:items-center" aria-expanded={open}>
+      <button type="button" onClick={() => setOpen(!open)} className="flex w-full flex-col gap-3 p-4 text-start transition-colors hover:bg-muted/30 sm:flex-row sm:items-center" aria-expanded={open}>
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <Avatar>
             <AvatarFallback>{st.initials}</AvatarFallback>
@@ -81,7 +81,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
           {r.priority && <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-700 dark:bg-red-950 dark:text-red-300">Priority</span>}
           {openIssues > 0 && PENDING.includes(r.status) && <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-300">{openIssues} to review</span>}
           <UrgencyBadge label={urgencyOf(r.deadline).label} />
-          <span className="w-16 text-right font-semibold tabular">{usd(remaining)}</span>
+          <span className="w-16 text-end font-semibold tabular">{aed(remaining)}</span>
           <StatusBadge status={r.status} />
           <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
         </div>
@@ -107,14 +107,14 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
                 ))}
               </ul>
               <p className="mt-3 text-xs text-muted-foreground">
-                {LEVEL_LABEL[st.level]} · {st.city}, {st.country}
+                {LEVEL_LABEL[st.level]} · {st.city}, {st.emirate} · {st.residency} · age {st.age}
               </p>
             </div>
             <div>
               <p className="mb-2 text-[13px] font-medium">Funding</p>
               <Progress value={r.amount ? (r.funded / r.amount) * 100 : 100} />
               <p className="mt-1.5 text-xs text-muted-foreground">
-                {usd(r.funded)} of {usd(r.amount)} · due {fmtDate(r.deadline)} ({relDays(r.deadline)})
+                {aed(r.funded)} of {aed(r.amount)} · due {fmtDate(r.deadline)} ({relDays(r.deadline)})
               </p>
               {opp && <p className="mt-3 text-xs text-muted-foreground">Expected outcome: {opp.outcome}</p>}
             </div>
@@ -305,9 +305,9 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
               </div>
               {waiver && (
                 <div>
-                  <Label htmlFor={`wa-${r.id}`}>Reduction (USD)</Label>
+                  <Label htmlFor={`wa-${r.id}`}>Reduction (AED)</Label>
                   <Input id={`wa-${r.id}`} className="mt-1.5 tabular" inputMode="decimal" placeholder={String(suggested)} value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} />
-                  <p className="mt-1 text-xs text-muted-foreground">Suggested {usd(suggested)} · capped at the remaining {usd(remaining)}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Suggested {aed(suggested)} · capped at the remaining {aed(remaining)}</p>
                 </div>
               )}
             </div>
@@ -343,7 +343,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
             <SelectContent>
               {resources.map((x) => (
                 <SelectItem key={x.id} value={x.id}>
-                  {x.name} — {x.available} left · saves {usd(x.retailValue)}
+                  {x.name} — {x.available} left · saves {aed(x.retailValue)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -382,12 +382,12 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
               <label key={k} className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm has-[:checked]:border-primary">
                 <RadioGroupItem value={k} />
                 <span className="flex-1">{l}</span>
-                <span className="font-medium tabular">{usd(v)}</span>
+                <span className="font-medium tabular">{aed(v)}</span>
               </label>
             ))}
           </RadioGroup>
           <div>
-            <Label htmlFor={`fa-${r.id}`}>Amount (USD)</Label>
+            <Label htmlFor={`fa-${r.id}`}>Amount (AED)</Label>
             <Input id={`fa-${r.id}`} className="mt-1.5 tabular" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={!!fundErr} />
             <FieldError>{amount && fundErr}</FieldError>
           </div>
@@ -398,7 +398,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
             <Button
               disabled={!!fundErr}
               onClick={() => {
-                dispatch(fundRequest(r.id, fundAmt, source), { success: `${usd(fundAmt)} allocated to ${r.ref}` });
+                dispatch(fundRequest(r.id, fundAmt, source), { success: `${aed(fundAmt)} allocated to ${r.ref}` });
                 close();
               }}
             >

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { RotateCcw } from "lucide-react";
 import { simulate, type SimInput } from "@/lib/simulator";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -13,16 +13,16 @@ import { MoreDetails } from "@/components/shared/Focus";
 import { ChartTooltip } from "@/components/shared/ChartTooltip";
 import { fmtMultiplier } from "@/lib/impact";
 
-const DEFAULTS: SimInput = { cost: 180, studentFunds: 70, waivers: 50, borrowing: 0, institutional: 0, sponsorBudget: 500, crowdFee: 0.05 };
+const DEFAULTS: SimInput = { cost: 600, studentFunds: 150, waivers: 0, borrowing: 200, institutional: 100, sponsorBudget: 1000, crowdFee: 0.05 };
 
 const FIELDS: { key: keyof SimInput; label: string; max: number; step: number; help: string; pct?: boolean }[] = [
-  { key: "cost", label: "Educational opportunity cost", max: 1500, step: 5, help: "Exam fee, materials, travel — the full cost of taking part." },
-  { key: "studentFunds", label: "Student's available funds", max: 1000, step: 5, help: "What the student can already contribute. Never counted as platform impact." },
-  { key: "waivers", label: "Available fee waivers", max: 500, step: 5, help: "Fee waivers, discounts and free alternatives the student qualifies for." },
-  { key: "borrowing", label: "Equipment borrowing savings", max: 500, step: 5, help: "Items borrowed from a lending programme instead of bought." },
-  { key: "institutional", label: "Institutional assistance", max: 500, step: 5, help: "Existing hardship funds or grants applied after reductions." },
-  { key: "sponsorBudget", label: "Sponsor funding budget", max: 5000, step: 50, help: "A sponsor's total budget, used to estimate how many opportunities it could rescue." },
-  { key: "crowdFee", label: "Crowdfunding fee assumption", max: 0.1, step: 0.005, pct: true, help: "Deducted from donations. A 2.9% + $0.30 processing fee is ~4.4% of a $20 gift; some platforms add a platform fee. Varies by platform and country." },
+  { key: "cost", label: "Educational opportunity cost", max: 5000, step: 10, help: "Exam fee, materials, travel — the full cost of taking part." },
+  { key: "studentFunds", label: "Student's available funds", max: 3000, step: 10, help: "What the student can already contribute. Never counted as platform impact." },
+  { key: "waivers", label: "Available fee waivers", max: 2000, step: 10, help: "Fee waivers, discounts and free alternatives the student qualifies for." },
+  { key: "borrowing", label: "Equipment borrowing savings", max: 2000, step: 10, help: "Items borrowed from a lending programme instead of bought." },
+  { key: "institutional", label: "Institutional assistance", max: 2000, step: 10, help: "Existing hardship funds or grants applied after reductions." },
+  { key: "sponsorBudget", label: "Sponsor funding budget", max: 20000, step: 100, help: "A sponsor's total budget, used to estimate how many opportunities it could rescue." },
+  { key: "crowdFee", label: "Crowdfunding fee assumption", max: 0.1, step: 0.005, pct: true, help: "Platform and card-processing fees taken from donations. Varies by platform; adjust to match the one you have in mind." },
 ];
 
 const axis = { fontSize: 12, stroke: "hsl(var(--muted-foreground))", tickLine: false, axisLine: false } as const;
@@ -41,7 +41,7 @@ export function RescueSimulator() {
     return Array.from({ length: 5 }, (_, i) => {
       const b = Math.round((max * (i + 1)) / 5);
       const s = simulate({ ...v, sponsorBudget: b });
-      return { name: usd(b), Crowdfunding: Number.isFinite(s.opportunitiesA) ? s.opportunitiesA : null, BridgeFund: Number.isFinite(s.opportunitiesB) ? s.opportunitiesB : null };
+      return { name: aed(b), Crowdfunding: Number.isFinite(s.opportunitiesA) ? s.opportunitiesA : null, BridgeFund: Number.isFinite(s.opportunitiesB) ? s.opportunitiesB : null };
     });
   }, [v]);
 
@@ -61,13 +61,13 @@ export function RescueSimulator() {
                 <label htmlFor={`sim-${f.key}`} className="text-sm font-medium">
                   {f.label}
                 </label>
-                <span className="text-sm font-semibold tabular">{f.pct ? `${(v[f.key] * 100).toFixed(1)}%` : usd(v[f.key])}</span>
+                <span className="text-sm font-semibold tabular">{f.pct ? `${(v[f.key] * 100).toFixed(1)}%` : aed(v[f.key])}</span>
               </div>
               <Slider id={`sim-${f.key}`} aria-label={f.label} className="mt-2.5" min={0} max={f.max} step={f.step} value={[v[f.key]]} onValueChange={([x]) => setV({ ...v, [f.key]: x })} />
               <p className="mt-1.5 text-xs text-muted-foreground">{f.help}</p>
             </div>
           ))}
-          <p className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">Starting values reproduce the demo case: a $180 certification exam, $70 of student savings, and a $50 fee waiver.</p>
+          <p className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">Starting values reproduce the demo: Mariam&apos;s AED 600 STEM competition, AED 150 of her savings, a borrowed kit and school travel support.</p>
         </CardContent>
       </Card>
 
@@ -76,25 +76,25 @@ export function RescueSimulator() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Card className="p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Scenario A · Traditional crowdfunding</p>
-            <p className="mt-2 text-3xl font-semibold tabular">{usd(r.crowdDonorsNeeded)}</p>
+            <p className="mt-2 text-3xl font-semibold tabular">{aed(r.crowdDonorsNeeded)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              donor money to raise for the full {usd(r.shortfall)} gap{v.crowdFee > 0 && `, including ~${usd(r.crowdDonorsNeeded - r.shortfall)} in assumed fees`}.
+              donor money to raise for the full {aed(r.shortfall)} gap{v.crowdFee > 0 && `, including ~${aed(r.crowdDonorsNeeded - r.shortfall)} in assumed fees`}.
             </p>
           </Card>
           <Card className="border-primary/40 p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-primary">Scenario B · BridgeFund</p>
-            <p className="mt-2 text-3xl font-semibold tabular text-primary">{usd(r.bridgeSponsorNeeded)}</p>
+            <p className="mt-2 text-3xl font-semibold tabular text-primary">{aed(r.bridgeSponsorNeeded)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              sponsor money after {usd(r.reductions)} in cost reductions{r.institutional > 0 && ` and ${usd(r.institutional)} institutional assistance`}.
+              sponsor money after {aed(r.reductions)} in cost reductions{r.institutional > 0 && ` and ${aed(r.institutional)} institutional assistance`}.
             </p>
           </Card>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           {[
-            { l: "Money saved", v: usd(r.moneySaved), h: "Cost removed rather than fundraised" },
-            { l: "Sponsor funds conserved", v: usd(r.sponsorConserved), h: "Per opportunity, A − B" },
-            { l: "Opportunities rescued", v: `${fmtCount(r.opportunitiesB)} vs ${fmtCount(r.opportunitiesA)}`, h: `With a ${usd(v.sponsorBudget)} budget (B vs A)` },
+            { l: "Money saved", v: aed(r.moneySaved), h: "Cost removed rather than fundraised" },
+            { l: "Sponsor funds conserved", v: aed(r.sponsorConserved), h: "Per opportunity, A − B" },
+            { l: "Opportunities rescued", v: `${fmtCount(r.opportunitiesB)} vs ${fmtCount(r.opportunitiesA)}`, h: `With a ${aed(v.sponsorBudget)} budget (B vs A)` },
             { l: "Impact multiplier", v: fmtMultiplier(r.multiplier), h: r.multiplier ? "Barriers resolved ÷ sponsor money" : "No sponsor money needed" },
           ].map((s) => (
             <Card key={s.l} className="p-4">
@@ -105,8 +105,8 @@ export function RescueSimulator() {
           ))}
         </div>
         {Number.isFinite(r.extraOpportunities) && r.extraOpportunities > 0 && (
-          <p className="rounded-lg border-l-2 border-primary bg-primary-light/60 px-4 py-3 text-sm dark:bg-primary/10">
-            The same {usd(v.sponsorBudget)} budget could support an estimated <strong>{r.extraOpportunities} more</strong> opportunit{r.extraOpportunities === 1 ? "y" : "ies"} like this one when costs are reduced before fundraising — assuming similar students qualify for similar reductions.
+          <p className="rounded-lg border-s-2 border-primary bg-primary-light/60 px-4 py-3 text-sm dark:bg-primary/10">
+            The same {aed(v.sponsorBudget)} budget could support an estimated <strong>{r.extraOpportunities} more</strong> opportunit{r.extraOpportunities === 1 ? "y" : "ies"} like this one when costs are reduced before fundraising — assuming similar students qualify for similar reductions.
           </p>
         )}
 
@@ -119,7 +119,7 @@ export function RescueSimulator() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={composition} layout="vertical" margin={{ left: 10, right: 10 }}>
                 <CartesianGrid horizontal={false} stroke="hsl(var(--border))" />
-                <XAxis type="number" {...axis} tickFormatter={(x) => usd(x)} />
+                <XAxis type="number" {...axis} tickFormatter={(x) => aed(x)} />
                 <YAxis type="category" dataKey="name" width={120} {...axis} />
                 <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />

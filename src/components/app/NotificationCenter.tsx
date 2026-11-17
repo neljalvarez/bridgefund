@@ -23,7 +23,7 @@ export function NotificationCenter() {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative" aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}>
           <Bell />
-          {unread > 0 && <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">{unread}</span>}
+          {unread > 0 && <span className="absolute end-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">{unread}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[min(380px,calc(100vw-1.5rem))]">
@@ -49,7 +49,7 @@ export function NotificationCenter() {
                   setOpen(false);
                   if (n.href) router.push(n.href);
                 }}
-                className="flex w-full gap-3 border-b px-4 py-3 text-left transition-colors last:border-0 hover:bg-muted/60"
+                className="flex w-full gap-3 border-b px-4 py-3 text-start transition-colors last:border-0 hover:bg-muted/60"
               >
                 <span className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-primary")} aria-hidden />
                 <span className="min-w-0">

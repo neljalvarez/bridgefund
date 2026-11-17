@@ -4,19 +4,25 @@ export { daysBetween };
 
 import { CURRENCIES } from "./regions";
 
-/** Display currency (all calculations stay in USD; conversion is display-only). */
-let display = { code: "USD", rate: 1 };
+/** UAE defaults: amounts are stored and calculated in AED; dates shown in Asia/Dubai. */
+export const LOCALE = "en-AE";
+export const TIME_ZONE = "Asia/Dubai";
+
+/** Display currency (all calculations stay in AED; conversion is display-only). */
+let display = { code: "AED", rate: 1 };
 export function setDisplayCurrency(code: string) {
   const c = CURRENCIES.find((x) => x.code === code) ?? CURRENCIES[0];
   display = { code: c.code, rate: c.rate };
 }
 export const displayCurrency = () => display.code;
 
-/** Formats a USD amount in the selected display currency. */
-export const usd = (n: number, cents?: boolean) => {
+/** Formats an AED amount (in the selected display currency, AED by default), e.g. "AED 1,250". */
+export const aed = (n: number, cents?: boolean) => {
   const v = n * display.rate;
-  const showCents = display.code === "USD" ? (cents ?? !Number.isInteger(Math.round(v * 100) / 100)) : false;
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: display.code, currencyDisplay: display.code === "USD" ? "symbol" : "code", minimumFractionDigits: showCents ? 2 : 0, maximumFractionDigits: showCents ? 2 : 0 }).format(display.code === "USD" ? v : Math.round(v));
+  const showCents = cents ?? !Number.isInteger(Math.round(v * 100) / 100);
+  return new Intl.NumberFormat(LOCALE, { style: "currency", currency: display.code, currencyDisplay: "code", minimumFractionDigits: showCents ? 2 : 0, maximumFractionDigits: showCents ? 2 : 0 })
+    .format(display.code === "AED" ? v : Math.round(v * 100) / 100)
+    .replace(/\u00a0/g, " ");
 };
 
 export const sum = (xs: number[]) => Math.round(xs.reduce((a, b) => a + b, 0) * 100) / 100;
@@ -31,9 +37,10 @@ export const isoDaysFromNow = (days: number, base = new Date()) => {
 };
 
 export const daysUntil = (iso: string) => daysBetween(new Date(), iso);
-export const fmtDate = (iso: string, opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" }) => new Date(iso).toLocaleDateString("en-US", opts);
-export const fmtDateLong = (iso: string) => fmtDate(iso, { year: "numeric", month: "long", day: "numeric" });
-export const fmtDateTime = (iso: string) => fmtDate(iso, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+export const fmtDate = (iso: string, opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }) => new Date(iso).toLocaleDateString(LOCALE, { timeZone: TIME_ZONE, ...opts });
+export const fmtDateLong = (iso: string) => fmtDate(iso, { day: "numeric", month: "long", year: "numeric" });
+export const fmtDateNumeric = (iso: string) => fmtDate(iso, { day: "2-digit", month: "2-digit", year: "numeric" });
+export const fmtDateTime = (iso: string) => new Date(iso).toLocaleString(LOCALE, { timeZone: TIME_ZONE, day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
 export const relDays = (iso: string) => {
   const d = daysUntil(iso);
@@ -69,14 +76,14 @@ export const EXPENSE_LABEL: Record<ExpenseCategory, string> = {
 export const EXPENSE_CATEGORIES = Object.keys(EXPENSE_LABEL) as ExpenseCategory[];
 
 export const OPP_LABEL: Record<OpportunityCategory, string> = {
-  certification: "Certification",
-  examination: "Examination",
+  "stem-competition": "STEM competition",
+  robotics: "Robotics competition",
+  "science-fair": "Science fair",
+  entrepreneurship: "Entrepreneurship",
   "university-application": "University application",
-  competition: "Competition",
   internship: "Internship",
-  interview: "Interview",
-  technology: "Technology access",
-  course: "Course",
+  workshop: "Workshop",
+  certification: "Certification",
 };
 export const OPP_CATEGORIES = Object.keys(OPP_LABEL) as OpportunityCategory[];
 

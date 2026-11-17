@@ -2,31 +2,33 @@
 
 **Small gaps. Big futures.**
 
-Students who qualify for an opportunity are often stopped by something small: an exam fee, a university application fee, a competition registration, a bus ticket or a calculator. BridgeFund finds those barriers and **reduces them before anyone is asked for money**. It checks fee waivers, free alternatives, discounts, equipment the student can borrow, institutional assistance and grants. Only after all of that does it connect the student with verified sponsors, and only for the amount still left.
+Students who qualify for an opportunity are often stopped by something small: a competition's materials, a bus fare, a university application cost, a book or a calculator. BridgeFund finds those barriers and **reduces them before anyone is asked for money**. It checks free alternatives, discounts, equipment the student can borrow, school support and grants. Only after all of that does it connect the student with verified sponsors, and only for the amount still left.
 
-BridgeFund is not a scholarship directory, a crowdfunding site, a budgeting app or a lender.
+**Launch market: the United Arab Emirates** — Abu Dhabi first, then Dubai, Sharjah and the remaining emirates. All amounts are in **AED**, dates use the UAE format and the Asia/Dubai time zone, and the interface works in **English and Arabic (right-to-left)**.
 
-> ⚠️ **Competition prototype.** Every student, institution, sponsor, programme, waiver, amount and outcome in this repository is fictional demonstration data. Sign-in, verification and transactions are simulated, and no real money moves. BridgeFund has not run a pilot and has no partners, customers or users. Final eligibility for any real waiver is always decided by the organisation that offers it.
+BridgeFund is not a scholarship directory, a crowdfunding site, a budgeting app or a lender. Students never pay.
+
+> ⚠️ **Competition prototype.** Every student, school, sponsor, request, amount and outcome in this repository is fictional demonstration data. Sign-in, verification and payments are simulated and no real money moves. Real fundraising and payments would require appropriate UAE regulatory review and authorised partners. BridgeFund has not run a pilot and has no partners, customers or users.
+>
+> The **UAE opportunities and assistance programmes** in the directory are real, taken from official pages (verified 17 November 2026, with source links in `src/lib/uae.ts`). BridgeFund is **not affiliated with or endorsed by** any of those organisations. Fees and deadlines that an organiser hasn't published are shown as *Not published* rather than estimated.
 
 ---
 
-## What's new in this version
+## What's new in the UAE version
 
 | Area | Where | What it does |
 | --- | --- | --- |
-| **BridgeEngine 2.0** | `/student/engine`, `src/lib/optimizer.ts` | Calculates three alternative assistance strategies (lowest out-of-pocket, fastest, lowest external dependency) under real constraints, compares their trade-offs and labels every source *Confirmed*, *Estimated* or *Pending*. |
-| **Opportunity Rescue Simulator** | `/simulator` | Crowdfunding vs. BridgeFund for any opportunity, with live charts. |
-| **Impact Multiplier** | Sponsor dashboard, institution analytics, demo, presentation | Barriers resolved ÷ sponsor funding used. |
-| **Financial Deadline Rescue** | Student dashboard, `/institution/urgent` | Countdown, gap, processing estimate, urgency, next action and alternatives; emergency-fund and priority review for staff. |
-| **Verification & fraud prevention** | Institution review cards, `/institution/audit` | Checklist, document review, duplicate detection, manual flags, funding history, simulated direct provider payments, CSV audit export. |
-| **Supply & demand matching** | `/institution/matching` | Matches needs to lending inventory, fee reductions, transport assistance and grants, with staff availability confirmation and no double assignment. |
-| **Social Impact Dashboard** | `/impact` | Public demonstration metrics with country and category filters, separating barriers resolved, participation and confirmed outcomes. |
-| **Sponsor Impact Planner** | `/sponsor/allocate` | Compares three allocation approaches for a budget; sponsors adjust, institutions approve the final allocation. |
-| **Business Model Simulator** | `/business#simulator` | MRR, ARR, costs, profit, break-even and 24-month projections under three scenarios. |
-| **Why BridgeFund?** | `/why` | Fair comparison with five alternative approaches and a research and evidence section with source links. |
-| **Global scalability** | `/scale`, Settings | Market registry, country-scoped programmes, display currencies and a navigation translation preview. |
-| **Pilot programme** | `/pilot` | Proposed pilot design and an empty dashboard for real, verified results. |
-| **Presentation Mode** | `/present` (“Present” in the main navigation and app header) | Fullscreen 8-section, ~3-minute pitch built from live components. |
+| **UAE localisation** | Everywhere | AED in every calculation, chart and simulated transaction; UAE date format and Asia/Dubai time; 15 fictional Emirati and expatriate students across all seven emirates; emirate filters. |
+| **English / Arabic** | Language button in every header, Settings | Arabic translation of navigation, dashboards and the main journey, with full RTL layout (logical CSS properties, mirrored icons). |
+| **UAE Opportunity Finder** | Student → **Opportunities** (`/student/waivers`) | 12 real opportunities — EYSC 2026, ATRC challenges, Emirates Robotics Competition, FIRST Tech Challenge UAE, ADEK work placements, NYUAD and AUS admissions and more — filtered by emirate, type and status (open / upcoming / closed), with location, eligibility, deadline, published fees, costs to plan for and the official link. **Plan my costs** sends one straight into the cost journey. |
+| **UAE Financial Assistance Directory** | Opportunities → *Cost help*; BridgeEngine | RTA student nol (50% off in Dubai), Abu Dhabi Hafilat, MAKTABA libraries, NYUAD, ADU and AUS financial aid. BridgeEngine applies the ones that fit the student's emirate (e.g. nol only when the saving exceeds the card cost) and lists the rest as "Also worth checking". |
+| **Mariam demo** | `/demo`, `/present`, landing | Fictional Grade 11 student in Abu Dhabi: STEM competition costs AED 600 (materials 350, transport 100, competition 150); she has AED 150. Borrowed kit saves 200, school support 100, sponsor 150 → gap **AED 450 → 150 → 0**, multiplier **3.00x**. |
+| **Institution pilot workflow** | Institution dashboard | Verify expenses, approve assistance, manage resources, track allocations, collect feedback and confirm participation from one card. |
+| **Privacy & trust** | Throughout | Anonymous student IDs for sponsors, guardian consent for under-18s (submit is blocked until it's given; staff see a check), documents visible only to the verifying school, duplicate-funding checks, audit log. |
+| **Feedback & CSV** | Feedback button in the app header; `/pilot` | Anonymous 1–5 rating + optional comment. Pilot metrics and feedback export as CSV (UTF-8 with BOM, so Arabic opens correctly in Excel). |
+| **Business model in AED** | `/business#simulator` | School/university subscriptions, CSR-sponsored programmes, institutional licensing, operating and verification costs, break-even. Every figure is a labelled hypothetical projection; there are no actual results to report. |
+| **Impact by emirate** | `/impact` | Barriers resolved, student expenses reduced, sponsor funds conserved, opportunities unlocked, average processing time — computed from request records — plus a clickable map of the seven emirates. |
+| **UAE expansion & pilot** | `/scale`, `/pilot` | Abu Dhabi → Dubai → Sharjah → remaining emirates → GCC, and a proposed one-term Abu Dhabi school pilot with an empty dashboard for real results. |
 
 ## Quick start
 
@@ -43,9 +45,9 @@ npm run dev            # → http://localhost:3000
 | `npm run build` | Production build (all pages prerender) |
 | `npm start` | Serve the production build |
 | `npm run typecheck` | TypeScript check |
-| `npm test` | 22 unit tests: BridgeEngine, optimiser, allocation, funding rules, verification, matching, simulator and business model (Node ≥ 22.6) |
+| `npm test` | 24 unit tests: BridgeEngine (incl. the AED demo and emirate rules), optimiser, allocation, funding rules, guardian consent, verification, matching, simulator and business model (Node ≥ 22.6) |
 
-You need Node.js 18.18 or newer; Node 22 is recommended. The app needs no API keys, database or paid services. Demo data lives in the browser's `localStorage` under `bridgefund-state` (schema version 5; older saved data is replaced automatically).
+You need Node.js 18.18 or newer; Node 22 is recommended. The app needs no API keys, database or paid services. Demo data lives in the browser's `localStorage` under `bridgefund-state` (schema version 6; older saved data is replaced automatically).
 
 ## Deploy to Vercel
 
@@ -59,42 +61,40 @@ Or use the CLI: `npx vercel --prod`.
 
 ### Option A — Presentation Mode (about 3 minutes)
 
-Open `/present` or click **Present**. Use ← → (or Space, PageUp/PageDown), number keys **1–8**, or the section tabs. **F** toggles fullscreen. A timer tracks progress against the 3:00 target and can be paused by clicking it. The live journey runs in a sandbox, so presenting never changes the demo data.
+Open `/present` or click **Present**. Use ← → (or Space, PageUp/PageDown), number keys **1–8**, or the section tabs. **F** toggles fullscreen. The live journey runs in a sandbox, so presenting never changes the demo data.
 
 | # | Section | ~Time | Show |
 | --- | --- | --- | --- |
-| 1 | The problem | 20s | Amina's $110 gap and three sourced statistics |
+| 1 | The problem | 20s | Mariam's AED 450 gap and three sourced UAE figures |
 | 2 | Existing solution limitations | 20s | Five alternative approaches and the missing piece |
-| 3 | Introducing BridgeFund | 20s | Identify → Reduce → Verify → Fund, with the interactive gap example |
-| 4 | BridgeEngine demonstration | 30s | The animated seven-step analysis, then the **Strategy comparison** tab |
-| 5 | Live student journey | 35s | Press the four steps: submit, verify, fund, pay provider. The record ends with a **1.83x** multiplier. |
-| 6 | Measurable social impact | 25s | $110 ÷ $60 = 1.83x; 8 vs 4 opportunities from a $500 budget |
-| 7 | Business model and scalability | 20s | Revenue streams, break-even, markets |
+| 3 | Introducing BridgeFund | 20s | Identify → Reduce → Verify → Fund |
+| 4 | BridgeEngine demonstration | 30s | The seven-step analysis, then **Strategy comparison** |
+| 5 | Live student journey | 35s | Submit, verify, fund, pay provider |
+| 6 | Measurable social impact | 25s | AED 450 ÷ AED 150 = 3.00x; 2 vs 6 opportunities from AED 1,000 |
+| 7 | Business model and scalability | 20s | Revenue streams, break-even, Abu Dhabi → every emirate |
 | 8 | Future vision | 10s | Pilot → year one → beyond |
 
 ### Option B — 90-second demo
 
-Click **See how it works** on the landing page, **Launch Interactive Demo** in the app, or go to `/demo`. One fictional student, five steps, one button per step (→ also works). Every step performs the real action, so the student, school and sponsor dashboards update too.
+Click **See how it works** on the landing page, **Launch demo** in the app, or go to `/demo`. Every step performs the real action, so the student, school and sponsor dashboards update too.
 
 | # | Step | Big number | Button |
 | --- | --- | --- | --- |
-| 1 | The barrier | **$110** missing ($180 exam, $70 saved) | Run BridgeEngine |
-| 2 | BridgeEngine | **$60** left after a $50 fee waiver | Verify as her school |
-| 3 | Verified | **$60** verified need | Fund as a sponsor |
-| 4 | Funded | **$0** — sponsor balance $500 → $440 | See the impact (pays the provider) |
-| 5 | Impact | **1.83x** impact multiplier | Replay (resets the data) |
+| 1 | The barrier | **AED 450** missing (AED 600 costs, AED 150 saved) | Run BridgeEngine |
+| 2 | BridgeEngine | **AED 150** left after a borrowed kit (200) and school support (100) | Verify as her school |
+| 3 | Verified | **AED 150** verified need | Fund as a sponsor |
+| 4 | Funded | **AED 0** — Ghaf Community Fund AED 1,000 → 850 | See the impact |
+| 5 | Impact | **3.00x** impact multiplier | Replay (resets the data) |
 
 ### Option C — Explore the features
 
-1. **Student → Get assistance**: costs, BridgeEngine, choose a plan, submit, track — all on one page.
-2. **Student → Dashboard**: the *Financial deadline rescue* card lists at-risk opportunities.
-3. **Institution → Urgent cases**: deadline-risk cases, requests flagged for manual review (try BF-2056, a possible duplicate, and BF-2057, an institution mismatch with missing documents), and sponsor allocations awaiting approval.
-4. **Institution → Requests**: expand a request to see the verification checklist, accept or reject documents, raise or resolve flags, and approve (a confirmation lists any open items).
-5. **Institution → Needs matching**: confirm availability and assign a match; it disappears from the list.
-6. **Sponsor → Budget planner**: compare approaches, adjust amounts, submit for review — then approve or decline it under Institution → Urgent cases.
-7. **Institution → Audit log**: every action, plus the simulated provider-payment ledger, exportable to CSV.
-8. Public pages: `/simulator`, `/impact`, `/business#simulator`, `/why`, `/scale`, `/pilot`.
-9. **Settings**: switch the display currency (e.g. KES) and preview French or Spanish navigation.
+1. **Student → Opportunities**: filter real UAE opportunities by emirate, type and status; open *Cost help*; press **Plan my costs** on one.
+2. **Student → Get assistance**: costs, BridgeEngine, choose a plan, guardian consent (Mariam is 16), submit, track.
+3. **Institution → Dashboard**: the *Pilot workflow* card links every pilot task; *Export feedback CSV*.
+4. **Institution → Requests**: verification checklist (including guardian consent), documents, flags; try BF-2056 (possible duplicate) and BF-2057 (institution mismatch).
+5. **Sponsor → Explore needs**: students appear only as anonymous IDs with their emirate.
+6. **Switch to العربية** in any header to see the right-to-left interface.
+7. Public pages: `/impact` (click an emirate), `/simulator`, `/business#simulator`, `/scale`, `/pilot` (CSV exports), `/why`.
 
 ## Features
 
@@ -118,7 +118,7 @@ Click **See how it works** on the landing page, **Launch Interactive Demo** in t
 - **Get assistance** (`/student/engine`). The five-step journey above, with BridgeEngine at its centre.
 - **Assistance requests** (`/student/requests`). Each request has a purpose, exact amount, deadline, breakdown, private explanation, document placeholders and a verifying institution. Requests move through **Draft → Submitted → Under Review → Additional Information Required → Verified → Partially Funded → Fully Funded → Completed**.
 - **Opportunity cost calculator** (`/student/calculator`). Compares up to three opportunities across eight cost categories and shows total cost, available assistance, out-of-pocket cost, remaining gap and an affordability chart.
-- **Fee waiver finder** (`/student/waivers`). Filter by country, opportunity type, education level, eligibility, deadline and estimated savings, and save waivers. A personalised eligibility assessment labels each result *likely*, *check requirements* or *not available*, and never guarantees eligibility.
+- **Opportunities** (`/student/waivers`). Real UAE opportunities filtered by emirate, type and status, each with eligibility, deadline, published fees (or *Not published*), costs to plan for and the official link; a *Cost help* tab lists real UAE assistance programmes. Nothing here guarantees eligibility — the organiser decides.
 - **Borrow equipment** (`/student/resources`). Search and filter by category and location, then reserve an item and track it from Reserved to Collected to Returned. Each item shows how much borrowing saves.
 - **My progress** (`/student/tracker`). A calendar view, per-deadline reminders, documents still required, money saved and personal milestones.
 
@@ -146,7 +146,7 @@ Global search (`⌘K` / `Ctrl+K`), a notification center for each role, deadline
 
 ## Calculation methods
 
-All calculations run in USD in pure, unit-tested functions. Display currency conversion uses fixed illustrative rates and happens only at formatting time.
+All calculations run in AED in pure, unit-tested functions. Display currency conversion uses fixed illustrative rates and happens only at formatting time.
 
 ### BridgeEngine 2.0 — strategy optimisation (`src/lib/optimizer.ts`)
 
@@ -174,7 +174,7 @@ The *independent* strategy is recommended unless it cannot meet the deadline and
 multiplier = financial barriers resolved ÷ sponsor funding used
 barriers resolved = confirmed cost reductions + institutional assistance + sponsor money (incl. shared pool)
 ```
-Only fully funded or completed requests count. **The student's own funds are never counted.** Demo case: shortfall $110 (=$180 − $70), waiver $50, sponsor $60 → $110 ÷ $60 = **1.83x**. Requests resolved without any sponsor money have no multiplier (shown as “—”).
+Only fully funded or completed requests count. **The student's own funds are never counted.** Demo case: gap AED 450 (= AED 600 − AED 150), borrowed kit AED 200, school support AED 100, sponsor AED 150 → 450 ÷ 150 = **3.00x**. Requests resolved without any sponsor money have no multiplier (shown as “—”).
 
 ### Financial Deadline Rescue (`src/lib/deadline.ts`)
 
@@ -186,7 +186,7 @@ Institutional verification (student enrolled at the verifying institution), oppo
 
 ### Needs matching (`src/lib/matching.ts`)
 
-For each open expense: lending inventory by keyword and category, fee reductions valid for the student's country, level and eligibility, the institution's travel programme for transport, and grant programmes with budget left. Each match lists its reasons and availability. A key (`opportunity:expense:source`) can only be assigned or suggested once; resources reserve a unit, grants and transport debit their budgets, and a match attached to an open request becomes a *Confirmed* reduction.
+For each open expense: lending inventory by keyword and category, fee reductions valid for the student's emirate, level and eligibility (e.g. RTA nol only in Dubai and only when the saving beats the card cost), the institution's travel programme for transport, and grant programmes with budget left. Each match lists its reasons and availability. A key (`opportunity:expense:source`) can only be assigned or suggested once; resources reserve a unit, grants and transport debit their budgets, and a match attached to an open request becomes a *Confirmed* reduction.
 
 ### Sponsor Impact Planner (`src/lib/allocation.ts`)
 
@@ -260,7 +260,9 @@ src/
     student/ sponsor/ institution/ demo/
   lib/
     types.ts              Domain model
-    knowledge.ts          Seeded, country-scoped waivers, alternatives and grants (fictional)
+    knowledge.ts          Emirate-scoped discounts, alternatives and grants used by BridgeEngine
+    uae.ts                Real UAE opportunities and assistance programmes, with sources and verified date
+    csv.ts                CSV export for pilot metrics and anonymised feedback
     seed.ts               15 students, 13 institutions, 3 sponsor pools, 16 requests, 13 resources
     engine.ts             BridgeEngine seven-step analysis
     optimizer.ts          BridgeEngine 2.0 strategy optimisation
@@ -283,10 +285,10 @@ tests/                    Node test runner unit tests
 ## Current limitations
 
 - **Simulated everything.** No authentication, database, payments, document storage or messaging; data lives in one browser's `localStorage`, so roles share state only within that browser. *Reset demo* also clears any pilot results recorded on `/pilot`.
-- **Seeded knowledge base.** Waivers, grants and alternatives are fictional. Eligibility uses simple yes/no signals, and processing times and likelihoods are fixed assumptions, not learned from data.
+- **Directory is a snapshot.** UAE opportunities and assistance programmes were checked against official pages on 17 November 2026 and will go out of date; there is no live feed. School-level programmes (e.g. "School STEM travel support (example)") and the two grant funds are fictional. Eligibility uses simple yes/no signals, and processing times and likelihoods are fixed assumptions.
 - **Heuristic optimisation.** Strategies are built greedily from policy orderings; they are not proven globally optimal. Likelihoods are estimates, not probabilities validated against outcomes.
-- **Display-only currencies.** Exchange rates are fixed and illustrative; amount inputs remain in USD.
-- **Translation preview.** Only navigation chrome is translated (French and Spanish previews).
+- **Display-only currencies.** All amounts are stored in AED. Other display currencies use the USD peg (3.6725) or fixed illustrative rates.
+- **Partial Arabic.** Navigation, dashboards, the main journey and the landing hero are translated; detailed pages and demo data remain in English. Translations should be reviewed by a native speaker before any real use.
 - **Models, not forecasts.** The simulators make simplifying assumptions (e.g. no crowdfunding success rates, constant growth/churn) and are for discussion only.
 - **Fraud checks are basic.** Duplicate detection is rule-based; there is no document authenticity analysis or identity verification.
 
@@ -299,11 +301,11 @@ tests/                    Node test runner unit tests
 | Data | PostgreSQL (e.g. Supabase or Neon) with row-level security per institution; an append-only audit table; programme catalogue tables keyed by country, level and eligibility rule. |
 | Identity | Role-based auth (institution staff, sponsors, students), SSO for institutions, guardian consent for minors, MFA for staff. |
 | Documents | Encrypted object storage with signed URLs, virus scanning and retention policies; documents visible only to the verifying institution. |
-| Payments | Licensed payment partners per market (e.g. card processors and mobile-money aggregators) paying **providers directly**; sponsor funds held by a regulated partner, never by BridgeFund on students' behalf. |
+| Payments | Authorised payment partners licensed by the Central Bank of the UAE, paying **providers directly**; sponsor funds held by a regulated partner, never by BridgeFund. Charitable fundraising would need the relevant emirate-level approvals. |
 | FX | A licensed exchange-rate feed; amounts stored with currency and settled locally. |
 | Notifications | Email/SMS/WhatsApp via a provider, with deadline reminders scheduled by a job queue. |
 | Analytics | Aggregated, de-identified reporting with small-number suppression; public impact page fed only by institution-confirmed data. |
-| Compliance | Data-protection review per market (e.g. Kenya's Data Protection Act), safeguarding policies, and external audit of fund flows. |
+| Compliance | UAE Personal Data Protection Law review, ADEK/KHDA/SPEA requirements for school data, guardian consent for minors, safeguarding policies and external audit of fund flows. |
 | i18n | `next-intl` with locally reviewed translations. |
 
 ## Tech stack
@@ -315,6 +317,7 @@ Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui (Radix primit
 - Money is paid directly to providers, never to students as cash.
 - Sponsors see goals, amounts, deadlines and outcomes, never personal circumstances.
 - No automated system approves or rejects a student; checks only advise staff.
-- All simulated data is clearly labelled. The app makes no claims of real impact, testimonials, users, pilots or partnerships, and external claims link to their sources (`/why#evidence`).
+- All simulated data is clearly labelled. The app makes no claims of real impact, testimonials, users, pilots or partnerships, and external claims link to their sources (`/why#evidence`, `src/lib/uae.ts`).
+- Listing a real UAE programme does not imply any partnership with, or endorsement by, the organisation that runs it.
 
 The previous vintage-styled prototype is preserved on the `vintage-prototype` branch.

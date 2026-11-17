@@ -1,75 +1,72 @@
 /**
- * Demonstration seed data. Every student, institution, sponsor and amount is
- * FICTIONAL. Deadlines are generated relative to the day the demo is seeded so
- * the walkthrough always makes sense.
+ * Demonstration seed data for the UAE launch market. Every student, school,
+ * sponsor, request and amount here is FICTIONAL (amounts in AED). Real UAE
+ * opportunities and assistance programmes live in src/lib/uae.ts. Deadlines are
+ * generated relative to the day the demo is seeded.
  */
 import type { AppState, Contribution, DistributionEvent, Expense, FundingRequest, Institution, Opportunity, Reduction, RequestStatus, Resource, Sponsor, Student } from "./types";
 import { isoDaysFromNow } from "./format";
 import { GRANT_BUDGETS } from "./knowledge";
 
-export const STATE_VERSION = 5;
-export const DEMO_STUDENT_ID = "s-amina";
-export const DEMO_OPPORTUNITY_ID = "o-amina-cert";
-export const DEMO_SPONSOR_ID = "sp-juniper";
+export const STATE_VERSION = 6;
+export const DEMO_STUDENT_ID = "s-mariam";
+export const DEMO_OPPORTUNITY_ID = "o-mariam-stem";
+export const DEMO_SPONSOR_ID = "sp-ghaf";
 
+const UAE = "United Arab Emirates";
 export const INSTITUTIONS: Institution[] = [
-  { id: "i-northfield", name: "Northfield Community School", type: "School", country: "Kenya", city: "Nairobi", fund: 600 },
-  { id: "i-riverside", name: "Riverside Secondary School", type: "School", country: "Philippines", city: "Cebu", fund: 250 },
-  { id: "i-ponte", name: "Ponte Educational Trust", type: "Nonprofit", country: "Brazil", city: "Recife", fund: 400 },
-  { id: "i-lakeshore", name: "Lakeshore Public High School", type: "School", country: "India", city: "Pune", fund: 180 },
-  { id: "i-horizon", name: "Horizon Learning Collective", type: "Nonprofit", country: "Jordan", city: "Amman", fund: 350 },
-  { id: "i-valleverde", name: "Valle Verde Preparatoria", type: "School", country: "Mexico", city: "Puebla", fund: 150 },
-  { id: "i-brightpath", name: "Bright Path Education Foundation", type: "Nonprofit", country: "Nigeria", city: "Lagos", fund: 300 },
-  { id: "i-songhan", name: "Song Han Upper Secondary", type: "School", country: "Vietnam", city: "Da Nang", fund: 120 },
-  { id: "i-altamira", name: "Altamira Community College", type: "University", country: "Colombia", city: "Medellín", fund: 280 },
-  { id: "i-merapi", name: "Merapi Senior High School", type: "School", country: "Indonesia", city: "Yogyakarta", fund: 140 },
-  { id: "i-asante", name: "Asante Ridge Senior High", type: "School", country: "Ghana", city: "Kumasi", fund: 160 },
-  { id: "i-ravi", name: "Ravi Scholars Trust", type: "Nonprofit", country: "Pakistan", city: "Lahore", fund: 320 },
-  { id: "i-pacifico", name: "Colegio Pacífico", type: "School", country: "Peru", city: "Lima", fund: 130 },
+  { id: "i-ghaf", name: "Ghaf Grove School", type: "School", country: UAE, city: "Abu Dhabi", fund: 2400 },
+  { id: "i-oasis", name: "Oasis Ridge Secondary", type: "School", country: UAE, city: "Al Ain", fund: 1800 },
+  { id: "i-falcon", name: "Falcon Heights Academy", type: "School", country: UAE, city: "Dubai", fund: 2000 },
+  { id: "i-creekside", name: "Creekside College", type: "University", country: UAE, city: "Dubai", fund: 3000 },
+  { id: "i-corniche", name: "Corniche Learning Centre", type: "School", country: UAE, city: "Sharjah", fund: 1400 },
+  { id: "i-pearl", name: "Pearl Coast School", type: "School", country: UAE, city: "Ajman", fund: 900 },
+  { id: "i-mangrove", name: "Mangrove Bay School", type: "School", country: UAE, city: "Umm Al Quwain", fund: 700 },
+  { id: "i-jebel", name: "Jebel View Academy", type: "School", country: UAE, city: "Ras Al Khaimah", fund: 1100 },
+  { id: "i-wadi", name: "Wadi Hills School", type: "School", country: UAE, city: "Fujairah", fund: 800 },
+  { id: "i-desertrose", name: "Desert Rose Youth Foundation", type: "Nonprofit", country: UAE, city: "Sharjah", fund: 2500 },
 ];
 
 const elig = (lowIncome: boolean, publicSchool: boolean, firstGeneration: boolean, hasSchoolLetter: boolean) => ({ lowIncome, publicSchool, firstGeneration, hasSchoolLetter });
+const stu = (id: string, firstName: string, initials: string, emirate: Student["emirate"], city: string, residency: Student["residency"], age: number, grade: string, level: Student["level"], institutionId: string, goal: string, eligibility: Student["eligibility"]): Student => ({ id, firstName, initials, country: UAE, city, emirate, residency, age, grade, level, institutionId, goal, eligibility });
 
 export const STUDENTS: Student[] = [
-  { id: "s-amina", firstName: "Amina", initials: "AY", country: "Kenya", city: "Nairobi", grade: "Grade 12", level: "secondary", institutionId: "i-northfield", goal: "Become a certified data analyst", eligibility: elig(true, true, true, true) },
-  { id: "s-joshua", firstName: "Joshua", initials: "JR", country: "Philippines", city: "Cebu", grade: "Grade 11", level: "secondary", institutionId: "i-riverside", goal: "Compete in the national science olympiad finals", eligibility: elig(true, true, false, true) },
-  { id: "s-lucia", firstName: "Lucía", initials: "LM", country: "Colombia", city: "Medellín", grade: "Pre-university", level: "pre-university", institutionId: "i-altamira", goal: "Qualify for an engineering degree", eligibility: elig(true, true, true, true) },
-  { id: "s-priya", firstName: "Priya", initials: "PK", country: "India", city: "Pune", grade: "Diploma, year 1", level: "vocational", institutionId: "i-lakeshore", goal: "Complete a software engineering internship", eligibility: elig(true, true, true, true) },
-  { id: "s-mateus", firstName: "Mateus", initials: "MS", country: "Brazil", city: "Recife", grade: "Final year", level: "secondary", institutionId: "i-ponte", goal: "Sit the national university entrance exam", eligibility: elig(true, true, true, false) },
-  { id: "s-hana", firstName: "Hana", initials: "HA", country: "Jordan", city: "Amman", grade: "Grade 12", level: "secondary", institutionId: "i-horizon", goal: "Meet the English requirement for university", eligibility: elig(true, false, true, true) },
-  { id: "s-diego", firstName: "Diego", initials: "DR", country: "Mexico", city: "Puebla", grade: "Grade 12", level: "secondary", institutionId: "i-valleverde", goal: "Attend a coding academy admission interview", eligibility: elig(true, true, false, true) },
-  { id: "s-ngozi", firstName: "Ngozi", initials: "NO", country: "Nigeria", city: "Lagos", grade: "Year 2", level: "undergraduate", institutionId: "i-brightpath", goal: "Finish an online data science course", eligibility: elig(true, false, true, true) },
-  { id: "s-linh", firstName: "Linh", initials: "LT", country: "Vietnam", city: "Da Nang", grade: "Grade 11", level: "secondary", institutionId: "i-songhan", goal: "Represent the school at the national debate championship", eligibility: elig(false, true, false, true) },
-  { id: "s-putri", firstName: "Putri", initials: "PW", country: "Indonesia", city: "Yogyakarta", grade: "Grade 12", level: "secondary", institutionId: "i-merapi", goal: "Apply to a public university", eligibility: elig(true, true, true, false) },
-  { id: "s-ayesha", firstName: "Ayesha", initials: "AK", country: "Pakistan", city: "Lahore", grade: "Grade 12", level: "secondary", institutionId: "i-ravi", goal: "Sit the engineering university entrance test", eligibility: elig(true, true, true, true) },
-  { id: "s-kofi", firstName: "Kofi", initials: "KM", country: "Ghana", city: "Kumasi", grade: "Final year", level: "undergraduate", institutionId: "i-asante", goal: "Start an agricultural research internship", eligibility: elig(true, true, true, true) },
-  { id: "s-mariana", firstName: "Mariana", initials: "MQ", country: "Peru", city: "Lima", grade: "Grade 11", level: "secondary", institutionId: "i-pacifico", goal: "Join the national youth robotics team", eligibility: elig(false, true, false, true) },
-  { id: "s-fatima", firstName: "Fatima", initials: "FH", country: "Kenya", city: "Nairobi", grade: "Grade 12", level: "secondary", institutionId: "i-northfield", goal: "Complete A-level chemistry practicals", eligibility: elig(true, true, false, true) },
-  { id: "s-tomas", firstName: "Tomás", initials: "TB", country: "Philippines", city: "Cebu", grade: "Grade 10", level: "secondary", institutionId: "i-riverside", goal: "Compete at the regional robotics finals", eligibility: elig(true, true, false, true) },
+  stu("s-mariam", "Mariam", "MA", "Abu Dhabi", "Abu Dhabi", "Emirati", 16, "Grade 11", "secondary", "i-ghaf", "Compete in a national STEM competition", elig(true, false, false, true)),
+  stu("s-omar", "Omar", "OK", "Abu Dhabi", "Al Ain", "Emirati", 17, "Grade 12", "secondary", "i-oasis", "Present a science fair project", elig(true, true, true, true)),
+  stu("s-priya", "Priya", "PN", "Dubai", "Dubai", "Expatriate", 16, "Grade 11", "secondary", "i-falcon", "Build the school robotics team's robot", elig(true, false, false, true)),
+  stu("s-yusuf", "Yusuf", "YH", "Dubai", "Dubai", "Expatriate", 19, "University, year 1", "undergraduate", "i-creekside", "Complete a first engineering internship", elig(true, false, true, true)),
+  stu("s-hessa", "Hessa", "HS", "Sharjah", "Sharjah", "Emirati", 15, "Grade 10", "secondary", "i-corniche", "Enter a science fair", elig(true, true, false, true)),
+  stu("s-aisha", "Aisha", "AR", "Sharjah", "Sharjah", "Expatriate", 17, "Grade 12", "secondary", "i-corniche", "Apply to university", elig(true, false, true, true)),
+  stu("s-rohan", "Rohan", "RM", "Ajman", "Ajman", "Expatriate", 16, "Grade 11", "secondary", "i-pearl", "Compete with the robotics club", elig(true, false, false, true)),
+  stu("s-khalid", "Khalid", "KA", "Umm Al Quwain", "Umm Al Quwain", "Emirati", 17, "Grade 12", "secondary", "i-mangrove", "Exhibit a student business", elig(true, true, false, true)),
+  stu("s-noura", "Noura", "NS", "Ras Al Khaimah", "Ras Al Khaimah", "Emirati", 18, "Grade 12", "secondary", "i-jebel", "Attend an AI workshop in Abu Dhabi", elig(false, true, false, true)),
+  stu("s-joseph", "Joseph", "JD", "Fujairah", "Fujairah", "Expatriate", 15, "Grade 10", "secondary", "i-wadi", "Join a coding workshop", elig(true, false, true, true)),
+  stu("s-fatima", "Fatima", "FM", "Abu Dhabi", "Abu Dhabi", "Emirati", 20, "University, year 2", "undergraduate", "i-ghaf", "Present research at a student conference", elig(true, true, false, true)),
+  stu("s-ahmed", "Ahmed", "AT", "Dubai", "Dubai", "Expatriate", 17, "Grade 12", "secondary", "i-falcon", "Prepare for university entrance", elig(true, false, false, true)),
+  stu("s-layla", "Layla", "LB", "Abu Dhabi", "Abu Dhabi", "Expatriate", 16, "Grade 11", "secondary", "i-oasis", "Join the school robotics team", elig(true, true, false, true)),
+  stu("s-saeed", "Saeed", "SH", "Ras Al Khaimah", "Ras Al Khaimah", "Emirati", 14, "Grade 9", "secondary", "i-jebel", "Compete at a regional robotics event", elig(true, true, false, true)),
+  stu("s-maria", "Maria", "MC", "Fujairah", "Fujairah", "Expatriate", 18, "Grade 12", "secondary", "i-wadi", "Complete hospitality training", elig(true, false, true, true)),
 ];
 
 export const SPONSORS: Sponsor[] = [
-  { id: DEMO_SPONSOR_ID, name: "Juniper Demo Fund", type: "Foundation", balance: 500, startingBalance: 500 },
-  { id: "sp-harbor", name: "Harbor Tech CSR Programme", type: "Company", balance: 1200, startingBalance: 1400 },
-  { id: "sp-community", name: "Community Giving Circle", type: "Individual", balance: 260, startingBalance: 400 },
+  { id: DEMO_SPONSOR_ID, name: "Ghaf Community Fund", type: "Foundation", balance: 1000, startingBalance: 1000 },
+  { id: "sp-horizon", name: "Gulf Horizon CSR Programme", type: "Company", balance: 4200, startingBalance: 5000 },
+  { id: "sp-parents", name: "Parents' Giving Circle", type: "Individual", balance: 900, startingBalance: 1500 },
 ];
 
 const res = (id: string, name: string, type: Resource["type"], institutionId: string, total: number, available: number, retailValue: number, loanTerm: string, description: string, keywords: string[]): Resource => ({ id, name, type, institutionId, total, available, retailValue, loanTerm, description, keywords });
 
 export const RESOURCES: Resource[] = [
-  res("r-graphing", "Graphing calculator", "calculator", "i-northfield", 12, 5, 120, "Full school term", "Exam-approved graphing calculators for mathematics and science papers.", ["graphing calculator"]),
-  res("r-sci-calc", "Scientific calculator", "calculator", "i-riverside", 25, 18, 25, "Full school term", "Standard scientific calculators for coursework and exams.", ["scientific calculator"]),
-  res("r-laptop", "Refurbished laptop", "laptop", "i-northfield", 8, 2, 450, "One semester", "Refurbished laptops with office and coding software installed.", ["laptop", "computer"]),
-  res("r-laptop-2", "Chromebook", "laptop", "i-brightpath", 10, 3, 260, "One semester", "Lightweight laptops for online courses and applications.", ["chromebook"]),
-  res("r-robot-kit", "Robotics starter kit", "engineering", "i-northfield", 6, 3, 85, "Until the competition ends", "Microcontroller, motors, sensors and chassis for school robotics teams.", ["robot"]),
-  res("r-sensor-kit", "Sensor and controller kit", "engineering", "i-pacifico", 4, 1, 150, "Until the competition ends", "Sensors and a programmable controller for advanced robotics.", ["sensor", "controller kit"]),
-  res("r-lab-set", "Lab goggles and coat set", "lab-equipment", "i-northfield", 20, 14, 35, "Practical exam period", "Safety equipment required for chemistry and biology practicals.", ["goggles", "lab coat"]),
-  res("r-microscope", "Student microscope kit", "lab-equipment", "i-ponte", 5, 1, 140, "Two weeks", "Portable microscope with prepared slides for biology projects.", ["microscope"]),
-  res("r-math-books", "Advanced mathematics textbook set", "textbook", "i-altamira", 15, 6, 60, "Academic year", "Exchange shelf for pre-university mathematics textbooks.", ["math textbook", "mathematics textbook"]),
-  res("r-physics-books", "Physics textbook set", "textbook", "i-riverside", 10, 4, 55, "Academic year", "Donated physics textbooks passed between year groups.", ["physics textbook"]),
-  res("r-prep-pack", "Certification exam prep pack", "exam-prep", "i-northfield", 10, 7, 40, "Until your exam date", "Printed past papers, a revision guide and access to recorded lessons.", ["prep pack", "revision guide"]),
-  res("r-printer", "3D printer time slot", "school-equipment", "i-lakeshore", 4, 4, 30, "Two-hour slot", "Supervised 3D printer access for STEM project prototypes.", ["3d print"]),
-  res("r-interview", "Interview clothing closet", "school-equipment", "i-valleverde", 12, 7, 70, "One week", "Clean, professional outfits for interviews and award ceremonies.", ["interview outfit", "formal clothes"]),
+  res("r-stem-kit", "Arduino-compatible STEM kit", "engineering", "i-ghaf", 6, 3, 200, "Until the competition ends", "Microcontroller, sensors and wiring for STEM projects.", ["project materials", "stem kit", "microcontroller", "arduino"]),
+  res("r-robot-kit", "Robotics starter kit", "engineering", "i-falcon", 4, 2, 180, "Until the competition ends", "Motors, chassis and controller for school robotics teams.", ["robot parts", "robotics kit"]),
+  res("r-sensor-kit", "Sensor and controller kit", "engineering", "i-oasis", 3, 1, 300, "Until the competition ends", "Advanced sensors and a programmable controller.", ["sensor kit", "sensor"]),
+  res("r-laptop", "Refurbished laptop", "laptop", "i-falcon", 8, 2, 1200, "One term", "Laptops with office and coding software installed.", ["laptop"]),
+  res("r-graphing", "Graphing calculator", "calculator", "i-corniche", 15, 6, 350, "Full school term", "Exam-approved graphing calculators.", ["graphing calculator"]),
+  res("r-sci-calc", "Scientific calculator", "calculator", "i-pearl", 25, 18, 60, "Full school term", "Scientific calculators for coursework and exams.", ["scientific calculator"]),
+  res("r-microscope", "Student microscope kit", "lab-equipment", "i-oasis", 5, 1, 450, "Two weeks", "Portable microscope with prepared slides.", ["microscope"]),
+  res("r-lab-set", "Lab goggles and coat set", "lab-equipment", "i-corniche", 20, 14, 90, "Practical exam period", "Safety equipment for practicals.", ["goggles", "lab coat"]),
+  res("r-printer", "3D printer time slot", "school-equipment", "i-jebel", 4, 4, 80, "Two-hour slot", "Supervised 3D printer access for prototypes.", ["3d print"]),
+  res("r-uniform", "Professional dress closet", "school-equipment", "i-wadi", 12, 7, 200, "One month", "Clean, professional outfits for placements and interviews.", ["uniform", "formal"]),
 ];
 
 const exp = (id: string, label: string, category: Expense["category"], amount: number, confirmed = true): Expense => ({ id, label, category, amount, confirmed });
@@ -98,22 +95,22 @@ interface ReqSeed {
 }
 
 const REQUESTS: ReqSeed[] = [
-  { id: "r-joshua", ref: "BF-2041", studentId: "s-joshua", days: 6, funded: 0, status: "Verified", explanation: "Family income covers school costs but not an unplanned inter-island trip.", title: "National Science Olympiad finals trip", provider: "National Science Olympiad Committee", category: "competition", outcome: "Compete at national level; finalists are considered for university science scholarships.", studentFunds: 20, expenses: [exp("e1", "Finalist registration", "registration", 25), exp("e2", "Ferry and bus fare", "transportation", 48), exp("e3", "Two nights' dormitory stay", "accommodation", 30, false)], reductions: [red("waiver", "w-olympiad", "Olympiad Finalist Registration Waiver", 25, "e1")] },
-  { id: "r-lucia", ref: "BF-2043", studentId: "s-lucia", days: 16, funded: 20, status: "Partially Funded", explanation: "Registration opened before the family's monthly income arrives.", title: "Pre-university mathematics placement exam", provider: "Altamira Community College", category: "examination", outcome: "Placement into the engineering foundation year.", studentFunds: 35, expenses: [exp("e1", "Exam registration", "examination", 95), exp("e2", "Certified transcript copy", "documentation", 10)], reductions: [red("alternative", "alt-transcript", "Free digital transcript", 10, "e2")] },
-  { id: "r-priya", ref: "BF-2044", studentId: "s-priya", days: 12, funded: 0, status: "Verified", explanation: "The internship stipend is only paid after the first month.", title: "Software engineering internship — first month", provider: "Pune technology employer", category: "internship", outcome: "First professional software role; stipend begins in month two.", studentFunds: 12, expenses: [exp("e1", "Monthly bus pass", "transportation", 38), exp("e2", "Document attestation", "documentation", 26), exp("e3", "Lunch for the first month", "food", 40, false)], reductions: [red("waiver", "w-intern-docs", "Internship Documentation Fee Waiver", 20, "e2")] },
-  { id: "r-mateus", ref: "BF-2046", studentId: "s-mateus", days: 9, funded: 0, status: "Submitted", explanation: "Registration closes before the next household payment.", title: "National university entrance exam", provider: "National Entrance Exam Office", category: "examination", outcome: "Eligibility for public university admission.", studentFunds: 12, expenses: [exp("e1", "Exam registration", "examination", 80), exp("e2", "Bus to exam centre", "transportation", 12)], reductions: [{ ...red("waiver", "w-public-exam", "Public School Entrance Exam Fee Reduction", 40, "e1"), confirmed: false }] },
-  { id: "r-hana", ref: "BF-2047", studentId: "s-hana", days: 19, funded: 0, status: "Under Review", explanation: "Required by the university by the end of the month.", title: "English proficiency test for university admission", provider: "International English Assessment Council", category: "examination", outcome: "Meets the language requirement for a conditional university offer.", studentFunds: 0, expenses: [exp("e1", "Test registration", "examination", 120)], reductions: [{ ...red("waiver", "w-lang-test", "Language Test Fee Reduction", 30, "e1"), confirmed: false }] },
-  { id: "r-diego", ref: "BF-2048", studentId: "s-diego", days: 4, funded: 0, status: "Verified", explanation: "The interview is in another city and transport was not budgeted.", title: "Coding academy admission interview", provider: "Puebla coding academy", category: "interview", outcome: "A place in a tuition-free coding academy cohort.", studentFunds: 0, expenses: [exp("e1", "Round-trip bus ticket", "transportation", 18), exp("e2", "Mobile data for the online test", "technology", 10)], reductions: [] },
-  { id: "r-ngozi", ref: "BF-2049", studentId: "s-ngozi", days: 22, funded: 40, status: "Partially Funded", explanation: "The laptop screen failed mid-course.", title: "Online data science course — laptop repair", provider: "Lagos repair centre", category: "technology", outcome: "Finish the course and earn its completion certificate.", studentFunds: 5, expenses: [exp("e1", "Laptop screen replacement", "equipment", 80), exp("e2", "Course data bundle", "technology", 20)], reductions: [red("discount", "d-tech-access", "Technology Access Student Discount", 24, "e1"), red("discount", "d-tech-access", "Technology Access Student Discount", 6, "e2")] },
-  { id: "r-linh", ref: "BF-2050", studentId: "s-linh", days: 27, funded: 35, status: "Fully Funded", explanation: "Team travel was not covered by the school budget this year.", title: "National youth debate championship", provider: "National Debate Society", category: "competition", outcome: "Represent the school at the national championship.", studentFunds: 30, expenses: [exp("e1", "Team registration share", "registration", 35), exp("e2", "Train fare", "transportation", 30)], reductions: [] },
-  { id: "r-putri", ref: "BF-2051", studentId: "s-putri", days: 31, funded: 0, status: "Additional Information Required", explanation: "The application window closes before scholarship results are released.", title: "Public university application fee", provider: "State university admissions", category: "university-application", outcome: "A complete application to a public university.", studentFunds: 0, expenses: [exp("e1", "Application fee", "registration", 30)], reductions: [], infoRequested: "Please attach the official fee notice from the admissions portal." },
-  { id: "r-ayesha", ref: "BF-2052", studentId: "s-ayesha", days: 8, funded: 0, status: "Verified", explanation: "The test centre is in another city and registration is due before the family's next income.", title: "Engineering university entrance test", provider: "University entrance testing service", category: "examination", outcome: "Eligibility for engineering programmes at public universities.", studentFunds: 15, expenses: [exp("e1", "Test registration", "examination", 70), exp("e2", "Intercity bus fare", "transportation", 40)], reductions: [] },
-  { id: "r-kofi", ref: "BF-2053", studentId: "s-kofi", days: 14, funded: 0, status: "Verified", explanation: "The research station is 300 km away and the stipend starts after week one.", title: "Agricultural research internship — first week", provider: "National crop research station", category: "internship", outcome: "A paid research internship with a recommendation letter.", studentFunds: 10, expenses: [exp("e1", "Bus to research station", "transportation", 35), exp("e2", "First-week hostel stay", "accommodation", 125)], reductions: [] },
-  { id: "r-mariana", ref: "BF-2054", studentId: "s-mariana", days: 26, funded: 0, status: "Verified", explanation: "The national team requires members to bring their own sensor kit.", title: "National youth robotics team — sensor kit", provider: "National Youth Robotics Programme", category: "competition", outcome: "A place on the national youth robotics team.", studentFunds: 30, expenses: [exp("e1", "Advanced sensor kit (team spec)", "equipment", 150)], reductions: [] },
-  { id: "r-diego-2", ref: "BF-2056", studentId: "s-diego", days: 4, funded: 0, status: "Submitted", explanation: "Bus ticket to the coding academy interview.", title: "Interview travel — coding academy", provider: "Puebla coding academy", category: "interview", outcome: "A place in a tuition-free coding academy cohort.", studentFunds: 0, expenses: [exp("e1", "Round-trip bus ticket", "transportation", 18)], reductions: [] },
-  { id: "r-mateus-2", ref: "BF-2057", studentId: "s-mateus", days: 5, funded: 0, status: "Submitted", explanation: "Need a laptop for the entrance exam preparation course.", title: "Laptop for exam preparation", provider: "Electronics retailer", category: "technology", outcome: "Access to online exam preparation.", studentFunds: 0, expenses: [exp("e1", "New laptop", "equipment", 420, false)], reductions: [], docsAttached: false, institutionId: "i-lakeshore", flag: "Requested amount is unusually high for an exam-prep need and no quote was attached." },
-  { id: "r-fatima", ref: "BF-2031", studentId: "s-fatima", days: -10, funded: 55, status: "Completed", explanation: "The practical exam fee was due before the bursary payment.", title: "A-level chemistry practical exam fee", provider: "National examinations council", category: "examination", outcome: "Sat the chemistry practical exam.", result: "Completed opportunity", studentFunds: 0, expenses: [exp("e1", "Practical exam fee", "examination", 55)], reductions: [] },
-  { id: "r-tomas", ref: "BF-2028", studentId: "s-tomas", days: -20, funded: 40, status: "Completed", explanation: "Travel to the regional finals.", title: "Regional robotics finals travel", provider: "Regional Robotics League", category: "competition", outcome: "Competed at the regional finals.", result: "Participated", studentFunds: 0, expenses: [exp("e1", "Bus and ferry fare", "transportation", 40)], reductions: [] },
+  { id: "r-omar", ref: "BF-2041", studentId: "s-omar", days: 6, funded: 0, status: "Verified", explanation: "Materials and transport for the science fair weren't in the family budget this term.", title: "Science fair project — materials and transport", provider: "School science fair (example)", category: "science-fair", outcome: "Present a water-quality project to judges.", studentFunds: 60, expenses: [exp("e1", "Project materials", "materials", 220), exp("e2", "Reference books", "materials", 40), exp("e3", "Transport to Abu Dhabi city", "transportation", 90, false)], reductions: [red("alternative", "alt-maktaba", "Borrow from MAKTABA public libraries", 40, "e2")] },
+  { id: "r-priya", ref: "BF-2043", studentId: "s-priya", days: 16, funded: 100, status: "Partially Funded", explanation: "Team members each cover their own robot parts.", title: "Robotics team — robot parts", provider: "School robotics club (example)", category: "robotics", outcome: "A competition-ready robot for the school team.", studentFunds: 150, expenses: [exp("e1", "Robot parts", "equipment", 450), exp("e2", "Event transport", "transportation", 120, false)], reductions: [red("borrow", "r-robot-kit", "Borrow: Robotics starter kit", 180, "e1")] },
+  { id: "r-yusuf", ref: "BF-2044", studentId: "s-yusuf", days: 12, funded: 0, status: "Verified", explanation: "The internship allowance only starts after the first month.", title: "Engineering internship — first month", provider: "Dubai engineering firm (example)", category: "internship", outcome: "A first professional engineering placement.", studentFunds: 50, expenses: [exp("e1", "Monthly metro and bus fares", "transportation", 320), exp("e2", "Document attestation", "documentation", 150, false)], reductions: [red("discount", "d-nol-student", "Student nol card — 50% off RTA fares", 160, "e1")] },
+  { id: "r-hessa", ref: "BF-2046", studentId: "s-hessa", days: 9, funded: 0, status: "Submitted", explanation: "Display materials are needed before the school can register the project.", title: "Science fair display and materials", provider: "School science fair (example)", category: "science-fair", outcome: "A completed project display for the science fair.", studentFunds: 40, expenses: [exp("e1", "Display board and printing", "materials", 180), exp("e2", "Transport", "transportation", 60, false)], reductions: [] },
+  { id: "r-aisha", ref: "BF-2047", studentId: "s-aisha", days: 19, funded: 0, status: "Under Review", explanation: "University applications are due before the family's next payment.", title: "University application — documents and prep", provider: "UAE university applications", category: "university-application", outcome: "Complete university applications.", studentFunds: 100, expenses: [exp("e1", "Document attestation", "documentation", 300, false), exp("e2", "Practice test books", "materials", 120)], reductions: [] },
+  { id: "r-rohan", ref: "BF-2048", studentId: "s-rohan", days: 4, funded: 0, status: "Verified", explanation: "The event is in another emirate and transport wasn't budgeted.", title: "Robotics competition — transport", provider: "Robotics club (example)", category: "robotics", outcome: "Compete with the school robotics club.", studentFunds: 0, expenses: [exp("e1", "Return bus to the venue", "transportation", 140)], reductions: [] },
+  { id: "r-khalid", ref: "BF-2049", studentId: "s-khalid", days: 22, funded: 150, status: "Partially Funded", explanation: "The exhibition requires a printed stand and product samples.", title: "Student business exhibition stand", provider: "School entrepreneurship programme", category: "entrepreneurship", outcome: "Exhibit a student-run business.", studentFunds: 100, expenses: [exp("e1", "Product materials", "materials", 400), exp("e2", "Stand printing", "other", 150)], reductions: [] },
+  { id: "r-noura", ref: "BF-2050", studentId: "s-noura", days: 27, funded: 380, status: "Fully Funded", explanation: "The workshop is in Abu Dhabi, two hours away.", title: "AI workshop in Abu Dhabi — travel and stay", provider: "University summer workshop (example)", category: "workshop", outcome: "Complete a week-long AI workshop.", studentFunds: 100, expenses: [exp("e1", "Intercity transport", "transportation", 180), exp("e2", "Two nights' accommodation", "accommodation", 300)], reductions: [] },
+  { id: "r-joseph", ref: "BF-2051", studentId: "s-joseph", days: 31, funded: 0, status: "Additional Information Required", explanation: "The workshop needs a laptop the family doesn't have.", title: "Coding workshop — laptop access", provider: "Coding workshop (example)", category: "workshop", outcome: "Finish a beginner coding workshop.", studentFunds: 0, expenses: [exp("e1", "Laptop rental", "technology", 250)], reductions: [], infoRequested: "Please attach the workshop's acceptance email." },
+  { id: "r-ahmed", ref: "BF-2052", studentId: "s-ahmed", days: 8, funded: 0, status: "Verified", explanation: "Preparation classes start before the family's next payment.", title: "University entrance preparation", provider: "Test preparation centre (example)", category: "university-application", outcome: "Prepared for university entrance requirements.", studentFunds: 150, expenses: [exp("e1", "Preparation course", "materials", 450), exp("e2", "Transport", "transportation", 60)], reductions: [] },
+  { id: "r-layla", ref: "BF-2053", studentId: "s-layla", days: 14, funded: 0, status: "Verified", explanation: "The team asks each member to bring a sensor kit.", title: "Robotics team — sensor kit", provider: "School robotics team (example)", category: "robotics", outcome: "A place on the school robotics team.", studentFunds: 50, expenses: [exp("e1", "Sensor kit", "equipment", 300)], reductions: [] },
+  { id: "r-maria", ref: "BF-2054", studentId: "s-maria", days: 26, funded: 0, status: "Verified", explanation: "The training requires a uniform and daily transport.", title: "Hospitality training — uniform and transport", provider: "Hospitality training (example)", category: "certification", outcome: "A hospitality training certificate.", studentFunds: 80, expenses: [exp("e1", "Uniform", "other", 200), exp("e2", "Daily transport", "transportation", 150)], reductions: [] },
+  { id: "r-rohan-2", ref: "BF-2056", studentId: "s-rohan", days: 4, funded: 0, status: "Submitted", explanation: "Bus to the robotics competition.", title: "Robotics competition — bus fare", provider: "Robotics club (example)", category: "robotics", outcome: "Compete with the school robotics club.", studentFunds: 0, expenses: [exp("e1", "Return bus to the venue", "transportation", 140)], reductions: [] },
+  { id: "r-hessa-2", ref: "BF-2057", studentId: "s-hessa", days: 5, funded: 0, status: "Submitted", explanation: "Need a laptop for the science project.", title: "Laptop for science project", provider: "Electronics retailer", category: "science-fair", outcome: "A finished science project.", studentFunds: 0, expenses: [exp("e1", "New laptop", "equipment", 2800, false)], reductions: [], docsAttached: false, institutionId: "i-pearl", flag: "Requested amount is unusually high for a science-fair need and no quote was attached." },
+  { id: "r-fatima", ref: "BF-2031", studentId: "s-fatima", days: -10, funded: 220, status: "Completed", explanation: "Poster printing and travel were due before the scholarship payment.", title: "Student research conference — poster and travel", provider: "Student research conference (example)", category: "workshop", outcome: "Presented research at a student conference.", result: "Completed opportunity", studentFunds: 0, expenses: [exp("e1", "Poster printing and transport", "other", 220)], reductions: [] },
+  { id: "r-saeed", ref: "BF-2028", studentId: "s-saeed", days: -20, funded: 160, status: "Completed", explanation: "Travel to the regional robotics event.", title: "Regional robotics event travel", provider: "Robotics event (example)", category: "robotics", outcome: "Competed at a regional robotics event.", result: "Participated", studentFunds: 0, expenses: [exp("e1", "Return transport", "transportation", 160)], reductions: [] },
 ];
 
 const FLOW: RequestStatus[] = ["Submitted", "Under Review", "Verified", "Partially Funded", "Fully Funded", "Completed"];
@@ -158,6 +155,7 @@ function build(s: ReqSeed, now: Date) {
     checks: verified ? { enrollment: true, opportunity: true, expenses: true } : {},
     flags: s.flag ? [{ id: `fl-${s.id}`, note: s.flag, at: created, by: "system" }] : [],
     outcome: s.result,
+    guardianConsent: st.age >= 18 ? "Not required" : s.status === "Submitted" ? "Pending" : "Given",
     status: s.status,
     infoRequested: s.infoRequested,
     history: path.map((st2, i) => ({ at: isoDaysFromNow(start + i, now), status: st2, note: NOTES[st2] ?? st2, actor: st2 === "Submitted" ? "student" : st2.includes("Funded") ? "sponsor" : "institution" })),
@@ -168,16 +166,29 @@ function build(s: ReqSeed, now: Date) {
 
 export function demoOpportunities(now: Date): Opportunity[] {
   return [
-    { id: DEMO_OPPORTUNITY_ID, studentId: DEMO_STUDENT_ID, title: "Associate Data Analyst Certification exam", provider: "Open Skills Certification Board", category: "certification", deadline: isoDaysFromNow(18, now), institutionId: "i-northfield", expenses: [exp("e1", "Certification exam fee", "examination", 180)], studentFunds: 70, priorAssistance: 0, outcome: "An industry-recognised credential required for entry-level data analyst roles.", createdAt: isoDaysFromNow(-6, now) },
-    { id: "o-amina-robotics", studentId: DEMO_STUDENT_ID, title: "Regional Robotics Challenge", provider: "Regional Robotics Challenge", category: "competition", deadline: isoDaysFromNow(24, now), institutionId: "i-northfield", expenses: [exp("e1", "Team registration", "registration", 40), exp("e2", "Bus fare to venue", "transportation", 35), exp("e3", "Robotics starter kit", "materials", 85, false), exp("e4", "Lunch on competition day", "food", 15, false)], studentFunds: 20, priorAssistance: 0, outcome: "Build a working robot with the school team; regional winners advance to nationals.", createdAt: isoDaysFromNow(-4, now) },
-    { id: "o-amina-uni", studentId: DEMO_STUDENT_ID, title: "State University of Technology application", provider: "State University of Technology", category: "university-application", deadline: isoDaysFromNow(40, now), institutionId: "i-northfield", expenses: [exp("e1", "Application fee", "registration", 45), exp("e2", "Certified transcript copy", "documentation", 12)], studentFunds: 0, priorAssistance: 0, outcome: "A complete application for a BSc in Data Science.", createdAt: isoDaysFromNow(-2, now) },
+    {
+      id: DEMO_OPPORTUNITY_ID,
+      studentId: DEMO_STUDENT_ID,
+      title: "STEM competition project",
+      provider: "National STEM competition (example)",
+      category: "stem-competition",
+      deadline: isoDaysFromNow(21, now),
+      institutionId: "i-ghaf",
+      expenses: [exp("e1", "Project materials", "materials", 350), exp("e2", "Transportation", "transportation", 100), exp("e3", "Competition-related expenses", "other", 150)],
+      studentFunds: 150,
+      priorAssistance: 0,
+      outcome: "Build and present a working STEM project with her school team.",
+      createdAt: isoDaysFromNow(-6, now),
+    },
+    { id: "o-mariam-reading", studentId: DEMO_STUDENT_ID, title: "Science reading list", provider: "School science club", category: "workshop", deadline: isoDaysFromNow(30, now), institutionId: "i-ghaf", expenses: [exp("e1", "Reference books", "materials", 120, false)], studentFunds: 0, priorAssistance: 0, outcome: "Background reading for the competition project.", createdAt: isoDaysFromNow(-4, now) },
+    { id: "o-mariam-uni", studentId: DEMO_STUDENT_ID, title: "University application — NYU Abu Dhabi", provider: "NYU Abu Dhabi", category: "university-application", deadline: isoDaysFromNow(45, now), institutionId: "i-ghaf", expenses: [exp("e1", "Document attestation", "documentation", 150, false), exp("e2", "Transport to campus visit", "transportation", 40, false)], studentFunds: 0, priorAssistance: 0, outcome: "A complete undergraduate application, with a need-based aid request.", createdAt: isoDaysFromNow(-2, now) },
   ];
 }
 
 export function createSeedState(now = new Date()): AppState {
   const built = REQUESTS.map((s) => build(s, now));
   const requests = built.map((b) => b.req);
-  const sponsorFor = (i: number) => (i % 2 ? "sp-harbor" : "sp-community");
+  const sponsorFor = (i: number) => (i % 2 ? "sp-horizon" : "sp-parents");
   const contributions: Contribution[] = requests
     .filter((r) => r.funded > 0)
     .map((r, i) => ({ id: `c-seed-${i}`, sponsorId: sponsorFor(i), sourceLabel: SPONSORS.find((s) => s.id === sponsorFor(i))!.name, requestId: r.id, amount: r.funded, at: r.history[r.history.length - 1].at, source: "sponsor" as const }));
@@ -194,7 +205,7 @@ export function createSeedState(now = new Date()): AppState {
     currentSponsorId: DEMO_SPONSOR_ID,
     currentInstitutionId: "all",
     sponsors: SPONSORS.map((s) => ({ ...s })),
-    pool: 150,
+    pool: 600,
     students: STUDENTS,
     institutions: INSTITUTIONS.map((i) => ({ ...i })),
     opportunities: [...demoOpportunities(now), ...built.map((b) => b.opp)],
@@ -204,33 +215,34 @@ export function createSeedState(now = new Date()): AppState {
     contributions,
     distribution,
     notifications: [
-      { id: "n1", role: "student", title: "Waiver deadline approaching", body: "A fee waiver that may apply to your certification exam closes in 21 days.", href: "/student/waivers", at: isoDaysFromNow(-1, now), read: false },
+      { id: "n1", role: "student", title: "New UAE opportunities", body: "Browse STEM competitions, internships and university aid in Opportunities.", href: "/student/waivers", at: isoDaysFromNow(-1, now), read: false },
       { id: "n2", role: "student", title: "Welcome to BridgeFund", body: "Run BridgeEngine on an opportunity to build your action plan.", href: "/student/engine", at: isoDaysFromNow(-2, now), read: true },
-      { id: "n3", role: "sponsor", title: "2 verified needs close within 7 days", body: "Smart Impact Allocation can suggest how to cover them.", href: "/sponsor/allocate", at: isoDaysFromNow(-1, now), read: false },
-      { id: "n4", role: "institution", title: "2 requests awaiting verification", body: "New submissions from Recife and Amman.", href: "/institution/requests", at: isoDaysFromNow(-1, now), read: false },
+      { id: "n3", role: "sponsor", title: "2 verified needs close within 7 days", body: "The budget planner can suggest how to cover them.", href: "/sponsor/allocate", at: isoDaysFromNow(-1, now), read: false },
+      { id: "n4", role: "institution", title: "2 requests awaiting verification", body: "New submissions from Sharjah and Ajman.", href: "/institution/requests", at: isoDaysFromNow(-1, now), read: false },
     ],
     activity: [
       { id: "a1", role: "system", text: "Demo environment seeded with fictional data", at: now.toISOString() },
-      { id: "a2", role: "student", text: "Amina added Associate Data Analyst Certification exam", at: isoDaysFromNow(-6, now) },
+      { id: "a2", role: "student", text: "Mariam added STEM competition project", at: isoDaysFromNow(-6, now) },
     ],
     savedWaivers: [],
     savedNeeds: [],
     reminders: [],
     scenarios: [],
     milestones: [
-      { id: "m1", at: isoDaysFromNow(-60, now), label: "Joined the Northfield data club" },
-      { id: "m2", at: isoDaysFromNow(-21, now), label: "Passed the practice certification test" },
-      { id: "m3", at: isoDaysFromNow(-6, now), label: "Earned a place on the certification exam register" },
+      { id: "m1", at: isoDaysFromNow(-60, now), label: "Joined the Ghaf Grove science club" },
+      { id: "m2", at: isoDaysFromNow(-21, now), label: "Team project idea approved by her teacher" },
+      { id: "m3", at: isoDaysFromNow(-6, now), label: "Team registered for the STEM competition" },
     ],
-    profile: { displayName: "Amina Y.", email: "amina.demo@bridgefund.example", emailUpdates: true, deadlineReminders: true },
+    profile: { displayName: "Mariam A.", email: "mariam.demo@bridgefund.example", emailUpdates: true, deadlineReminders: true },
     payments: requests
       .filter((r) => r.status === "Completed")
       .map((r) => ({ id: `pay-${r.id}`, requestId: r.id, provider: built.find((b) => b.req.id === r.id)!.opp.provider, amount: r.funded, at: r.history[r.history.length - 1].at, reference: `SIM-${r.ref.replace("BF-", "")}-PAY` })),
     pledges: [],
     matches: [],
     programFunds: { ...GRANT_BUDGETS },
-    display: { currency: "USD", locale: "en" },
+    display: { currency: "AED", locale: "en" },
     pilot: { schools: 0, students: 0, requests: 0, resolved: 0, participated: 0, avgDaysToResolve: null, notes: "", updatedAt: null },
+    feedback: [],
     onboarded: false,
     demo: { stage: 0, scanned: false },
   };

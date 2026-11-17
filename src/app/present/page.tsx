@@ -13,7 +13,7 @@ import { simulate } from "@/lib/simulator";
 import { summary, SCENARIOS } from "@/lib/business";
 import { MARKETS } from "@/lib/regions";
 import { fmtMultiplier } from "@/lib/impact";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { useHydrated } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -54,15 +54,15 @@ function Problem() {
       <div>
         <H kicker="01 · The problem">Small costs close big doors.</H>
         <p className="text-lg leading-relaxed text-muted-foreground">
-          Amina earned a seat on a <strong className="text-foreground">$180</strong> data-analyst certification exam. She has saved <strong className="text-foreground">$70</strong>. The registration deadline is weeks away. A <strong className="text-foreground">$110</strong> gap is all that stands between her and the credential.
+          Mariam, a Grade 11 student in Abu Dhabi, wants to enter a STEM competition. Materials, transport and competition costs come to <strong className="text-foreground">AED 600</strong>. She has <strong className="text-foreground">AED 150</strong>. An <strong className="text-foreground">AED 450</strong> gap stands between her and the stage.
         </p>
-        <p className="mt-4 text-sm text-muted-foreground">Amina is a fictional student. Her situation is not.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Mariam is fictional. The opportunities and help below are real.</p>
       </div>
       <div className="grid gap-3">
         {[
-          { v: "~30%", l: "of families in Kenya borrow to pay for education", s: "UNESCO GEM Report 2021/2" },
-          { v: "33%", l: "of education spending is borne by households in low-income countries", s: "UNESCO GEM Report 2017/8" },
-          { v: "+9 pts", l: "graduation within three terms after small emergency grants at Georgia State", s: "Ithaka S+R, 2022" },
+          { v: "2,651", l: "registrations for the Emirates Young Scientist Competition 2026 (Grades 5–12)", s: "MoE & ATRC, via GCC Business News" },
+          { v: "2,900+", l: "applications for 578 ADEK summer work placements in 2026", s: "Gulf News" },
+          { v: "50%", l: "off Dubai public transport with a student nol card — help exists, but it's scattered", s: "RTA" },
         ].map((x) => (
           <Card key={x.l} className="flex items-center gap-5 p-5">
             <span className="w-24 shrink-0 text-3xl font-semibold tabular text-primary">{x.v}</span>
@@ -72,8 +72,8 @@ function Problem() {
             </span>
           </Card>
         ))}
-        <Link href="/why#evidence" target="_blank" className="text-xs font-medium text-primary hover:underline">
-          Sources and full citations →
+        <Link href="/student/waivers" target="_blank" className="text-xs font-medium text-primary hover:underline">
+          See the verified UAE directory →
         </Link>
       </div>
     </div>
@@ -83,7 +83,7 @@ function Problem() {
 function Limitations() {
   const rows = [
     { n: "Crowdfunding", t: "Asks for the whole gap; outcomes track the size of the organiser's network." },
-    { n: "Scholarship directories", t: "Great for big awards, but discovery is not delivery — and rarely for a $110 exam fee." },
+    { n: "Scholarship directories", t: "Great for big awards, but discovery is not delivery — and rarely for an AED 150 competition cost." },
     { n: "Student loans", t: "Debt is disproportionate for a small, one-off cost." },
     { n: "Financial literacy apps", t: "Build long-term skills, but can't pay a fee due next week." },
     { n: "Emergency funds", t: "Valuable, but often manual, and pay full price for costs that could be waived." },
@@ -196,7 +196,7 @@ function Journey({ sb, setSb }: { sb: AppState; setSb: (fn: (s: AppState) => App
           ))}
           <div className="rounded-lg border p-3 text-sm">
             <p className="text-xs text-muted-foreground">{sponsor.name} balance</p>
-            <p className="text-xl font-semibold tabular">{usd(sponsor.balance)}</p>
+            <p className="text-xl font-semibold tabular">{aed(sponsor.balance)}</p>
           </div>
           <p className="text-xs text-muted-foreground">Runs in a sandbox — the presentation never changes your demo data. Payments are simulated.</p>
         </div>
@@ -217,7 +217,7 @@ function Journey({ sb, setSb }: { sb: AppState; setSb: (fn: (s: AppState) => App
             </>
           ) : (
             <div className="py-10 text-center text-muted-foreground">
-              <p className="text-lg font-medium text-foreground">Amina&apos;s plan is ready: {usd(plan.reductionsTotal)} of reductions, {usd(plan.sponsorAmount)} left to fund.</p>
+              <p className="text-lg font-medium text-foreground">Mariam&apos;s plan is ready: {aed(plan.reductionsTotal)} of reductions, {aed(plan.sponsorAmount)} left to fund.</p>
               <p className="mt-1 text-sm">Press “Student submits” to start.</p>
             </div>
           )}
@@ -228,7 +228,7 @@ function Journey({ sb, setSb }: { sb: AppState; setSb: (fn: (s: AppState) => App
 }
 
 function ImpactSection() {
-  const sim = simulate({ cost: 180, studentFunds: 70, waivers: 50, borrowing: 0, institutional: 0, sponsorBudget: 500, crowdFee: 0 });
+  const sim = simulate({ cost: 600, studentFunds: 150, waivers: 0, borrowing: 200, institutional: 100, sponsorBudget: 1000, crowdFee: 0 });
   return (
     <div>
       <H kicker="06 · Measurable social impact">The BridgeFund Impact Multiplier.</H>
@@ -236,31 +236,31 @@ function ImpactSection() {
         <Card className="p-6">
           <p className="text-sm text-muted-foreground">Financial barriers resolved ÷ sponsor funding used</p>
           <div className="mt-4 flex flex-wrap items-baseline gap-3 text-2xl font-semibold tabular md:text-3xl">
-            <span>{usd(sim.shortfall)}</span>
+            <span>{aed(sim.shortfall)}</span>
             <span className="text-muted-foreground">÷</span>
-            <span>{usd(sim.bridgeSponsorNeeded)}</span>
+            <span>{aed(sim.bridgeSponsorNeeded)}</span>
             <span className="text-muted-foreground">=</span>
             <span className="text-5xl text-primary">{fmtMultiplier(sim.multiplier)}</span>
           </div>
           <ul className="mt-6 space-y-2 text-sm">
             <li className="flex justify-between border-b pb-2">
-              <span className="text-muted-foreground">Original shortfall (after Amina&apos;s $70)</span>
-              <span className="tabular">{usd(sim.shortfall)}</span>
+              <span className="text-muted-foreground">Gap after Mariam&apos;s AED 150</span>
+              <span className="tabular">{aed(sim.shortfall)}</span>
             </li>
             <li className="flex justify-between border-b pb-2">
-              <span className="text-muted-foreground">Fee waiver secured</span>
-              <span className="tabular">{usd(sim.reductions)}</span>
+              <span className="text-muted-foreground">Borrowed kit + school support</span>
+              <span className="tabular">{aed(sim.reductions + sim.institutional)}</span>
             </li>
             <li className="flex justify-between">
               <span className="text-muted-foreground">Sponsor funding required</span>
-              <span className="tabular">{usd(sim.bridgeSponsorNeeded)}</span>
+              <span className="tabular">{aed(sim.bridgeSponsorNeeded)}</span>
             </li>
           </ul>
           <p className="mt-4 text-xs text-muted-foreground">Student&apos;s own funds are never counted as platform impact.</p>
         </Card>
         <div className="grid gap-4">
           <Card className="p-6">
-            <p className="text-sm text-muted-foreground">With a $500 sponsor budget, opportunities like Amina&apos;s could be rescued</p>
+            <p className="text-sm text-muted-foreground">With an AED 1,000 sponsor budget, opportunities like Mariam&apos;s could be rescued</p>
             <div className="mt-3 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-4xl font-semibold tabular">{sim.opportunitiesA}</p>
@@ -286,8 +286,8 @@ function ImpactSection() {
 }
 
 function Business() {
-  const s = summary({ clients: 12, price: 250, programs: 2, programFee: 400, opex: 7000, requestsPerClient: 15, verificationCost: 2.5, cac: 800 }, "moderate");
-  const fmt = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const s = summary({ clients: 10, price: 950, programs: 2, programFee: 1500, opex: 30000, requestsPerClient: 15, verificationCost: 9, cac: 3000, licences: 1, licenceFee: 2500 }, "moderate");
+  const fmt = (n: number) => `AED ${n.toLocaleString("en-AE")}`;
   return (
     <div>
       <H kicker="07 · Business model and scalability">Students never pay. Institutions and programmes do.</H>
@@ -295,9 +295,9 @@ function Business() {
         <Card className="space-y-4 p-6">
           <p className="font-semibold">Revenue</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Institutional subscriptions for verification, lending inventory and analytics</li>
-            <li>• Management fees on sponsored CSR and foundation programmes</li>
-            <li>• Nonprofit licensing partnerships</li>
+            <li>• School and university subscriptions</li>
+            <li>• CSR partnerships and sponsored programmes</li>
+            <li>• Institutional licensing</li>
           </ul>
           <div className="grid grid-cols-3 gap-3 border-t pt-4 text-center">
             <div>
@@ -325,7 +325,7 @@ function Business() {
               </li>
             ))}
           </ol>
-          <p className="mt-4 text-xs text-muted-foreground">Currencies, programmes, eligibility and language are configured per country. No partnerships agreed yet.</p>
+          <p className="mt-4 text-xs text-muted-foreground">Currencies, programmes, eligibility and language are set per emirate, then per country. No partnerships agreed yet.</p>
         </Card>
       </div>
     </div>
@@ -336,11 +336,11 @@ function Vision() {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <H kicker="08 · Future vision">No student should miss an opportunity over a gap this small.</H>
-      <div className="grid gap-3 text-left sm:grid-cols-3">
+      <div className="grid gap-3 text-start sm:grid-cols-3">
         {[
-          { t: "Next term", b: "A one-school pilot in Nairobi with manual verification and a lending inventory." },
-          { t: "Year one", b: "Regional sponsors, published pilot results, and verified programme data." },
-          { t: "Beyond", b: "A shared layer that helps institutions reduce costs before anyone has to fundraise." },
+          { t: "Next term", b: "A pilot with a small group of Abu Dhabi schools, verified manually." },
+          { t: "Year one", b: "Dubai and Sharjah, local CSR sponsors and published pilot results." },
+          { t: "Beyond", b: "Every emirate, then the region — always cutting costs before fundraising." },
         ].map((x) => (
           <Card key={x.t} className="p-5">
             <p className="font-semibold text-primary">{x.t}</p>
@@ -427,7 +427,7 @@ function Presentation() {
             ))}
           </ol>
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-2">
           <button type="button" onClick={() => setRunning((r) => !r)} className={cn("flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs tabular", over ? "border-amber-300 text-warning" : "text-muted-foreground")} aria-label={running ? "Pause timer" : "Resume timer"} title="Pause or resume the timer">
             <Timer className="h-3.5 w-3.5" /> {mmss(elapsed)} / {mmss(TOTAL)}
           </button>

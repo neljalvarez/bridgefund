@@ -1,5 +1,7 @@
 "use client";
 
+import { EMIRATES } from "@/lib/uae";
+
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { PieChart, RotateCcw, ShieldCheck, SlidersHorizontal } from "lucide-react";
@@ -7,7 +9,7 @@ import type { OpportunityCategory } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { remainingOf } from "@/lib/actions";
 import { oppOf, studentOf } from "@/lib/selectors";
-import { OPP_CATEGORIES, OPP_LABEL, daysUntil, urgencyOf, usd } from "@/lib/format";
+import { OPP_CATEGORIES, OPP_LABEL, daysUntil, urgencyOf, aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -36,14 +38,14 @@ export default function MarketplacePage() {
   const pool = state.requests.filter((r) => seen.current.has(r.id) || (["Verified", "Partially Funded"].includes(r.status) && daysUntil(r.deadline) >= 0));
   pool.forEach((r) => seen.current.add(r.id));
 
-  const countries = [...new Set(pool.map((r) => studentOf(state, r.studentId)?.country ?? ""))].sort();
+  const countries = [...EMIRATES].filter((e) => pool.some((r) => studentOf(state, r.studentId)?.emirate === e));
   const insts = [...new Set(pool.map((r) => r.institutionId))];
 
   const list = useMemo(() => {
     const xs = pool.filter((r) => {
       const st = studentOf(state, r.studentId);
       if (category !== ALL && oppOf(state, r.opportunityId)?.category !== category) return false;
-      if (country !== ALL && st?.country !== country) return false;
+      if (country !== ALL && st?.emirate !== country) return false;
       if (institution !== ALL && r.institutionId !== institution) return false;
       if (urgency !== ALL && urgencyOf(r.deadline).label !== urgency) return false;
       if (remainingOf(r) > maxGap) return false;
@@ -111,11 +113,11 @@ export default function MarketplacePage() {
               </Button>
             </div>
             {sel("Educational category", category, setCategory, [[ALL, "All categories"], ...OPP_CATEGORIES.map((c) => [c, OPP_LABEL[c as OpportunityCategory]] as [string, string])])}
-            {sel("Location", country, setCountry, [[ALL, "All countries"], ...countries.map((c) => [c, c] as [string, string])])}
+            {sel("Emirate", country, setCountry, [[ALL, "All emirates"], ...countries.map((c) => [c, c] as [string, string])])}
             {sel("Institution", institution, setInstitution, [[ALL, "All institutions"], ...insts.map((i) => [i, state.institutions.find((x) => x.id === i)?.name ?? i] as [string, string])])}
             {sel("Urgency", urgency, setUrgency, [[ALL, "Any urgency"], ["Critical", "Critical (≤7 days)"], ["High", "High (≤14 days)"], ["Moderate", "Moderate (≤30 days)"], ["Low", "Low"]])}
             <div>
-              <Label className="text-xs text-muted-foreground">Financial gap up to {usd(maxGap)}</Label>
+              <Label className="text-xs text-muted-foreground">Financial gap up to {aed(maxGap)}</Label>
               <Slider className="mt-3" min={10} max={200} step={5} value={[maxGap]} onValueChange={([v]) => setMaxGap(v)} aria-label="Maximum financial gap" />
             </div>
             <div>

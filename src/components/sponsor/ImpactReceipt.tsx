@@ -4,7 +4,7 @@ import { BadgeCheck, CheckCircle2, Clock } from "lucide-react";
 import type { AppState, Contribution } from "@/lib/types";
 import { remainingOf } from "@/lib/actions";
 import { institutionOf, oppOf } from "@/lib/selectors";
-import { fmtDateLong, usd } from "@/lib/format";
+import { fmtDateLong, aed } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { LogoMark } from "@/components/shared/Logo";
 
@@ -52,7 +52,7 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
             <p className="text-xs text-muted-foreground">Digital impact receipt</p>
           </div>
         </div>
-        <div className="text-right text-xs text-muted-foreground">
+        <div className="text-end text-xs text-muted-foreground">
           <p className="font-mono text-foreground">{d.number}</p>
           <p>Issued {fmtDateLong(c.at)}</p>
         </div>
@@ -64,9 +64,9 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
           <p className="mt-1 text-xl font-semibold tracking-tight">{d.r.purpose}</p>
           <p className="mt-1 text-sm text-muted-foreground">{d.r.expenses.map((e) => e.label).join(" · ")}</p>
         </div>
-        <div className="sm:text-right">
+        <div className="sm:text-end">
           <p className="text-xs text-muted-foreground">Contribution amount</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-primary tabular">{usd(c.amount)}</p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight text-primary tabular">{aed(c.amount)}</p>
         </div>
       </div>
 
@@ -91,7 +91,7 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
               </>
             ) : (
               <>
-                <Clock className="h-4 w-4 text-warning" /> {d.r.status === "Fully Funded" ? "Awaiting payment to provider" : `${d.r.status} — ${usd(d.remaining)} still needed`}
+                <Clock className="h-4 w-4 text-warning" /> {d.r.status === "Fully Funded" ? "Awaiting payment to provider" : `${d.r.status} — ${aed(d.remaining)} still needed`}
               </>
             )}
           </dd>
@@ -109,12 +109,12 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
             {d.lines.map((l, i) => (
               <tr key={i} className={l.kind === "this" ? "bg-primary-light/60 font-medium" : "border-b"}>
                 <td className="px-2 py-2">{l.label}</td>
-                <td className="px-2 py-2 text-right tabular">{l.kind === "total" ? usd(l.amount) : `−${usd(l.amount)}`}</td>
+                <td className="px-2 py-2 text-end tabular">{l.kind === "total" ? aed(l.amount) : `−${aed(l.amount)}`}</td>
               </tr>
             ))}
             <tr>
               <td className="px-2 pt-3 font-semibold">Remaining financial gap</td>
-              <td className="px-2 pt-3 text-right text-lg font-semibold tabular">{usd(d.remaining)}</td>
+              <td className="px-2 pt-3 text-end text-lg font-semibold tabular">{aed(d.remaining)}</td>
             </tr>
           </tbody>
         </table>
@@ -128,7 +128,7 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
 export function receiptHtml(state: AppState, c: Contribution) {
   const d = receiptData(state, c);
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
-  const rows = d.lines.map((l) => `<tr${l.kind === "this" ? ' class="this"' : ""}><td>${esc(l.label)}</td><td class="r">${l.kind === "total" ? usd(l.amount) : "−" + usd(l.amount)}</td></tr>`).join("");
+  const rows = d.lines.map((l) => `<tr${l.kind === "this" ? ' class="this"' : ""}><td>${esc(l.label)}</td><td class="r">${l.kind === "total" ? aed(l.amount) : "−" + aed(l.amount)}</td></tr>`).join("");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>BridgeFund impact receipt ${d.number}</title><style>
 body{font-family:Inter,system-ui,sans-serif;background:#F8FAFC;color:#101828;padding:40px}
 .c{max-width:640px;margin:auto;background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:28px}
@@ -138,12 +138,12 @@ table{width:100%;border-collapse:collapse}td{padding:8px 6px;border-bottom:1px s
 </style></head><body><div class="c">
 <h1>BridgeFund — Digital impact receipt</h1><p class="m">${d.number} · issued ${fmtDateLong(c.at)}</p>
 <p class="m">Educational expense covered</p><h2>${esc(d.r.purpose)}</h2>
-<p class="m">Contribution amount</p><div class="big">${usd(c.amount)}</div>
+<p class="m">Contribution amount</p><div class="big">${aed(c.amount)}</div>
 <dl><div><dt>Anonymous recipient reference</dt><dd>${d.anon}</dd></div>
 <div><dt>Verification status</dt><dd>Verified by ${esc(d.inst?.name ?? "")}</dd></div>
 <div><dt>Completion date</dt><dd>${d.completedAt ? fmtDateLong(d.completedAt) : "Awaiting payment to provider"}</dd></div>
 <div><dt>Educational outcome</dt><dd>${esc(d.opp?.outcome ?? d.r.purpose)}</dd></div></dl>
-<table>${rows}<tr><td><b>Remaining financial gap</b></td><td class="r"><b>${usd(d.remaining)}</b></td></tr></table>
+<table>${rows}<tr><td><b>Remaining financial gap</b></td><td class="r"><b>${aed(d.remaining)}</b></td></tr></table>
 <p class="m" style="margin-top:20px">Demonstration receipt from a competition prototype. All people, institutions and amounts are fictional; no real money was transferred. Not a tax document.</p>
 </div></body></html>`;
 }

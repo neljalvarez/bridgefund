@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Download, Search } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { inInstitutionScope } from "@/lib/selectors";
-import { fmtDateTime, usd } from "@/lib/format";
+import { fmtDateTime, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,36 +53,36 @@ export default function AuditPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-5">Date</TableHead>
+                  <TableHead className="ps-5">Date</TableHead>
                   <TableHead>Request</TableHead>
                   <TableHead>Paid to (verified provider)</TableHead>
                   <TableHead>Reference</TableHead>
-                  <TableHead className="pr-5 text-right">Amount</TableHead>
+                  <TableHead className="pe-5 text-end">Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {payments.map((p) => (
                   <TableRow key={p.id}>
-                    <TableCell className="pl-5 text-muted-foreground">{fmtDateTime(p.at)}</TableCell>
+                    <TableCell className="ps-5 text-muted-foreground">{fmtDateTime(p.at)}</TableCell>
                     <TableCell>{state.requests.find((r) => r.id === p.requestId)?.ref}</TableCell>
                     <TableCell>
-                      {p.provider} <Badge variant="outline" className="ml-1 border-dashed">Simulated</Badge>
+                      {p.provider} <Badge variant="outline" className="ms-1 border-dashed">Simulated</Badge>
                     </TableCell>
                     <TableCell className="font-mono text-xs">{p.reference}</TableCell>
-                    <TableCell className="pr-5 text-right tabular">{usd(p.amount)}</TableCell>
+                    <TableCell className="pe-5 text-end tabular">{aed(p.amount)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           )}
-          <p className="px-5 py-3 text-xs text-muted-foreground">BridgeFund pays verified education providers directly. It never transfers unrestricted cash to student accounts.</p>
+          <p className="px-5 py-3 text-xs text-muted-foreground">Payments go to verified providers, never as cash to students. All payments are simulated: real fundraising and payments would need UAE regulatory review and authorised payment partners.</p>
         </CardContent>
       </Card>
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input aria-label="Search the audit log" className="pl-9" placeholder="Search by reference or event…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input aria-label="Search the audit log" className="ps-9" placeholder="Search by reference or event…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select value={actor} onValueChange={setActor}>
           <SelectTrigger className="sm:w-48" aria-label="Actor">
@@ -104,7 +104,7 @@ export default function AuditPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="pl-5">Timestamp</TableHead>
+                <TableHead className="ps-5">Timestamp</TableHead>
                 <TableHead>Request</TableHead>
                 <TableHead>Actor</TableHead>
                 <TableHead>Event</TableHead>
@@ -113,7 +113,7 @@ export default function AuditPage() {
             <TableBody>
               {list.slice(0, 200).map((e) => (
                 <TableRow key={e.id}>
-                  <TableCell className="whitespace-nowrap pl-5 text-muted-foreground">{fmtDateTime(e.at)}</TableCell>
+                  <TableCell className="whitespace-nowrap ps-5 text-muted-foreground">{fmtDateTime(e.at)}</TableCell>
                   <TableCell className="font-medium">{e.ref}</TableCell>
                   <TableCell>
                     <Badge variant="neutral" className="capitalize">

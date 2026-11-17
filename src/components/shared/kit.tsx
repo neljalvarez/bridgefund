@@ -4,7 +4,7 @@ import { animate, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FlaskConical, Inbox } from "lucide-react";
 import type { RequestStatus } from "@/lib/types";
-import { STATUS_TONE, usd } from "@/lib/format";
+import { STATUS_TONE, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ export function AnimatedNumber({ value, money = true, className }: { value: numb
     prev.current = value;
     return () => c.stop();
   }, [value, reduce]);
-  return <span className={cn("tabular", className)}>{money ? usd(Math.round(shown)) : Math.round(shown).toLocaleString()}</span>;
+  return <span className={cn("tabular", className)}>{money ? aed(Math.round(shown)) : Math.round(shown).toLocaleString()}</span>;
 }
 
 export function StatCard({ label, value, money = true, hint, icon, tone }: { label: string; value: number | string; money?: boolean; hint?: ReactNode; icon?: ReactNode; tone?: "primary" | "warning" | "muted" }) {

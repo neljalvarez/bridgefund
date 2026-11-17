@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useStore } from "@/lib/store";
+import { useStore, useT } from "@/lib/store";
 import { currentSponsor, remainingOf, setSponsor } from "@/lib/actions";
 import { studentOf, verifiedNeeds } from "@/lib/selectors";
 import { fmtMultiplier, portfolioImpact } from "@/lib/impact";
-import { fmtDate, relDays, sum, usd } from "@/lib/format";
+import { fmtDate, relDays, sum, aed } from "@/lib/format";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EmptyState, StatCard, UrgencyBadge } from "@/components/shared/kit";
@@ -14,6 +14,7 @@ import { urgencyOf } from "@/lib/format";
 
 export default function SponsorDashboard() {
   const { state, dispatch } = useStore();
+  const tr = useT();
   const sponsor = currentSponsor(state);
   const needs = verifiedNeeds(state).sort((a, b) => a.deadline.localeCompare(b.deadline));
   const mine = state.contributions.filter((c) => c.sponsorId === sponsor.id);
@@ -24,7 +25,7 @@ export default function SponsorDashboard() {
 
   const action =
     top && sponsor.balance > 0
-      ? { title: `${usd(Math.min(remainingOf(top), sponsor.balance))} ${remainingOf(top) <= sponsor.balance ? "completes" : "goes toward"} ${top.purpose}`, text: `${top.ref} · ${studentOf(state, top.studentId)?.country} · due ${relDays(top.deadline)}`, href: `/sponsor/marketplace/${top.id}`, cta: "Fund this need" }
+      ? { title: `${aed(Math.min(remainingOf(top), sponsor.balance))} ${remainingOf(top) <= sponsor.balance ? "completes" : "goes toward"} ${top.purpose}`, text: `${top.ref} · ${studentOf(state, top.studentId)?.emirate} · due ${relDays(top.deadline)}`, href: `/sponsor/marketplace/${top.id}`, cta: "Fund this need" }
       : top
         ? { title: "Your balance is fully committed", text: "Thank you — see what your contributions resolved.", href: "/sponsor/impact", cta: "View impact" }
         : { title: "Every verified need is funded", text: "New needs appear once schools verify them.", href: "/sponsor/impact", cta: "View impact" };
@@ -43,7 +44,7 @@ export default function SponsorDashboard() {
           <SelectContent>
             {state.sponsors.map((s) => (
               <SelectItem key={s.id} value={s.id}>
-                {s.name} · {usd(s.balance)}
+                {s.name} · {aed(s.balance)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -52,7 +53,7 @@ export default function SponsorDashboard() {
 
       <DashboardFocus
         figures={[
-          { label: "Available to give", value: sponsor.balance, tone: "primary", sub: held > 0 ? `${usd(held)} awaiting school approval` : `of ${usd(sponsor.startingBalance)} simulated` },
+          { label: "Available to give", value: sponsor.balance, tone: "primary", sub: held > 0 ? `${aed(held)} awaiting school approval` : `of ${aed(sponsor.startingBalance)} simulated` },
           { label: "Verified needs", value: sum(needs.map(remainingOf)), sub: `${needs.length} students waiting` },
           { label: "Next deadline", value: top ? fmtDate(top.deadline, { month: "short", day: "numeric" }) : "—", sub: top ? `${top.ref} · ${relDays(top.deadline)}` : "Nothing due" },
         ]}
@@ -61,7 +62,7 @@ export default function SponsorDashboard() {
 
       <Card className="mt-8">
         <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle>Closing soon</CardTitle>
+          <CardTitle>{tr("Closing soon")}</CardTitle>
           <Link href="/sponsor/marketplace" className="text-sm font-medium text-primary hover:underline">
             All verified needs
           </Link>
@@ -77,13 +78,13 @@ export default function SponsorDashboard() {
                 key={r.id}
                 href={`/sponsor/marketplace/${r.id}`}
                 title={r.purpose}
-                meta={`${r.ref} · ${studentOf(state, r.studentId)?.country} · ${relDays(r.deadline)}`}
+                meta={`${r.ref} · ${studentOf(state, r.studentId)?.emirate} · ${relDays(r.deadline)}`}
                 right={
                   <>
                     <span className="hidden sm:inline">
                       <UrgencyBadge label={urgencyOf(r.deadline).label} />
                     </span>
-                    <span className="w-14 text-right font-semibold tabular">{usd(remainingOf(r))}</span>
+                    <span className="w-14 text-end font-semibold tabular">{aed(remainingOf(r))}</span>
                   </>
                 }
               />

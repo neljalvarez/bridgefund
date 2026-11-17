@@ -11,7 +11,7 @@ import { DEMO_OPPORTUNITY_ID, DEMO_SPONSOR_ID } from "@/lib/seed";
 import { oppOf, requestForOpp } from "@/lib/selectors";
 import { planFor } from "@/lib/plan";
 import { fmtMultiplier, requestImpact } from "@/lib/impact";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/Logo";
@@ -33,7 +33,8 @@ function Demo() {
   const plan = useMemo(() => (opp ? planFor(state, opp) : null), [opp, state]);
   const r = requestForOpp(state, DEMO_OPPORTUNITY_ID);
   const sponsor = currentSponsor(state);
-  const pristine = !r && state.sponsors.find((x) => x.id === DEMO_SPONSOR_ID)?.balance === 500;
+  const demoSponsor = state.sponsors.find((x) => x.id === DEMO_SPONSOR_ID);
+  const pristine = !r && demoSponsor?.balance === demoSponsor?.startingBalance;
 
   useEffect(() => {
     const role = SCENES[stage].role;
@@ -79,18 +80,22 @@ function Demo() {
 
   const total = plan.totalCost;
   const own = plan.studentFunds;
-  const savings = stage >= 1 ? plan.reductionsTotal : 0;
+  const sumKind = (k: string) => plan.phases.filter((p) => p.kind === k).flatMap((p) => p.findings).reduce((a, f) => a + f.amount, 0);
+  const borrowed = stage >= 1 ? sumKind("borrow") : 0;
+  const school = stage >= 1 ? sumKind("institutional") : 0;
+  const otherSavings = stage >= 1 ? plan.reductionsTotal - sumKind("borrow") - sumKind("institutional") : 0;
+  const savings = borrowed + school + otherSavings;
   const sponsorPart = stage >= 3 ? plan.sponsorAmount : 0;
   const gap = Math.max(total - own - savings - sponsorPart, 0);
   const impact = r ? requestImpact(r, state.contributions) : null;
 
   const captions = [
-    <>Amina earned a seat on a {usd(total)} exam. She has {usd(own)}.</>,
-    <>BridgeEngine found a {usd(plan.reductionsTotal)} fee waiver. Sponsors are asked for {usd(plan.sponsorAmount)}, not {usd(plan.initialGap)}.</>,
-    <>Her school checked the details and confirmed the waiver.</>,
-    <>A sponsor covered the last {usd(plan.sponsorAmount)} — paid straight to the exam board.</>,
+    <>Mariam, Grade 11 in Abu Dhabi, wants to enter a STEM competition. It costs {aed(total)}; she has {aed(own)}.</>,
+    <>BridgeEngine found a kit to borrow ({aed(sumKind("borrow"))}) and school travel support ({aed(sumKind("institutional"))}). Sponsors are asked for {aed(plan.sponsorAmount)}, not {aed(plan.initialGap)}.</>,
+    <>Her school checked the costs and confirmed the help.</>,
+    <>A sponsor covered the last {aed(plan.sponsorAmount)} — paid straight to the providers.</>,
     <>
-      {usd(impact?.resolved ?? plan.initialGap)} of barriers resolved with {usd(impact?.sponsor ?? plan.sponsorAmount)} from a sponsor.
+      {aed(impact?.resolved ?? plan.initialGap)} of barriers resolved with {aed(impact?.sponsor ?? plan.sponsorAmount)} from a sponsor.
     </>,
   ];
   const big = stage === 4 ? fmtMultiplier(impact?.multiplier ?? null) : null;
@@ -102,7 +107,7 @@ function Demo() {
       <ol className="grid grid-cols-5 gap-2" aria-label="Demo progress">
         {SCENES.map((s, i) => (
           <li key={s.tag}>
-            <button type="button" onClick={() => go(i)} disabled={i > stage} className="w-full text-left disabled:cursor-default focus-visible:outline-none" aria-current={i === stage ? "step" : undefined}>
+            <button type="button" onClick={() => go(i)} disabled={i > stage} className="w-full text-start disabled:cursor-default focus-visible:outline-none" aria-current={i === stage ? "step" : undefined}>
               <span className="block h-1.5 overflow-hidden rounded-full bg-secondary">
                 <motion.span className="block h-full bg-primary" initial={false} animate={{ width: i <= stage ? "100%" : "0%" }} transition={{ duration: 0.5 }} />
               </span>
@@ -127,7 +132,7 @@ function Demo() {
         </p>
         <div className="mt-4 flex items-center gap-3">
           {stage === 2 && <BadgeCheck className="h-12 w-12 text-primary md:h-16 md:w-16" strokeWidth={1.5} />}
-          <p className={cn("text-7xl font-semibold tracking-tight tabular md:text-8xl", (stage === 3 || stage === 4) && "text-primary")}>{big ?? <AnimatedNumber value={gap} />}</p>
+          <p className={cn("text-6xl font-semibold tracking-tight tabular md:text-8xl", (stage === 3 || stage === 4) && "text-primary")}>{big ?? <AnimatedNumber value={gap} />}</p>
         </div>
         <p className="mt-2 text-lg text-muted-foreground">{label}</p>
 
@@ -138,17 +143,19 @@ function Demo() {
         </AnimatePresence>
 
         <div className="mt-10 w-full max-w-xl">
-          <div className="flex h-4 overflow-hidden rounded-full bg-secondary" role="img" aria-label={`Own funds ${usd(own)}, savings ${usd(savings)}, sponsor ${usd(sponsorPart)}, remaining ${usd(gap)}`}>
+          <div className="flex h-4 overflow-hidden rounded-full bg-secondary" role="img" aria-label={`Own funds ${aed(own)}, borrowed ${aed(borrowed)}, school ${aed(school)}, sponsor ${aed(sponsorPart)}, remaining ${aed(gap)}`}>
             <motion.div className="bg-slate-400" initial={false} animate={{ width: `${(own / total) * 100}%` }} />
-            <motion.div className="bg-emerald-300" initial={false} animate={{ width: `${(savings / total) * 100}%` }} transition={{ duration: 0.7 }} />
+            <motion.div className="bg-emerald-200" initial={false} animate={{ width: `${(borrowed / total) * 100}%` }} transition={{ duration: 0.7 }} />
+            <motion.div className="bg-emerald-400" initial={false} animate={{ width: `${((school + otherSavings) / total) * 100}%` }} transition={{ duration: 0.7 }} />
             <motion.div className="bg-primary" initial={false} animate={{ width: `${(sponsorPart / total) * 100}%` }} transition={{ duration: 0.7 }} />
           </div>
           <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
             <Legend color="bg-slate-400" label="Her savings" value={own} />
-            <Legend color="bg-emerald-300" label="Fee waiver" value={savings} />
+            <Legend color="bg-emerald-200" label="Borrowed kit" value={borrowed} />
+            <Legend color="bg-emerald-400" label="School support" value={school + otherSavings} />
             <Legend color="bg-primary" label="Sponsor" value={sponsorPart} />
           </div>
-          {stage >= 3 && <p className="mt-4 text-sm text-muted-foreground">Sponsor balance {usd(sponsor.balance)} of {usd(sponsor.startingBalance)}</p>}
+          {stage >= 3 && <p className="mt-4 text-sm text-muted-foreground">Sponsor balance {aed(sponsor.balance)} of {aed(sponsor.startingBalance)}</p>}
         </div>
       </div>
 
@@ -173,7 +180,7 @@ function Demo() {
 function Legend({ color, label, value }: { color: string; label: string; value: number }) {
   return (
     <span className="flex items-center gap-1.5">
-      <span className={cn("h-2.5 w-2.5 rounded-full", color)} /> {label} <span className="font-medium text-foreground tabular">{usd(value)}</span>
+      <span className={cn("h-2.5 w-2.5 rounded-full", color)} /> {label} <span className="font-medium text-foreground tabular">{aed(value)}</span>
     </span>
   );
 }
@@ -184,7 +191,7 @@ function DemoHeader() {
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
         <Logo />
         <span className="hidden text-sm text-muted-foreground sm:inline">· 90-second demo</span>
-        <Button asChild variant="ghost" size="sm" className="ml-auto">
+        <Button asChild variant="ghost" size="sm" className="ms-auto">
           <Link href="/">
             <LogOut /> Exit
           </Link>

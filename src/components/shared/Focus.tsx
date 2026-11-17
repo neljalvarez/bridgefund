@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AnimatedNumber } from "./kit";
+import { useT } from "@/lib/store";
 
 export interface Figure {
   label: string;
@@ -19,15 +20,16 @@ export interface Figure {
 
 /** The three numbers that matter most, plus one obvious next step. */
 export function DashboardFocus({ figures, action }: { figures: Figure[]; action: { title: string; text?: ReactNode; href?: string; onClick?: () => void; cta: string; icon?: ReactNode } }) {
+  const tr = useT();
   const Btn = (
     <Button size="lg" className="w-full sm:w-auto" onClick={action.onClick} asChild={!!action.href}>
       {action.href ? (
         <Link href={action.href}>
-          {action.icon} {action.cta} <ArrowRight />
+          {action.icon} {tr(action.cta)} <ArrowRight />
         </Link>
       ) : (
         <>
-          {action.icon} {action.cta} <ArrowRight />
+          {action.icon} {tr(action.cta)} <ArrowRight />
         </>
       )}
     </Button>
@@ -37,7 +39,7 @@ export function DashboardFocus({ figures, action }: { figures: Figure[]; action:
       <Card className="grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {figures.map((f) => (
           <div key={f.label} className="p-5 md:p-6">
-            <p className="text-[13px] font-medium text-muted-foreground">{f.label}</p>
+            <p className="text-[13px] font-medium text-muted-foreground">{tr(f.label)}</p>
             <p className={cn("mt-2 text-3xl font-semibold tracking-tight md:text-4xl", f.tone === "primary" && "text-primary", f.tone === "warning" && "text-warning")}>
               {typeof f.value === "number" ? <AnimatedNumber value={f.value} money={f.money ?? true} /> : f.value}
             </p>
@@ -47,7 +49,7 @@ export function DashboardFocus({ figures, action }: { figures: Figure[]; action:
       </Card>
       <div className="flex flex-col gap-4 rounded-xl border border-primary/25 bg-primary-light/50 p-5 dark:bg-primary/10 sm:flex-row sm:items-center sm:justify-between md:p-6">
         <div className="min-w-0">
-          <p className="text-[13px] font-medium text-primary">Next step</p>
+          <p className="text-[13px] font-medium text-primary">{tr("Next step")}</p>
           <p className="mt-0.5 text-lg font-semibold tracking-tight">{action.title}</p>
           {action.text && <p className="mt-0.5 text-sm text-muted-foreground">{action.text}</p>}
         </div>
@@ -59,12 +61,13 @@ export function DashboardFocus({ figures, action }: { figures: Figure[]; action:
 
 /** Secondary information, collapsed by default. */
 export function MoreDetails({ title = "More details", children, defaultOpen }: { title?: string; children: ReactNode; defaultOpen?: boolean }) {
+  const tr = useT();
   return (
     <Collapsible.Root type="single" collapsible defaultValue={defaultOpen ? "x" : undefined} className="mt-8">
       <Collapsible.Item value="x" className="border-t">
         <Collapsible.Header>
-          <Collapsible.Trigger className="group flex w-full items-center justify-between py-4 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            {title}
+          <Collapsible.Trigger className="group flex w-full items-center justify-between py-4 text-start text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            {tr(title)}
             <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
           </Collapsible.Trigger>
         </Collapsible.Header>

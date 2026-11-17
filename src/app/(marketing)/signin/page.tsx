@@ -53,7 +53,7 @@ function SignIn() {
                     role="radio"
                     aria-checked={role === r}
                     onClick={() => setR(r)}
-                    className={cn("flex items-center gap-3 rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", role === r ? "border-primary bg-primary-light/50" : "hover:bg-muted/50")}
+                    className={cn("flex items-center gap-3 rounded-lg border p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", role === r ? "border-primary bg-primary-light/50" : "hover:bg-muted/50")}
                   >
                     <span className={cn("flex h-9 w-9 items-center justify-center rounded-md", role === r ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
                       <m.icon className="h-4 w-4" />

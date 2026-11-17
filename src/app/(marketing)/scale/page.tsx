@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageIntro } from "@/components/marketing/PageIntro";
 import { CURRENCIES, LAUNCH_MARKET, MARKETS } from "@/lib/regions";
-import { WAIVERS } from "@/lib/knowledge";
+import { ASSISTANCE } from "@/lib/uae";
 
 export const metadata: Metadata = { title: "Global scalability" };
 
 const LAYERS = [
-  { icon: Coins, t: "Local currencies", b: "Stored with each amount; settled by local payment partners." },
+  { icon: Coins, t: "AED first", b: "Every amount is in dirhams; other currencies are display-only." },
   { icon: ListChecks, t: "Country programmes", b: "Each waiver and grant knows where it applies." },
   { icon: GraduationCap, t: "Education systems", b: "Grades and exams named the local way." },
   { icon: Building2, t: "Local eligibility", b: "Evidence rules set per programme." },
   { icon: Handshake, t: "School partners", b: "Growth through school and nonprofit networks." },
-  { icon: Languages, t: "Multilingual", b: "Navigation already previews French and Spanish." },
+  { icon: Languages, t: "Arabic and English", b: "Switch languages anytime; Arabic uses right-to-left layouts." },
 ];
 
 const STEPS = [
@@ -27,12 +27,11 @@ const STEPS = [
 ];
 
 export default function ScalePage() {
-  const programmes = (country: string) => WAIVERS.filter((w) => w.countries.includes(country)).length;
-  const global = WAIVERS.filter((w) => w.countries.includes("Global")).length;
+  const programmes = (region: string) => (region.includes("GCC") ? "—" : ASSISTANCE.filter((a) => a.emirates === "All" || a.emirates.some((e) => region.includes(e))).length);
   return (
     <>
-      <PageIntro eyebrow="Global plan" title="One market, one partner at a time">
-        Every country has its own rules. Money, programmes, eligibility and language are set per market.
+      <PageIntro eyebrow="UAE first, then the region" title="Abu Dhabi first. Then Dubai, Sharjah and every emirate.">
+        Each emirate — and later each country — has its own rules. Programmes, eligibility and language are set per region, never copied.
       </PageIntro>
 
       <section className="border-b">
@@ -57,7 +56,7 @@ export default function ScalePage() {
             </Badge>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">{LAUNCH_MARKET.country}</h2>
             <p className="mt-3 text-muted-foreground">
-              The interactive demo follows Amina, a fictional Grade 12 student in Nairobi. Kenya is the proposed first market because school-related costs are a documented burden on families — UNESCO reports that around 30% of families in Kenya borrow to pay for education (<Link href="/why#evidence" className="text-primary hover:underline">see sources</Link>).
+              The demo follows Mariam, a fictional Grade 11 student in Abu Dhabi. National STEM competitions and official cost-saving programmes — student transport passes, free public libraries, university aid — already exist; BridgeFund connects them (<Link href="/student/waivers" className="text-primary hover:underline">see the directory</Link>).
             </p>
             <dl className="mt-6 space-y-3 text-sm">
               <div>
@@ -73,15 +72,15 @@ export default function ScalePage() {
                 <dd className="font-medium">{LAUNCH_MARKET.partnerModel}</dd>
               </div>
             </dl>
-            <p className="mt-6 text-xs text-muted-foreground">No partnership in Kenya or elsewhere has been agreed. These are proposals for a future pilot.</p>
+            <p className="mt-6 text-xs text-muted-foreground">No partnership with any UAE school, authority or company has been agreed. These are proposals for a future pilot.</p>
           </div>
           <div className="overflow-x-auto rounded-xl border bg-background">
             <table className="w-full min-w-[560px] text-sm">
-              <caption className="sr-only">Proposed expansion markets</caption>
+              <caption className="sr-only">Proposed expansion: Abu Dhabi, Dubai, Sharjah, then the remaining emirates</caption>
               <thead>
-                <tr className="border-b bg-muted/40 text-left">
+                <tr className="border-b bg-muted/40 text-start">
                   <th scope="col" className="px-4 py-3 font-medium">
-                    Market
+                    Region
                   </th>
                   <th scope="col" className="px-3 py-3 font-medium">
                     Phase
@@ -92,15 +91,15 @@ export default function ScalePage() {
                   <th scope="col" className="px-3 py-3 font-medium">
                     Education system
                   </th>
-                  <th scope="col" className="px-3 py-3 text-right font-medium">
-                    Local demo programmes
+                  <th scope="col" className="px-3 py-3 text-end font-medium">
+                    Verified local programmes
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {MARKETS.map((m) => (
                   <tr key={m.country} className="border-b last:border-0">
-                    <th scope="row" className="px-4 py-3 text-left font-medium">
+                    <th scope="row" className="px-4 py-3 text-start font-medium">
                       {m.country}
                     </th>
                     <td className="px-3 py-3">
@@ -108,12 +107,12 @@ export default function ScalePage() {
                     </td>
                     <td className="px-3 py-3 tabular">{m.currency}</td>
                     <td className="px-3 py-3 text-muted-foreground">{m.educationSystem}</td>
-                    <td className="px-3 py-3 text-right tabular">{programmes(m.country)}</td>
+                    <td className="px-3 py-3 text-end tabular">{programmes(m.country)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <p className="border-t px-4 py-3 text-xs text-muted-foreground">Plus {global} programmes in the demo knowledge base marked as available globally. Every count reflects fictional demonstration data.</p>
+            <p className="border-t px-4 py-3 text-xs text-muted-foreground">Counts the real assistance programmes in the directory that apply in each region. Regulators listed for context only.</p>
           </div>
         </div>
       </section>
@@ -137,9 +136,9 @@ export default function ScalePage() {
         <div className="container py-14">
           <Card className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="font-medium">Same $180 exam, shown in each demo currency</p>
+              <p className="font-medium">Mariam&apos;s AED 600 competition in each display currency</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {CURRENCIES.map((c) => `${c.code} ${Math.round(180 * c.rate).toLocaleString("en-US")}`).join(" · ")} — illustrative fixed rates, display only.
+                {CURRENCIES.map((c) => `${c.code} ${Math.round(600 * c.rate).toLocaleString("en-AE")}`).join(" · ")} — display only; USD uses the official peg, others are illustrative.
               </p>
             </div>
             <Button asChild variant="outline">

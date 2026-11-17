@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: { default: "BridgeFund — Small gaps. Big futures.", template: "%s · BridgeFund" },
-  description: "BridgeFund removes the financial barriers standing between students and their next educational opportunity — reducing costs first, then funding only what remains.",
+  description: "BridgeFund helps UAE students reach competitions, internships and university — cutting costs first, then funding only what remains.",
   icons: { icon: "/favicon.svg" },
 };
 
@@ -19,7 +19,7 @@ export const viewport: Viewport = {
   ],
 };
 
-const themeScript = `try{if(localStorage.getItem('bf-theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}`;
+const themeScript = `try{if(localStorage.getItem('bf-theme')==='dark'){document.documentElement.classList.add('dark')}var st=JSON.parse(localStorage.getItem('bridgefund-state')||'null');if(st&&st.display&&st.display.locale==='ar'){document.documentElement.dir='rtl';document.documentElement.lang='ar'}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans">
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
           Skip to content
         </a>
         <StoreProvider>

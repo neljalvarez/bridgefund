@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { FileText, LayoutGrid, Package, Store, Ticket } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { WAIVERS } from "@/lib/knowledge";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { ACCOUNT_NAV, ROLE_NAV } from "./nav";
@@ -53,7 +53,7 @@ export function CommandSearch({ open, onOpenChange }: { open: boolean; onOpenCha
                 <CommandItem key={p.href + p.label} value={`page ${p.label} ${p.description}`} onSelect={() => go(p.href)}>
                   <p.icon />
                   <span>{p.label}</span>
-                  <span className="ml-auto truncate text-xs text-muted-foreground">{p.description}</span>
+                  <span className="ms-auto truncate text-xs text-muted-foreground">{p.description}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -64,7 +64,7 @@ export function CommandSearch({ open, onOpenChange }: { open: boolean; onOpenCha
                   <span>
                     {r.ref} · {r.purpose}
                   </span>
-                  <span className="ml-auto text-xs text-muted-foreground">{r.status}</span>
+                  <span className="ms-auto text-xs text-muted-foreground">{r.status}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -75,7 +75,7 @@ export function CommandSearch({ open, onOpenChange }: { open: boolean; onOpenCha
                   <span>
                     {r.ref} · {r.purpose}
                   </span>
-                  <span className="ml-auto text-xs text-muted-foreground tabular">{usd(Math.max(r.amount - r.funded, 0))} left</span>
+                  <span className="ms-auto text-xs text-muted-foreground tabular">{aed(Math.max(r.amount - r.funded, 0))} left</span>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -92,7 +92,7 @@ export function CommandSearch({ open, onOpenChange }: { open: boolean; onOpenCha
                 <CommandItem key={r.id} value={`resource ${r.name} ${r.type}`} onSelect={() => go(`/student/resources?r=${r.id}`)}>
                   <Package />
                   <span>{r.name}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">{r.available} available</span>
+                  <span className="ms-auto text-xs text-muted-foreground">{r.available} available</span>
                 </CommandItem>
               ))}
             </CommandGroup>

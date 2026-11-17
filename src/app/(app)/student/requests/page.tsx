@@ -7,7 +7,7 @@ import type { FundingRequest } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { deleteDraft, remainingOf, respondToInfo, submitRequest } from "@/lib/actions";
 import { institutionOf } from "@/lib/selectors";
-import { fmtDate, fmtDateTime, usd } from "@/lib/format";
+import { fmtDate, fmtDateTime, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,7 +26,7 @@ function RequestCard({ r }: { r: FundingRequest }) {
 
   return (
     <Card>
-      <button type="button" onClick={() => setOpen(!open)} className="flex w-full flex-col gap-3 p-5 text-left sm:flex-row sm:items-center" aria-expanded={open}>
+      <button type="button" onClick={() => setOpen(!open)} className="flex w-full flex-col gap-3 p-5 text-start sm:flex-row sm:items-center" aria-expanded={open}>
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground">
             {r.ref} · due {fmtDate(r.deadline)} · {inst?.name}
@@ -34,9 +34,9 @@ function RequestCard({ r }: { r: FundingRequest }) {
           <p className="mt-0.5 font-medium">{r.purpose}</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-right">
+          <div className="text-end">
             <p className="text-xs text-muted-foreground">Remaining</p>
-            <p className="font-semibold tabular">{usd(remainingOf(r))}</p>
+            <p className="font-semibold tabular">{aed(remainingOf(r))}</p>
           </div>
           <StatusBadge status={r.status} />
           <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
@@ -71,7 +71,7 @@ function RequestCard({ r }: { r: FundingRequest }) {
                 <p className="mb-2 text-[13px] font-medium">Funding progress</p>
                 <Progress value={r.amount ? (r.funded / r.amount) * 100 : 100} />
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  {usd(r.funded)} of {usd(r.amount)} requested
+                  {aed(r.funded)} of {aed(r.amount)} requested
                 </p>
               </div>
               <div>
@@ -89,7 +89,7 @@ function RequestCard({ r }: { r: FundingRequest }) {
               </div>
               <details className="text-sm">
                 <summary className="cursor-pointer text-[13px] font-medium">Status history ({r.history.length})</summary>
-                <ol className="mt-2 space-y-1.5 border-l pl-3">
+                <ol className="mt-2 space-y-1.5 border-s ps-3">
                   {[...r.history].reverse().map((h, i) => (
                     <li key={i} className="text-xs">
                       <span className="text-muted-foreground">{fmtDateTime(h.at)}</span> — {h.note}
@@ -133,7 +133,7 @@ export default function RequestsPage() {
     <>
       <PageHeader
         title="Assistance requests"
-        description="Private, verified and tracked to the last dollar."
+        description="Private, verified and tracked to the last dirham."
         actions={
           <Button
             onClick={() => {

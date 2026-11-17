@@ -13,14 +13,14 @@ export type ExpenseCategory =
   | "other";
 
 export type OpportunityCategory =
-  | "certification"
-  | "examination"
+  | "stem-competition"
+  | "robotics"
+  | "science-fair"
+  | "entrepreneurship"
   | "university-application"
-  | "competition"
   | "internship"
-  | "interview"
-  | "technology"
-  | "course";
+  | "workshop"
+  | "certification";
 
 export type EducationLevel = "secondary" | "pre-university" | "undergraduate" | "vocational";
 
@@ -46,6 +46,10 @@ export interface Student {
   initials: string;
   country: string;
   city: string;
+  /** UAE emirate of residence/schooling. */
+  emirate: import("./uae").Emirate;
+  residency: "Emirati" | "Expatriate";
+  age: number;
   grade: string;
   level: EducationLevel;
   institutionId: string;
@@ -138,6 +142,17 @@ export interface FundingRequest {
   priority?: boolean;
   strategy?: StrategyId;
   outcome?: "Participated" | "Completed opportunity" | "Did not participate";
+  /** Required for students under 18 before verification (simulated). */
+  guardianConsent?: "Not required" | "Pending" | "Given";
+}
+
+export interface Feedback {
+  id: string;
+  role: Role;
+  rating: number; // 1–5
+  comment: string;
+  page: string;
+  at: string;
 }
 
 export type StrategyId = "lowest-cost" | "fastest" | "independent";
@@ -208,6 +223,13 @@ export interface Waiver extends ProgramMeta {
   kind: "waiver" | "discount" | "institutional";
   /** Programmes that cannot be combined with this one on the same expense. */
   conflictsWith?: string[];
+  /** Only offered in these emirates (omit = nationwide). */
+  emirates?: string[];
+  /** Only suggested when the expense is at least this large (e.g. a card fee must be worth it). */
+  minBase?: number;
+  /** A real programme checked against its official source. */
+  verified?: boolean;
+  url?: string;
 }
 
 export interface Alternative extends ProgramMeta {
@@ -217,6 +239,9 @@ export interface Alternative extends ProgramMeta {
   replaces: ExpenseCategory[];
   keywords: string[];
   description: string;
+  emirates?: string[];
+  verified?: boolean;
+  url?: string;
 }
 
 export interface Grant extends ProgramMeta {
@@ -338,8 +363,9 @@ export interface AppState {
   matches: Match[];
   /** Remaining budget of each grant programme across the network. */
   programFunds: Record<string, number>;
-  display: { currency: string; locale: "en" | "fr" | "es" };
+  display: { currency: string; locale: "en" | "ar" };
   pilot: { schools: number; students: number; requests: number; resolved: number; participated: number; avgDaysToResolve: number | null; notes: string; updatedAt: string | null };
+  feedback: Feedback[];
   onboarded: boolean;
   demo: { stage: number; scanned: boolean };
 }

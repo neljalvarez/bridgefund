@@ -1,46 +1,42 @@
 /**
- * Region registry — the foundation for international expansion.
- * Assistance rules are NOT assumed to be identical across countries: every
- * programme in the knowledge base is scoped to the countries, education levels
- * and eligibility rules it actually applies to, and each market below records
- * its own currency, education system and launch phase.
- *
- * Exchange rates are fixed, illustrative values used for DISPLAY ONLY. All
- * calculations are performed in USD. A production system would use a licensed
- * FX feed and settle in local currency through local payment providers.
+ * Region registry. The United Arab Emirates is the launch market; amounts are
+ * stored and calculated in AED. Other currencies are DISPLAY ONLY. The USD rate
+ * reflects the AED's fixed peg (USD 1 = AED 3.6725); the rest are illustrative.
+ * Assistance rules are never assumed to be identical across emirates or countries:
+ * every programme records where it applies.
  */
 export interface Currency {
   code: string;
   label: string;
-  /** Illustrative units per 1 USD — display only. */
+  /** Units per 1 AED — display only. */
   rate: number;
 }
 
 export const CURRENCIES: Currency[] = [
-  { code: "USD", label: "US dollar", rate: 1 },
-  { code: "KES", label: "Kenyan shilling", rate: 129 },
-  { code: "PHP", label: "Philippine peso", rate: 58 },
-  { code: "INR", label: "Indian rupee", rate: 84 },
-  { code: "BRL", label: "Brazilian real", rate: 5.4 },
-  { code: "EUR", label: "Euro", rate: 0.92 },
+  { code: "AED", label: "UAE dirham", rate: 1 },
+  { code: "USD", label: "US dollar (peg)", rate: 1 / 3.6725 },
+  { code: "EUR", label: "Euro (illustrative)", rate: 0.25 },
+  { code: "INR", label: "Indian rupee (illustrative)", rate: 23 },
+  { code: "PHP", label: "Philippine peso (illustrative)", rate: 15.8 },
+  { code: "PKR", label: "Pakistani rupee (illustrative)", rate: 76 },
 ];
 
 export interface Market {
-  country: string;
+  country: string; // emirate or country
   currency: string;
-  educationSystem: string;
+  educationSystem: string; // regulator / system
   languages: string[];
-  phase: "Launch market" | "Phase 2" | "Phase 3";
+  phase: "Launch market" | "Phase 2" | "Phase 3" | "Phase 4" | "International";
   partnerModel: string;
 }
 
+/** Proposed expansion: Abu Dhabi first, then Dubai, Sharjah and the remaining emirates, then the region. */
 export const MARKETS: Market[] = [
-  { country: "Kenya", currency: "KES", educationSystem: "Competency-based curriculum; KCSE secondary exams", languages: ["English", "Kiswahili"], phase: "Launch market", partnerModel: "Pilot with one secondary school and one nonprofit in Nairobi" },
-  { country: "Ghana", currency: "GHS", educationSystem: "WASSCE senior high examinations", languages: ["English"], phase: "Phase 2", partnerModel: "Regional school networks via an education nonprofit" },
-  { country: "Nigeria", currency: "NGN", educationSystem: "WAEC / JAMB examinations", languages: ["English"], phase: "Phase 2", partnerModel: "Foundation-run assistance programmes" },
-  { country: "Philippines", currency: "PHP", educationSystem: "K-12 with senior high tracks", languages: ["English", "Filipino"], phase: "Phase 2", partnerModel: "Public school divisions" },
-  { country: "India", currency: "INR", educationSystem: "State and national boards; vocational diplomas", languages: ["English", "Hindi", "Marathi"], phase: "Phase 3", partnerModel: "Polytechnic and diploma colleges" },
-  { country: "Brazil", currency: "BRL", educationSystem: "Ensino médio; national entrance exam", languages: ["Portuguese"], phase: "Phase 3", partnerModel: "Educational trusts and municipal secretariats" },
+  { country: "Abu Dhabi", currency: "AED", educationSystem: "ADEK-regulated public and private schools", languages: ["Arabic", "English"], phase: "Launch market", partnerModel: "Pilot with a small group of Abu Dhabi schools" },
+  { country: "Dubai", currency: "AED", educationSystem: "KHDA private schools; MoE public schools", languages: ["Arabic", "English"], phase: "Phase 2", partnerModel: "Private school groups and university outreach offices" },
+  { country: "Sharjah", currency: "AED", educationSystem: "SPEA private schools; MoE public schools", languages: ["Arabic", "English"], phase: "Phase 3", partnerModel: "School networks and university partners" },
+  { country: "Ajman, Umm Al Quwain, Ras Al Khaimah, Fujairah", currency: "AED", educationSystem: "MoE public schools and private schools", languages: ["Arabic", "English"], phase: "Phase 4", partnerModel: "Ministry-aligned school clusters" },
+  { country: "GCC and beyond", currency: "Local", educationSystem: "Configured per country", languages: ["Arabic", "English", "+ local"], phase: "International", partnerModel: "Institutional partners in each market" },
 ];
 
 export const LAUNCH_MARKET = MARKETS[0];

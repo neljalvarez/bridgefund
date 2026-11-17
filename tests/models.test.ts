@@ -3,15 +3,15 @@ import assert from "node:assert/strict";
 import { simulate } from "../src/lib/simulator";
 import { project, summary } from "../src/lib/business";
 
-test("simulator: demo case reproduces the $110 → $60 rescue", () => {
-  const r = simulate({ cost: 180, studentFunds: 70, waivers: 50, borrowing: 0, institutional: 0, sponsorBudget: 500, crowdFee: 0 });
-  assert.equal(r.shortfall, 110);
-  assert.equal(r.bridgeSponsorNeeded, 60);
-  assert.equal(r.sponsorConserved, 50);
-  assert.equal(r.opportunitiesA, 4); // 500 / 110
-  assert.equal(r.opportunitiesB, 8); // 500 / 60
+test("simulator: UAE demo case reproduces the AED 450 → AED 150 rescue", () => {
+  const r = simulate({ cost: 600, studentFunds: 150, waivers: 0, borrowing: 200, institutional: 100, sponsorBudget: 1000, crowdFee: 0 });
+  assert.equal(r.shortfall, 450);
+  assert.equal(r.bridgeSponsorNeeded, 150);
+  assert.equal(r.sponsorConserved, 300);
+  assert.equal(r.opportunitiesA, 2); // 1000 / 450
+  assert.equal(r.opportunitiesB, 6); // 1000 / 150
   assert.equal(r.extraOpportunities, 4);
-  assert.equal(r.multiplier, 1.83);
+  assert.equal(r.multiplier, 3);
 });
 
 test("simulator: reductions and institutional aid are capped at the shortfall", () => {
@@ -29,6 +29,13 @@ test("simulator: student funds above cost produce no shortfall", () => {
   assert.equal(r.shortfall, 0);
   assert.equal(r.crowdDonorsNeeded, 0);
   assert.equal(r.bridgeSponsorNeeded, 0);
+});
+
+test("business: licence revenue is included in MRR and break-even (AED)", () => {
+  const s = summary({ clients: 10, price: 950, programs: 2, programFee: 1500, opex: 30000, requestsPerClient: 15, verificationCost: 9, cac: 3000, licences: 1, licenceFee: 2500 }, "moderate");
+  assert.equal(s.mrr, 15000); // 9,500 + 3,000 + 2,500
+  assert.equal(s.contribution, 815); // 950 − 15 × 9
+  assert.equal(s.breakEvenClients, 31); // (30,000 − 3,000 − 2,500) ÷ 815 = 30.06, rounded up
 });
 
 test("business: summary and break-even", () => {

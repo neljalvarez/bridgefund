@@ -40,11 +40,11 @@ export function ExpenseEditor({ expenses, onChange, idPrefix = "exp" }: { expens
                 </SelectContent>
               </Select>
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">AED</span>
                 <Input
                   aria-label={`Expense ${i + 1} amount`}
                   inputMode="decimal"
-                  className="pl-6 tabular"
+                  className="ps-12 tabular"
                   placeholder="0"
                   value={e.amount ? String(e.amount) : ""}
                   onChange={(ev) => update(e.id, { amount: Number(ev.target.value.replace(/[^\d.]/g, "")) || 0 })}

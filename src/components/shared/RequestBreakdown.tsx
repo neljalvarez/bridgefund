@@ -3,7 +3,7 @@
 import { Check } from "lucide-react";
 import type { AppState, FundingRequest, RequestStatus } from "@/lib/types";
 import { remainingOf } from "@/lib/actions";
-import { STATUS_FLOW, usd } from "@/lib/format";
+import { STATUS_FLOW, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -18,16 +18,16 @@ export function RequestBreakdown({ r, state, compact }: { r: FundingRequest; sta
             <span className="text-muted-foreground">
               {e.label} {!e.confirmed && <span className="text-[11px]">(estimate)</span>}
             </span>
-            <span className="tabular">{usd(e.amount)}</span>
+            <span className="tabular">{aed(e.amount)}</span>
           </div>
         ))}
       <div className={cn("flex justify-between gap-3 py-1 font-medium", !compact && "border-t pt-1.5")}>
         <span>Total cost</span>
-        <span className="tabular">{usd(r.totalCost)}</span>
+        <span className="tabular">{aed(r.totalCost)}</span>
       </div>
       <div className="flex justify-between gap-3 py-1">
         <span className="text-muted-foreground">Personal funds</span>
-        <span className="tabular">−{usd(r.studentFunds)}</span>
+        <span className="tabular">−{aed(r.studentFunds)}</span>
       </div>
       {r.reductions.map((x) => (
         <div key={x.id} className="flex items-center justify-between gap-3 py-1">
@@ -37,18 +37,18 @@ export function RequestBreakdown({ r, state, compact }: { r: FundingRequest; sta
               {x.confirmed ? "Confirmed" : "Estimated"}
             </Badge>
           </span>
-          <span className="shrink-0 text-primary tabular">−{usd(x.amount)}</span>
+          <span className="shrink-0 text-primary tabular">−{aed(x.amount)}</span>
         </div>
       ))}
       {contributions.map((c) => (
         <div key={c.id} className="flex justify-between gap-3 py-1">
           <span className="truncate text-muted-foreground">{c.sourceLabel}</span>
-          <span className="tabular text-primary">−{usd(c.amount)}</span>
+          <span className="tabular text-primary">−{aed(c.amount)}</span>
         </div>
       ))}
       <div className="mt-1 flex justify-between gap-3 border-t pt-2 font-semibold">
         <span>Remaining financial gap</span>
-        <span className="tabular">{usd(remainingOf(r))}</span>
+        <span className="tabular">{aed(remainingOf(r))}</span>
       </div>
     </div>
   );

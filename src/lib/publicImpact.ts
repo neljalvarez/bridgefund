@@ -9,9 +9,10 @@ import type { AppState, FundingRequest } from "./types";
 import { RESOLVED, portfolioImpact, requestImpact } from "./impact";
 import { daysBetween } from "./allocation";
 import { OPP_LABEL } from "./format";
+import { EMIRATES } from "./uae";
 
 export interface ImpactFilter {
-  country: string; // "all" or a country
+  emirate: string; // "all" or an emirate
   category: string; // "all" or an opportunity category key
 }
 
@@ -22,14 +23,16 @@ export function resolvedAt(r: FundingRequest) {
 }
 
 export function publicImpact(state: AppState, f: ImpactFilter) {
-  const country = (r: FundingRequest) => state.students.find((s) => s.id === r.studentId)?.country ?? "Unknown";
-  const category = (r: FundingRequest) => state.opportunities.find((o) => o.id === r.opportunityId)?.category ?? "course";
-  const scope = state.requests.filter((r) => r.status !== "Draft" && (f.country === "all" || country(r) === f.country) && (f.category === "all" || category(r) === f.category));
+  const emirateOf = (r: FundingRequest) => state.students.find((s) => s.id === r.studentId)?.emirate ?? "Unknown";
+  const category = (r: FundingRequest) => state.opportunities.find((o) => o.id === r.opportunityId)?.category ?? "workshop";
+  const scope = state.requests.filter((r) => r.status !== "Draft" && (f.emirate === "all" || emirateOf(r) === f.emirate) && (f.category === "all" || category(r) === f.category));
   const resolved = scope.filter((r) => RESOLVED.includes(r.status));
   const p = portfolioImpact(scope, state.contributions);
   const confirmedKind = (r: FundingRequest, kinds: string[]) => r.reductions.filter((x) => x.confirmed && kinds.includes(x.kind)).reduce((a, x) => a + x.amount, 0);
   const waiverSavings = r2(resolved.reduce((a, r) => a + confirmedKind(r, ["waiver", "discount", "alternative"]), 0));
   const borrowSavings = r2(resolved.reduce((a, r) => a + confirmedKind(r, ["borrow"]), 0));
+  // Sponsor money that wasn't needed because costs were reduced or covered by schools first.
+  const sponsorConserved = r2(p.reductions + p.institutional);
   const sponsorAllocated = r2(state.contributions.filter((c) => (c.source === "sponsor" || c.source === "pool") && scope.some((r) => r.id === c.requestId)).reduce((a, c) => a + c.amount, 0));
 
   // Average share of the shortfall removed by confirmed reductions (resolved requests only).
@@ -57,14 +60,12 @@ export function publicImpact(state: AppState, f: ImpactFilter) {
     .filter((x) => x.total > 0)
     .sort((a, b) => b.total - a.total);
 
-  const countries = [...new Set(scope.map(country))].sort();
-  const byCountry = countries
-    .map((c) => {
-      const xs = scope.filter((r) => country(r) === c);
-      const rs = xs.filter((r) => RESOLVED.includes(r.status));
-      return { country: c, requests: xs.length, resolved: rs.length, students: new Set(rs.map((r) => r.studentId)).size, amount: portfolioImpact(xs, state.contributions).resolved };
-    })
-    .sort((a, b) => b.amount - a.amount || b.requests - a.requests);
+  const byEmirate = EMIRATES.map((e) => {
+    const xs = scope.filter((r) => emirateOf(r) === e);
+    const rs = xs.filter((r) => RESOLVED.includes(r.status));
+    const i = portfolioImpact(xs, state.contributions);
+    return { emirate: e, requests: xs.length, resolved: rs.length, students: new Set(rs.map((r) => r.studentId)).size, amount: i.resolved, reduced: i.reductions };
+  });
 
   return {
     requests: scope.length,
@@ -81,8 +82,10 @@ export function publicImpact(state: AppState, f: ImpactFilter) {
     completedOutcome,
     notRecorded,
     byCategory,
-    byCountry,
+    byEmirate,
+    sponsorConserved,
+    expensesReduced: p.reductions,
   };
 }
 
-export const ALL_COUNTRIES = (state: AppState) => [...new Set(state.students.map((s) => s.country))].sort();
+

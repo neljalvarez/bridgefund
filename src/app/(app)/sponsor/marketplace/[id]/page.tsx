@@ -1,5 +1,7 @@
 "use client";
 
+import { anonId } from "@/lib/uae";
+
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -7,7 +9,7 @@ import { ArrowLeft, BadgeCheck, CalendarClock, GraduationCap, HandCoins, MapPin,
 import { useStore } from "@/lib/store";
 import { remainingOf } from "@/lib/actions";
 import { institutionOf, oppOf, studentOf } from "@/lib/selectors";
-import { EXPENSE_LABEL, LEVEL_LABEL, OPP_LABEL, fmtDateLong, fmtDateTime, relDays, urgencyOf, usd } from "@/lib/format";
+import { EXPENSE_LABEL, LEVEL_LABEL, OPP_LABEL, fmtDateLong, fmtDateTime, relDays, urgencyOf, aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -44,9 +46,9 @@ export default function NeedDetailPage() {
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">{r.purpose}</h1>
             <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-              <span>{st.firstName} · {LEVEL_LABEL[st.level]}</span>
+              <span>{anonId(st.id)} · {LEVEL_LABEL[st.level]}</span>
               <span className="flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" /> {st.city}, {st.country}
+                <MapPin className="h-3.5 w-3.5" /> {st.emirate}
               </span>
               {opp && <span>{OPP_LABEL[opp.category]}</span>}
             </p>
@@ -72,12 +74,12 @@ export default function NeedDetailPage() {
             </CardHeader>
             <CardContent>
               {r.expenses.map((e) => (
-                <KeyValue key={e.id} label={`${e.label} · ${EXPENSE_LABEL[e.category]}`} value={usd(e.amount)} />
+                <KeyValue key={e.id} label={`${e.label} · ${EXPENSE_LABEL[e.category]}`} value={aed(e.amount)} />
               ))}
-              <KeyValue label="Student's own contribution" value={`−${usd(r.studentFunds)}`} className="border-t" />
-              {reductions > 0 && <KeyValue label="Waivers, alternatives and discounts (confirmed)" value={`−${usd(reductions)}`} />}
-              <KeyValue label="Verified requirement for sponsors" value={usd(r.amount)} className="border-t font-semibold" />
-              <p className="mt-3 text-xs text-muted-foreground">BridgeFund reduced this need by {usd(reductions)} before it reached the marketplace.</p>
+              <KeyValue label="Student's own contribution" value={`−${aed(r.studentFunds)}`} className="border-t" />
+              {reductions > 0 && <KeyValue label="Waivers, alternatives and discounts (confirmed)" value={`−${aed(reductions)}`} />}
+              <KeyValue label="Verified requirement for sponsors" value={aed(r.amount)} className="border-t font-semibold" />
+              <p className="mt-3 text-xs text-muted-foreground">BridgeFund reduced this need by {aed(reductions)} before it reached the marketplace.</p>
             </CardContent>
           </Card>
           <Card>
@@ -85,7 +87,7 @@ export default function NeedDetailPage() {
               <CardTitle>Verification trail</CardTitle>
             </CardHeader>
             <CardContent>
-              <ol className="space-y-2 border-l pl-4 text-sm">
+              <ol className="space-y-2 border-s ps-4 text-sm">
                 {sponsorEvents.map((h, i) => (
                   <li key={i}>
                     {h.note} <span className="text-xs text-muted-foreground">· {fmtDateTime(h.at)}</span>
@@ -93,7 +95,7 @@ export default function NeedDetailPage() {
                 ))}
               </ol>
               <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <ShieldCheck className="h-3.5 w-3.5 text-primary" /> The student&apos;s explanation and documents are visible only to {inst?.name}.
+                <ShieldCheck className="h-3.5 w-3.5 text-primary" /> You see an anonymous ID. The student&apos;s name, explanation and documents are visible only to {inst?.name}.
               </p>
             </CardContent>
           </Card>
@@ -106,11 +108,11 @@ export default function NeedDetailPage() {
               </p>
               <div>
                 <p className="text-sm text-muted-foreground">Amount remaining</p>
-                <p className="text-4xl font-semibold tracking-tight tabular">{usd(remaining)}</p>
+                <p className="text-4xl font-semibold tracking-tight tabular">{aed(remaining)}</p>
               </div>
               <Progress value={r.amount ? (r.funded / r.amount) * 100 : 100} />
               <p className="text-sm text-muted-foreground">
-                {usd(r.funded)} of {usd(r.amount)} funded
+                {aed(r.funded)} of {aed(r.amount)} funded
               </p>
               <p className="flex items-center gap-1.5 text-sm">
                 <CalendarClock className="h-4 w-4 text-muted-foreground" /> Due {fmtDateLong(r.deadline)} · {relDays(r.deadline)}

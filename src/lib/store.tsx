@@ -6,6 +6,7 @@ import type { AppState } from "./types";
 import type { Action } from "./actions";
 import { createSeedState, STATE_VERSION } from "./seed";
 import { setDisplayCurrency } from "./format";
+import { DIR, t, type Locale } from "./i18n";
 
 const KEY = "bridgefund-state";
 
@@ -69,11 +70,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const reset = useCallback(() => {
-    setState((s) => ({ ...createSeedState(), onboarded: true, profile: s?.profile ?? createSeedState().profile }));
+    // Reset demo data, but keep preferences and anything real the user entered (pilot results, feedback).
+    setState((s) => ({ ...createSeedState(), onboarded: true, profile: s?.profile ?? createSeedState().profile, display: s?.display ?? createSeedState().display, pilot: s?.pilot ?? createSeedState().pilot, feedback: s?.feedback ?? [] }));
     toast("Demo reset", { description: "All demonstration data has been restored." });
   }, []);
 
-  if (state) setDisplayCurrency(state.display.currency); // display-only conversion; calculations stay in USD
+  if (state) setDisplayCurrency(state.display.currency); // display-only conversion; calculations stay in AED
+  const locale = state?.display.locale ?? "en";
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = DIR[locale];
+  }, [locale]);
   const value = useMemo(() => (state ? { state, dispatch, reset } : null), [state, dispatch, reset]);
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
@@ -89,4 +96,20 @@ export const useHydrated = () => useContext(StoreContext) !== null;
 /** Renders children only once demo data has loaded from localStorage. */
 export function Hydrated({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) {
   return useHydrated() ? <>{children}</> : <>{fallback}</>;
+}
+
+/** Current interface language; safe to call before demo data has loaded. */
+export function useLocale(): Locale {
+  return useContext(StoreContext)?.state.display.locale ?? "en";
+}
+
+/** Translate an interface string for the current language. */
+export function useT() {
+  const locale = useLocale();
+  return (key: string) => t(locale, key);
+}
+
+/** Like useStore, but returns null before demo data has loaded (safe on public pages). */
+export function useMaybeStore() {
+  return useContext(StoreContext);
 }

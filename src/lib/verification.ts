@@ -57,6 +57,12 @@ export function verificationChecks(state: AppState, r: FundingRequest): Verifica
       detail: docsRejected.length ? `${docsRejected.map((d) => d.name).join(", ")} rejected.` : docsMissing.length ? `Missing: ${docsMissing.map((d) => d.name).join(", ")}.` : unconfirmedCost.length ? `${unconfirmedCost.length} cost(s) are estimates — review the evidence.` : "All costs supported by documents.",
     },
     {
+      key: "guardian",
+      label: "Guardian consent",
+      status: !st || st.age >= 18 || r.guardianConsent === "Not required" ? "pass" : r.guardianConsent === "Given" ? "pass" : "warn",
+      detail: !st || st.age >= 18 ? "Not required (18 or over)." : r.guardianConsent === "Given" ? "A parent or guardian has consented (simulated)." : `Student is ${st.age} — guardian consent is still needed.`,
+    },
+    {
       key: "duplicate",
       label: "Duplicate assistance check",
       status: dupes.length ? "fail" : "pass",

@@ -2,7 +2,7 @@
 
 import { AlarmClock, ArrowRight, Lightbulb } from "lucide-react";
 import type { DeadlineAssessment, RiskLevel } from "@/lib/deadline";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -40,7 +40,7 @@ export function DeadlineRiskPanel({ a, compact }: { a: DeadlineAssessment; compa
         </div>
         <div>
           <p className="text-[11px] text-muted-foreground">Outstanding gap</p>
-          <p className="font-semibold tabular">{usd(a.gap)}</p>
+          <p className="font-semibold tabular">{aed(a.gap)}</p>
         </div>
         <div>
           <p className="text-[11px] text-muted-foreground">Est. processing</p>

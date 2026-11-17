@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
 import { useStore } from "@/lib/store";
 import { currentSponsor } from "@/lib/actions";
 import { oppOf } from "@/lib/selectors";
-import { OPP_LABEL, sum, usd } from "@/lib/format";
+import { OPP_LABEL, sum, aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/shared/kit";
@@ -27,7 +27,7 @@ export default function SponsorImpactPage() {
     const m = new Map<string, number>();
     toNeeds.forEach((c) => {
       const r = state.requests.find((x) => x.id === c.requestId);
-      const cat = r ? OPP_LABEL[oppOf(state, r.opportunityId)?.category ?? "course"] : "Other";
+      const cat = r ? OPP_LABEL[oppOf(state, r.opportunityId)?.category ?? "workshop"] : "Other";
       m.set(cat, (m.get(cat) ?? 0) + c.amount);
     });
     return [...m.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
@@ -51,7 +51,7 @@ export default function SponsorImpactPage() {
           <p className="text-sm text-muted-foreground">
             {impact.count > 0 ? (
               <>
-                Across the {impact.count} fully-funded request{impact.count === 1 ? "" : "s"} you supported, BridgeFund resolved <strong className="text-foreground">{usd(impact.resolved)}</strong> of financial barriers using <strong className="text-foreground">{usd(impact.sponsor)}</strong> of sponsor money ({usd(impact.reductions)} from confirmed waivers, discounts and borrowed resources{impact.institutional > 0 ? `, ${usd(impact.institutional)} institutional` : ""}). Students&apos; own funds are excluded.
+                Across the {impact.count} fully-funded request{impact.count === 1 ? "" : "s"} you supported, BridgeFund resolved <strong className="text-foreground">{aed(impact.resolved)}</strong> of financial barriers using <strong className="text-foreground">{aed(impact.sponsor)}</strong> of sponsor money ({aed(impact.reductions)} from confirmed waivers, discounts and borrowed resources{impact.institutional > 0 ? `, ${aed(impact.institutional)} institutional` : ""}). Students&apos; own funds are excluded.
               </>
             ) : (
               "Appears once a request you supported is fully funded. Multiplier = barriers resolved ÷ sponsor funding used; students' own funds are excluded."
@@ -59,7 +59,7 @@ export default function SponsorImpactPage() {
           </p>
           {held > 0 && (
             <Button asChild variant="outline" size="sm">
-              <Link href="/sponsor/allocate">{usd(held)} awaiting institutional review</Link>
+              <Link href="/sponsor/allocate">{aed(held)} awaiting institutional review</Link>
             </Button>
           )}
         </CardContent>
@@ -110,7 +110,7 @@ export default function SponsorImpactPage() {
                 <ul className="space-y-2 text-sm">
                   {statusData.map((d) => (
                     <li key={d.name} className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ background: d.color }} /> {d.name} <span className="font-medium tabular">{usd(d.value)}</span>
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ background: d.color }} /> {d.name} <span className="font-medium tabular">{aed(d.value)}</span>
                     </li>
                   ))}
                 </ul>

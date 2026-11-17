@@ -8,7 +8,7 @@ import { fundRequest, remainingOf, reviewPledge, setPriority } from "@/lib/actio
 import { assessDeadline, RISK_ORDER } from "@/lib/deadline";
 import { needsReview, verificationChecks } from "@/lib/verification";
 import { inInstitutionScope, studentOf } from "@/lib/selectors";
-import { fmtDateTime, sum, usd } from "@/lib/format";
+import { fmtDateTime, sum, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,7 +115,7 @@ export default function UrgentPage() {
                         {r.ref} · {r.purpose}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {studentOf(state, r.studentId)?.firstName} · {usd(r.amount)} requested
+                        {studentOf(state, r.studentId)?.firstName} · {aed(r.amount)} requested
                       </p>
                       <ul className="mt-2 space-y-1 text-[13px]">
                         {issues.map((c) => (
@@ -160,7 +160,7 @@ export default function UrgentPage() {
                         {sp?.name} → {r.ref} · {r.purpose}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {usd(p.amount)} proposed · {usd(remainingOf(r))} still needed · approach: {p.approach} · {fmtDateTime(p.at)}
+                        {aed(p.amount)} proposed · {aed(remainingOf(r))} still needed · approach: {p.approach} · {fmtDateTime(p.at)}
                       </p>
                     </div>
                     <div className="flex shrink-0 gap-2">
@@ -184,7 +184,7 @@ export default function UrgentPage() {
           <DialogHeader>
             <DialogTitle>Cover {er?.ref} from the emergency fund?</DialogTitle>
             <DialogDescription>
-              {usd(er ? remainingOf(er) : 0)} will be allocated from {erInst?.name}&apos;s fund ({usd(erInst?.fund ?? 0)} available) and paid to the provider on completion. This uses money that could support other students.
+              {aed(er ? remainingOf(er) : 0)} will be allocated from {erInst?.name}&apos;s fund ({aed(erInst?.fund ?? 0)} available) and paid to the provider on completion. This uses money that could support other students.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

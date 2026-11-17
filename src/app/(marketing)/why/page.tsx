@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Why BridgeFund?" };
 
 const ALTERNATIVES = [
   { name: "Crowdfunding", good: "Fast, open to anyone, transparent fees.", differ: "Asks for the full amount; results depend on the student's network." },
-  { name: "Scholarship directories", good: "Great for finding large awards.", differ: "Discovery isn't delivery — and rarely covers a $40 fee." },
+  { name: "Scholarship directories", good: "Great for finding large awards.", differ: "Discovery isn't delivery — and rarely covers an AED 150 competition cost." },
   { name: "Student loans", good: "Can finance big, long-term costs.", differ: "BridgeFund never lends. Debt is too much for a small gap." },
   { name: "Financial literacy apps", good: "Build lasting money skills.", differ: "Skills can't pay a fee due next week." },
   { name: "Emergency funds", good: "Schools know their students; research shows small grants help.", differ: "Often manual, and pay full price for costs that could be waived." },
@@ -36,6 +36,21 @@ const DIFFERENTIATION = [
 ];
 
 const SOURCES = [
+  {
+    claim: "Demand in the UAE is real: the Emirates Young Scientist Competition 2026 received 2,651 registrations from students in Grades 5–12.",
+    source: "GCC Business News, on the 8th NSTI Festival (MoE and ATRC)",
+    href: "https://www.gccbusinessnews.com/?p=157194",
+  },
+  {
+    claim: "ADEK expanded its Summer 2026 Work Placement Program to 578 Abu Dhabi high school students, from more than 2,900 applications.",
+    source: "Gulf News",
+    href: "https://gulfnews.com/uae/adek-expands-summer-work-placements-giving-578-abu-dhabi-students-hands-on-career-experience-1.500653956",
+  },
+  {
+    claim: "Cost help already exists but is scattered: RTA's student nol package offers 50% off RTA public transport; MAKTABA library borrowing in Abu Dhabi is free.",
+    source: "RTA; MAKTABA (DCT Abu Dhabi)",
+    href: "https://www.rta.ae/wps/portal/rta/ae/home/news-and-media/all-news/NewsDetails/nol-student-package-unveiled-at-gitex-2024",
+  },
   {
     claim: "Education costs fall heavily on families in lower-income countries: households bear an estimated 33% of education spending in low-income countries, versus 18% in high-income countries.",
     source: "UNESCO Global Education Monitoring Report 2017/8 — Finance",
@@ -67,7 +82,7 @@ const SOURCES = [
     href: "https://www.philanthropy.com/article/crowdfunding-success-for-schools-shows-deep-disparities-based-on-poverty/",
   },
   {
-    claim: "A large crowdfunding platform charges no platform fee in the US but deducts a 2.9% + $0.30 transaction fee from each donation (used as a reference for the simulator's fee assumption).",
+    claim: "A large crowdfunding platform charges no platform fee in the US but deducts a 2.9% + $0.30 transaction fee from each donation.",
     source: "GoFundMe pricing",
     href: "https://www.gofundme.com/c/pricing",
   },
@@ -116,7 +131,7 @@ export default function WhyPage() {
             <table className="w-full min-w-[860px] text-sm">
               <caption className="sr-only">Capability comparison</caption>
               <thead>
-                <tr className="border-b bg-muted/40 text-left">
+                <tr className="border-b bg-muted/40 text-start">
                   <th scope="col" className="px-4 py-3 font-medium">
                     Capability
                   </th>
@@ -130,7 +145,7 @@ export default function WhyPage() {
               <tbody>
                 {MATRIX.map((row) => (
                   <tr key={row.capability} className="border-b last:border-0">
-                    <th scope="row" className="px-4 py-3 text-left font-medium">
+                    <th scope="row" className="px-4 py-3 text-start font-medium">
                       {row.capability}
                     </th>
                     {row.values.map((v, i) => (

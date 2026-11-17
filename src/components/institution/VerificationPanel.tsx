@@ -6,7 +6,7 @@ import type { FundingRequest } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { addFlag, resolveFlag, reviewDocument, setCheck } from "@/lib/actions";
 import { verificationChecks, type CheckStatus } from "@/lib/verification";
-import { fmtDateTime, usd } from "@/lib/format";
+import { fmtDateTime, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -135,15 +135,15 @@ export function VerificationPanel({ r }: { r: FundingRequest }) {
                   <span className="text-muted-foreground">
                     {fmtDateTime(c.at)} · {c.sourceLabel}
                   </span>
-                  <span className="tabular">+{usd(c.amount)}</span>
+                  <span className="tabular">+{aed(c.amount)}</span>
                 </li>
               ))}
               {payments.map((p) => (
                 <li key={p.id} className="flex justify-between gap-2 font-medium">
                   <span>
-                    Paid to {p.provider} · {p.reference} <Badge variant="outline" className="ml-1 border-dashed">Simulated</Badge>
+                    Paid to {p.provider} · {p.reference} <Badge variant="outline" className="ms-1 border-dashed">Simulated</Badge>
                   </span>
-                  <span className="tabular">{usd(p.amount)}</span>
+                  <span className="tabular">{aed(p.amount)}</span>
                 </li>
               ))}
             </ul>

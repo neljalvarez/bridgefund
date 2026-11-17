@@ -6,7 +6,7 @@ import { CheckCircle2, Loader2, Lock, ShieldCheck } from "lucide-react";
 import type { FundingRequest } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { currentSponsor, fundRequest, remainingOf } from "@/lib/actions";
-import { usd } from "@/lib/format";
+import { aed } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,13 +38,13 @@ export function ContributeDialog({ request: r, open, onOpenChange }: { request: 
   }, [state.contributions, receiptId, busy, r.id, sponsor.id]);
 
   const v = Number(amount);
-  const err = !(v > 0) ? "Enter an amount greater than $0." : v > remaining ? `Only ${usd(remaining)} is needed — contributions can't exceed the remaining gap.` : v > sponsor.balance ? `Your available balance is ${usd(sponsor.balance)}.` : null;
+  const err = !(v > 0) ? "Enter an amount greater than AED 0." : v > remaining ? `Only ${aed(remaining)} is needed — contributions can't exceed the remaining gap.` : v > sponsor.balance ? `Your available balance is ${aed(sponsor.balance)}.` : null;
 
   const submit = () => {
     if (err) return;
     setBusy(true);
     setTimeout(() => {
-      dispatch(fundRequest(r.id, v, "sponsor"), { success: `${usd(v)} contributed to ${r.ref}`, description: v >= remaining ? "The request is now fully funded." : undefined });
+      dispatch(fundRequest(r.id, v, "sponsor"), { success: `${aed(v)} contributed to ${r.ref}`, description: v >= remaining ? "The request is now fully funded." : undefined });
       setBusy(false);
       setReceiptId("pending");
     }, 800);
@@ -80,21 +80,21 @@ export function ContributeDialog({ request: r, open, onOpenChange }: { request: 
             <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted/50 p-3 text-sm">
               <div>
                 <p className="text-xs text-muted-foreground">Remaining verified gap</p>
-                <p className="font-semibold tabular">{usd(remaining)}</p>
+                <p className="font-semibold tabular">{aed(remaining)}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{sponsor.name} balance</p>
-                <p className="font-semibold tabular">{usd(sponsor.balance)}</p>
+                <p className="font-semibold tabular">{aed(sponsor.balance)}</p>
               </div>
             </div>
             <div>
-              <Label htmlFor="contrib">Contribution (USD)</Label>
+              <Label htmlFor="contrib">Contribution (AED)</Label>
               <Input id="contrib" className="mt-1.5 text-base tabular" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={!!err} />
               <FieldError>{amount ? err : null}</FieldError>
               <div className="mt-2 flex flex-wrap gap-2">
                 {[...new Set([10, 25, remaining])].filter((x) => x <= remaining).map((x) => (
                   <Button key={x} type="button" variant="outline" size="sm" onClick={() => setAmount(String(Math.min(x, sponsor.balance)))}>
-                    {x === remaining ? `Close the gap · ${usd(x)}` : usd(x)}
+                    {x === remaining ? `Close the gap · ${aed(x)}` : aed(x)}
                   </Button>
                 ))}
               </div>
@@ -113,7 +113,7 @@ export function ContributeDialog({ request: r, open, onOpenChange }: { request: 
               </Button>
               <Button onClick={submit} disabled={!!err || busy}>
                 {busy ? <Loader2 className="animate-spin" /> : null}
-                {busy ? "Processing…" : `Contribute ${v > 0 ? usd(v) : ""}`}
+                {busy ? "Processing…" : `Contribute ${v > 0 ? aed(v) : ""}`}
               </Button>
             </DialogFooter>
           </>

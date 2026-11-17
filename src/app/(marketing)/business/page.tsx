@@ -57,7 +57,7 @@ export default function BusinessPage() {
                   </div>
                 </div>
                 <p className="mt-4 text-sm leading-relaxed">{s.body}</p>
-                <p className="mt-3 border-l-2 border-primary pl-3 text-sm text-muted-foreground">{s.value}</p>
+                <p className="mt-3 border-s-2 border-primary ps-3 text-sm text-muted-foreground">{s.value}</p>
               </Card>
             ))}
           </div>

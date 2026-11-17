@@ -33,6 +33,7 @@ export type AssistanceStatus = "Confirmed" | "Estimated";
 export interface OptimizerInput {
   category: OpportunityCategory;
   country: string;
+  emirate?: string;
   level: EducationLevel;
   expenses: Expense[];
   studentFunds: number;
@@ -155,6 +156,8 @@ export function enumerateOptions(input: OptimizerInput, kb: OptimizerKB, ctx: Op
     for (const w of kb.waivers) {
       if (!w.categories.includes(input.category) || !w.expenseCategories.includes(e.category)) continue;
       if (!countryOk(w.countries, input.country) || !w.levels.includes(input.level)) continue;
+      if (w.emirates && !(input.emirate && w.emirates.includes(input.emirate))) continue;
+      if (w.minBase && e.amount < w.minBase) continue;
       const confirmed = ctx.confirmedSourceIds.includes(w.id);
       if (!confirmed && !meetsRequirements(input.eligibility, w.requires)) {
         excluded.push({ title: w.name, reason: `Eligibility not met: requires that ${requirementReasons(w.requires).join(" and ")}.` });
@@ -191,6 +194,7 @@ export function enumerateOptions(input: OptimizerInput, kb: OptimizerKB, ctx: Op
     // Free alternatives
     for (const a of kb.alternatives) {
       if (!a.replaces.includes(e.category)) continue;
+      if (a.emirates && !(input.emirate && a.emirates.includes(input.emirate))) continue;
       const hit = keyword(e.label, a.keywords);
       if (!hit) continue;
       const t = timing(a.name, a.processingDays, a.deadlineDays, ctx.confirmedSourceIds.includes(a.id));
@@ -202,7 +206,7 @@ export function enumerateOptions(input: OptimizerInput, kb: OptimizerKB, ctx: Op
       const res = kb.resources.find((r) => keyword(e.label, r.keywords));
       if (res && res.available <= 0 && !ctx.confirmedSourceIds.includes(res.id)) excluded.push({ title: `Borrow: ${res.name}`, reason: "No units available right now — join the waitlist in Resource Rescue." });
       if (res && (res.available > 0 || ctx.confirmedSourceIds.includes(res.id))) {
-        options.push({ id: `o${++seq}`, kind: "borrow", sourceId: res.id, title: `Borrow: ${res.name}`, provider: "Resource Rescue lending library", expenseId: e.id, expenseLabel: e.label, amount: e.amount, cash: false, processingDays: 1, likelihood: ctx.confirmedSourceIds.includes(res.id) ? 1 : 0.95, status: ctx.confirmedSourceIds.includes(res.id) ? "Confirmed" : "Estimated", conflictsWith: [], why: [`${res.available} of ${res.total} available`, "Borrowing avoids the purchase entirely"] });
+        options.push({ id: `o${++seq}`, kind: "borrow", sourceId: res.id, title: `Borrow: ${res.name}`, provider: "Resource Rescue lending library", expenseId: e.id, expenseLabel: e.label, amount: Math.min(e.amount, res.retailValue), cash: false, processingDays: 1, likelihood: ctx.confirmedSourceIds.includes(res.id) ? 1 : 0.95, status: ctx.confirmedSourceIds.includes(res.id) ? "Confirmed" : "Estimated", conflictsWith: [], why: [`${res.available} of ${res.total} available`, "Borrowing avoids the purchase entirely"] });
       }
     }
     // Grants (limited by programme budget)
@@ -396,7 +400,7 @@ export function optimizeAssistance(input: OptimizerInput, kb: OptimizerKB, ctx: 
   let recommended: StrategyId = "independent";
   if (!by.independent.meetsDeadline && by.fastest.meetsDeadline) recommended = "fastest";
 
-  const money = (n: number) => `$${Math.round(n)}`;
+  const money = (n: number) => `AED ${Math.round(n).toLocaleString("en-AE")}`;
   const tradeoffs: string[] = [];
   tradeoffs.push(`Lowest out-of-pocket keeps the student's ${money(input.studentFunds)} but asks sponsors for ${money(by["lowest-cost"].sponsorNeeded)} — ${money(by["lowest-cost"].sponsorNeeded - by.independent.sponsorNeeded)} more than the independent strategy.`);
   if (by.fastest.daysToSecure < by.independent.daysToSecure) tradeoffs.push(`Fastest secures funding in ~${by.fastest.daysToSecure} days instead of ~${by.independent.daysToSecure}, but skips slower savings and needs ${money(by.fastest.sponsorNeeded)} from sponsors.`);

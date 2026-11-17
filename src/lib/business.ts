@@ -1,17 +1,20 @@
 /**
  * Business Model Simulator — hypothetical projections only.
- * Students are never charged: every revenue line comes from institutions
- * (subscriptions) and sponsored programmes (programme management fees).
+ * Students are never charged: revenue comes from school and university
+ * subscriptions, CSR / sponsored programme management fees and institutional
+ * licences. All values are in AED.
  */
 export interface BizInput {
   clients: number; // institutional subscribers at month 0
-  price: number; // subscription per institution per month (USD)
+  price: number; // subscription per institution per month (AED)
   programs: number; // sponsored programmes at month 0
-  programFee: number; // management fee per programme per month (USD)
-  opex: number; // fixed operating expenses per month (USD)
+  programFee: number; // management fee per programme per month (AED)
+  opex: number; // fixed operating expenses per month (AED)
   requestsPerClient: number; // verified requests per institution per month
-  verificationCost: number; // variable cost per verified request (USD)
-  cac: number; // customer acquisition cost per new institution (USD)
+  verificationCost: number; // variable cost per verified request (AED)
+  cac: number; // customer acquisition cost per new institution (AED)
+  licences?: number; // institutional licences (e.g. nonprofits, university offices) at month 0
+  licenceFee?: number; // licence fee per month (AED)
 }
 
 export type Scenario = "conservative" | "moderate" | "optimistic";
@@ -38,12 +41,14 @@ export function project(input: BizInput, scenario: Scenario, months = 24): Month
   const rows: MonthRow[] = [];
   let clients = Math.max(input.clients, 0);
   let programs = Math.max(input.programs, 0);
+  let licences = Math.max(input.licences ?? 0, 0);
   let cumulative = 0;
   for (let m = 1; m <= months; m++) {
     const added = clients * growth;
     clients = clients + added - clients * churn;
     programs = programs * (1 + growth / 2); // sponsored programmes follow institutions, more slowly
-    const revenue = clients * input.price + programs * input.programFee;
+    licences = licences * (1 + growth / 2);
+    const revenue = clients * input.price + programs * input.programFee + licences * (input.licenceFee ?? 0);
     const costs = input.opex + clients * input.requestsPerClient * input.verificationCost + added * input.cac;
     const profit = revenue - costs;
     cumulative += profit;
@@ -53,12 +58,13 @@ export function project(input: BizInput, scenario: Scenario, months = 24): Month
 }
 
 export function summary(input: BizInput, scenario: Scenario) {
-  const mrr = input.clients * input.price + input.programs * input.programFee;
+  const licenceRevenue = (input.licences ?? 0) * (input.licenceFee ?? 0);
+  const mrr = input.clients * input.price + input.programs * input.programFee + licenceRevenue;
   const variable = input.clients * input.requestsPerClient * input.verificationCost;
   const costs = input.opex + variable; // month-0 run rate, before acquisition spend
   const contribution = input.price - input.requestsPerClient * input.verificationCost; // per institution per month
   const programRevenue = input.programs * input.programFee;
-  const breakEvenClients = contribution > 0 ? Math.max(Math.ceil((input.opex - programRevenue) / contribution), 0) : null;
+  const breakEvenClients = contribution > 0 ? Math.max(Math.ceil((input.opex - programRevenue - licenceRevenue) / contribution), 0) : null;
   const rows = project(input, scenario);
   const breakEvenMonth = rows.find((r) => r.profit >= 0)?.month ?? null;
   return { mrr: r0(mrr), arr: r0(mrr * 12), costs: r0(costs), profit: r0(mrr - costs), contribution: r0(contribution), breakEvenClients, breakEvenMonth, rows };

@@ -30,6 +30,7 @@ import type {
 export interface EngineInput {
   category: OpportunityCategory;
   country: string;
+  emirate?: string;
   level: EducationLevel;
   expenses: Expense[];
   studentFunds: number;
@@ -95,7 +96,7 @@ export const PHASE_LABELS: Record<PhaseKind, string> = {
 };
 
 const round = (n: number) => Math.round(n * 100) / 100;
-const money = (n: number) => `$${round(n)}`;
+const money = (n: number) => `AED ${round(n).toLocaleString("en-AE")}`;
 
 const PROFILE_LABELS: Record<keyof EligibilityProfile, string> = {
   lowIncome: "you reported a household income below the local threshold",
@@ -174,9 +175,10 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
     const out: EngineFinding[] = [];
     for (const w of kb.waivers.filter((x) => x.kind === kind)) {
       if (!w.categories.includes(input.category) || !countryOk(w.countries, input.country) || !w.levels.includes(input.level)) continue;
+      if (w.emirates && !(input.emirate && w.emirates.includes(input.emirate))) continue;
       if (!meetsRequirements(input.eligibility, w.requires)) continue;
       for (const e of input.expenses) {
-        if (!w.expenseCategories.includes(e.category) || remaining[e.id] <= 0) continue;
+        if (!w.expenseCategories.includes(e.category) || remaining[e.id] <= 0 || (w.minBase && e.amount < w.minBase)) continue;
         const base = kind === "waiver" ? remaining[e.id] : e.amount; // percentage discounts apply to the list price
         const amt = take(w.id, e, waiverValue(w, base));
         if (amt > 0)
@@ -191,7 +193,8 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
             expenseLabel: e.label,
             why: [
               `Applies to ${CAT[e.category]} costs for ${input.category.replace("-", " ")} opportunities`,
-              w.countries.includes("Global") ? "Available in every country" : `Offered in ${input.country}`,
+              w.emirates ? `Offered in ${w.emirates.join(", ")}` : w.countries.includes("Global") ? "Available in every country" : `Offered in ${input.country}`,
+              ...(w.verified ? ["Real programme — confirm details on the official site"] : []),
               ...requirementReasons(w.requires),
             ],
             eligibility: w.eligibility,
@@ -210,6 +213,7 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
   phase(2, "alternative", "Free alternatives", "Is there a free way to meet the same requirement?", () => {
     const out: EngineFinding[] = [];
     for (const a of kb.alternatives) {
+      if (a.emirates && !(input.emirate && a.emirates.includes(input.emirate))) continue;
       for (const e of input.expenses) {
         if (!a.replaces.includes(e.category) || remaining[e.id] <= 0) continue;
         const hit = keywordHit(e.label, a.keywords);
@@ -245,7 +249,7 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
       if (!["equipment", "materials", "technology"].includes(e.category) || remaining[e.id] <= 0) continue;
       const r = kb.resources.find((x) => x.available > 0 && keywordHit(e.label, x.keywords));
       if (!r) continue;
-      const amt = take(r.id, e, remaining[e.id]);
+      const amt = take(r.id, e, Math.min(remaining[e.id], r.retailValue)); // borrowing saves the item's value, not the whole line
       if (amt > 0)
         out.push({
           id: `f${++seq}`,
@@ -256,7 +260,7 @@ export function runBridgeEngine(input: EngineInput, kb: EngineKnowledge): Engine
           amount: amt,
           expenseId: e.id,
           expenseLabel: e.label,
-          why: [`${r.available} of ${r.total} available to reserve`, "Borrowing avoids the purchase entirely"],
+          why: [`${r.available} of ${r.total} available to reserve`, `Borrowing saves the item's AED ${r.retailValue} value`],
           eligibility: ["Student at a partner institution"],
           documents: ["Student ID at pickup"],
           instructions: ["Reserve the item in Resource Rescue.", "Collect it from the school office on your pickup date.", `Return it at the end of the loan (${r.loanTerm.toLowerCase()}).`],

@@ -1,5 +1,7 @@
 "use client";
 
+import { anonId } from "@/lib/uae";
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Check, CheckCircle2, Info, RotateCcw, ShieldCheck } from "lucide-react";
@@ -7,7 +9,7 @@ import { useStore } from "@/lib/store";
 import { createPledges, currentSponsor } from "@/lib/actions";
 import { APPROACHES, planAllocation, rankNeeds, type Approach } from "@/lib/allocation";
 import { oppOf, studentOf, verifiedNeeds } from "@/lib/selectors";
-import { OPP_LABEL, fmtDate, relDays, urgencyOf, usd } from "@/lib/format";
+import { OPP_LABEL, fmtDate, relDays, urgencyOf, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,7 +38,7 @@ export default function ImpactPlannerPage() {
         funded: r.funded,
         deadline: r.deadline,
         studentId: r.studentId,
-        category: OPP_LABEL[oppOf(state, r.opportunityId)?.category ?? "course"],
+        category: OPP_LABEL[oppOf(state, r.opportunityId)?.category ?? "workshop"],
       })),
     [needs, state],
   );
@@ -66,7 +68,7 @@ export default function ImpactPlannerPage() {
       .filter(([, v]) => v > 0)
       .map(([requestId, amount]) => ({ requestId, amount }));
     dispatch(createPledges(items, APPROACHES[approach].name + (approach === "category" ? ` (${category})` : "") + (edited ? ", adjusted" : "")), {
-      success: `${usd(total)} submitted for institutional review`,
+      success: `${aed(total)} submitted for institutional review`,
       description: "The amount is held from your balance until institutions approve or decline each allocation.",
     });
     setDone(items.map((i) => ({ ref: needs.find((n) => n.id === i.requestId)!.ref, amount: i.amount })));
@@ -80,14 +82,14 @@ export default function ImpactPlannerPage() {
           <div>
             <h1 className="text-xl font-semibold">Allocation submitted for review</h1>
             <p className="text-sm text-muted-foreground">
-              {usd(done.reduce((a, b) => a + b.amount, 0))} proposed across {done.length} verified needs. It is held from your balance until each verifying institution approves or declines it.
+              {aed(done.reduce((a, b) => a + b.amount, 0))} proposed across {done.length} verified needs. It is held from your balance until each verifying institution approves or declines it.
             </p>
           </div>
           <ul className="divide-y rounded-lg border text-sm">
             {done.map((d) => (
               <li key={d.ref} className="flex justify-between px-3 py-2">
                 <span>{d.ref}</span>
-                <span className="font-medium tabular">{usd(d.amount)}</span>
+                <span className="font-medium tabular">{aed(d.amount)}</span>
               </li>
             ))}
           </ul>
@@ -123,18 +125,18 @@ export default function ImpactPlannerPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="budget">Amount to allocate (USD)</Label>
+                <Label htmlFor="budget">Amount to allocate (AED)</Label>
                 <div className="relative mt-1.5">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input id="budget" className="h-11 pl-7 text-lg font-semibold tabular" inputMode="decimal" value={budgetText} onChange={(e) => setBudgetText(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={overBalance} />
+                  <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground">AED</span>
+                  <Input id="budget" className="h-11 ps-14 text-lg font-semibold tabular" inputMode="decimal" value={budgetText} onChange={(e) => setBudgetText(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={overBalance} />
                 </div>
-                <FieldError>{overBalance ? `Exceeds ${sponsor.name}'s balance of ${usd(sponsor.balance)}.` : null}</FieldError>
-                {!overBalance && <p className="mt-1.5 text-xs text-muted-foreground">Available: {usd(sponsor.balance)}</p>}
+                <FieldError>{overBalance ? `Exceeds ${sponsor.name}'s balance of ${aed(sponsor.balance)}.` : null}</FieldError>
+                {!overBalance && <p className="mt-1.5 text-xs text-muted-foreground">Available: {aed(sponsor.balance)}</p>}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {[100, 250, 500].map((v) => (
                   <Button key={v} variant="outline" size="sm" onClick={() => setBudgetText(String(Math.min(v, sponsor.balance)))}>
-                    {usd(v)}
+                    {aed(v)}
                   </Button>
                 ))}
               </div>
@@ -169,7 +171,7 @@ export default function ImpactPlannerPage() {
                     role="radio"
                     aria-checked={on}
                     onClick={() => setApproach(a)}
-                    className={cn("rounded-xl border bg-card p-4 text-left shadow-card transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", on ? "border-primary ring-1 ring-primary" : "hover:border-primary/40")}
+                    className={cn("rounded-xl border bg-card p-4 text-start shadow-card transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", on ? "border-primary ring-1 ring-primary" : "hover:border-primary/40")}
                   >
                     <p className="flex items-center justify-between gap-2 text-sm font-semibold">
                       {APPROACHES[a].name}
@@ -178,13 +180,13 @@ export default function ImpactPlannerPage() {
                     <p className="mt-1 text-xs text-muted-foreground">{APPROACHES[a].tagline}</p>
                     <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
                       <dt className="text-muted-foreground">Needs fully covered</dt>
-                      <dd className="text-right font-semibold tabular">{p.fullyCovered}</dd>
+                      <dd className="text-end font-semibold tabular">{p.fullyCovered}</dd>
                       <dt className="text-muted-foreground">Students reached</dt>
-                      <dd className="text-right font-semibold tabular">{p.students}</dd>
+                      <dd className="text-end font-semibold tabular">{p.students}</dd>
                       <dt className="text-muted-foreground">Urgent (≤7d) covered</dt>
-                      <dd className="text-right font-semibold tabular">{p.urgentCovered}</dd>
+                      <dd className="text-end font-semibold tabular">{p.urgentCovered}</dd>
                       <dt className="text-muted-foreground">Unallocated</dt>
-                      <dd className="text-right font-semibold tabular">{usd(p.unallocated)}</dd>
+                      <dd className="text-end font-semibold tabular">{aed(p.unallocated)}</dd>
                     </dl>
                     <p className="mt-3 border-t pt-2 text-[11px] text-muted-foreground">
                       <span className="font-medium text-foreground">Trade-off:</span> {APPROACHES[a].tradeoff}
@@ -198,7 +200,7 @@ export default function ImpactPlannerPage() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
               <StatCard label="Needs fully covered" value={fully} money={false} tone="primary" />
               <StatCard label="Total proposed" value={total} />
-              <StatCard label="Balance after hold" value={Math.max(sponsor.balance - total, 0)} hint={`${usd(Math.max(budget - total, 0))} of this budget unallocated`} />
+              <StatCard label="Balance after hold" value={Math.max(sponsor.balance - total, 0)} hint={`${aed(Math.max(budget - total, 0))} of this budget unallocated`} />
             </div>
 
             <Card>
@@ -236,7 +238,7 @@ export default function ImpactPlannerPage() {
                           </div>
                           <p className="mt-1 font-medium">{r.purpose}</p>
                           <p className="text-xs text-muted-foreground">
-                            {st?.firstName}, {st?.country} · due {fmtDate(r.deadline)} ({relDays(r.deadline)}) · {usd(rk.remaining)} remaining
+                            {st ? anonId(st.id) : ""}, {st?.emirate} · due {fmtDate(r.deadline)} ({relDays(r.deadline)}) · {aed(rk.remaining)} remaining
                           </p>
                           {item ? (
                             <ul className="mt-2 space-y-0.5 text-xs">
@@ -252,10 +254,10 @@ export default function ImpactPlannerPage() {
                         </div>
                         <div>
                           <div className="relative">
-                            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                            <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">AED</span>
                             <Input
                               aria-label={`Allocation for ${r.ref}`}
-                              className="pl-6 text-right font-medium tabular"
+                              className="ps-12 text-end font-medium tabular"
                               inputMode="decimal"
                               value={amt || ""}
                               placeholder="0"
@@ -263,7 +265,7 @@ export default function ImpactPlannerPage() {
                             />
                           </div>
                           <button type="button" className="mt-1 text-xs font-medium text-primary hover:underline" onClick={() => setAmounts({ ...amounts, [id]: rk.remaining })}>
-                            Cover fully ({usd(rk.remaining)})
+                            Cover fully ({aed(rk.remaining)})
                           </button>
                         </div>
                       </li>
@@ -278,9 +280,9 @@ export default function ImpactPlannerPage() {
                   <ShieldCheck className="h-4 w-4 shrink-0 text-primary" /> You choose the plan; verifying institutions approve the final allocation and pay providers directly. Simulated — no real money moves.
                 </p>
                 <div className="flex shrink-0 flex-col items-end gap-1">
-                  {overBudget && <p className="text-xs font-medium text-destructive">Allocations ({usd(total)}) exceed the budget ({usd(budget)}).</p>}
+                  {overBudget && <p className="text-xs font-medium text-destructive">Allocations ({aed(total)}) exceed the budget ({aed(budget)}).</p>}
                   <Button onClick={submit} disabled={overBudget || overBalance || total <= 0 || total > sponsor.balance}>
-                    Submit {usd(total)} for review
+                    Submit {aed(total)} for review
                   </Button>
                 </div>
               </CardContent>

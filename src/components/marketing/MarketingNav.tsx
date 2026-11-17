@@ -9,13 +9,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/Logo";
 import { useTheme } from "@/components/app/useTheme";
+import { LanguageToggle } from "@/components/app/LanguageToggle";
 import { cn } from "@/lib/utils";
 
 export const COMPANY = [
   { href: "/simulator", label: "Rescue simulator", description: "Crowdfunding vs BridgeFund" },
   { href: "/business", label: "Business model", description: "How it pays for itself" },
-  { href: "/scale", label: "Global plan", description: "Markets and expansion" },
-  { href: "/pilot", label: "Pilot", description: "How we'll test it" },
+  { href: "/scale", label: "UAE expansion", description: "Abu Dhabi first, then every emirate" },
+  { href: "/pilot", label: "UAE pilot", description: "How we'll test it" },
 ];
 export const MARKETING_LINKS = [
   { href: "/#how-it-works", label: "How it works" },
@@ -61,7 +62,8 @@ export function MarketingNav() {
           ))}
           <Menu2 label="More" items={COMPANY} />
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-2">
+          <LanguageToggle className="hidden sm:inline-flex" />
           <Button variant="ghost" size="icon" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
             {dark ? <Sun /> : <Moon />}
           </Button>

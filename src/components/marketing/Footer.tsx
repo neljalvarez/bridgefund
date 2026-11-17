@@ -3,7 +3,7 @@ import { Logo } from "@/components/shared/Logo";
 
 const COLS = [
   { title: "Product", links: [["How it works", "/#how-it-works"], ["Interactive demo", "/demo"], ["Rescue simulator", "/simulator"], ["Impact", "/impact"]] },
-  { title: "Company", links: [["Why BridgeFund", "/why"], ["Business model", "/business"], ["Global plan", "/scale"], ["Pilot", "/pilot"]] },
+  { title: "Company", links: [["Why BridgeFund", "/why"], ["Business model", "/business"], ["UAE expansion", "/scale"], ["UAE pilot", "/pilot"]] },
   { title: "Get started", links: [["Sign in", "/signin"], ["Presentation mode", "/present"]] },
 ];
 
@@ -33,7 +33,7 @@ export function Footer() {
       <div className="border-t">
         <div className="container flex flex-col gap-2 py-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} BridgeFund — competition prototype.</p>
-          <p className="max-w-xl md:text-right">All people, figures and transactions are fictional and simulated. Students never pay, and there are no loans.</p>
+          <p className="max-w-xl md:text-end">Students, schools, sponsors and transactions are fictional; payments are simulated and would require UAE regulatory review and authorised partners. UAE programmes listed are real but not affiliated. Students never pay.</p>
         </div>
       </div>
     </footer>

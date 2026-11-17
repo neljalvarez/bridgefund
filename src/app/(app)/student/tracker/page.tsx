@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { addMilestone, toggleReminder } from "@/lib/actions";
 import { studentOverview } from "@/lib/selectors";
 import { WAIVERS } from "@/lib/knowledge";
-import { fmtDate, isoDaysFromNow, relDays, usd } from "@/lib/format";
+import { fmtDate, isoDaysFromNow, relDays, aed } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -173,7 +173,7 @@ export default function TrackerPage() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{p.opp.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      Due {fmtDate(p.opp.deadline)} · {usd(p.covered)} of {usd(p.total)} covered
+                      Due {fmtDate(p.opp.deadline)} · {aed(p.covered)} of {aed(p.total)} covered
                     </p>
                   </div>
                   {p.request ? <StatusBadge status={p.request.status} /> : <Badge variant="neutral">Not started</Badge>}
@@ -213,10 +213,10 @@ export default function TrackerPage() {
             <CardTitle>Personal milestones</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="relative space-y-3 border-l pl-5">
+            <ol className="relative space-y-3 border-s ps-5">
               {[...state.milestones].reverse().map((m) => (
                 <li key={m.id} className="relative text-sm">
-                  <Flag className="absolute -left-[27px] top-0.5 h-3.5 w-3.5 rounded-full bg-card text-primary" />
+                  <Flag className="absolute -start-[27px] top-0.5 h-3.5 w-3.5 rounded-full bg-card text-primary" />
                   {m.label}
                   <span className="block text-xs text-muted-foreground">{fmtDate(m.at, { month: "short", day: "numeric", year: "numeric" })}</span>
                 </li>
