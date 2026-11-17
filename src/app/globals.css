@@ -1,0 +1,177 @@
+/* Jersey 10 — SIL Open Font License (see /public/fonts/Jersey10-OFL.txt). Sized up to match body text. */
+@font-face {
+  font-family: "BF Pixel";
+  src: url("/fonts/jersey-10-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  size-adjust: 118%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "BF Pixel";
+  src: url("/fonts/jersey-10-latin-ext.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  size-adjust: 118%;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --c-bg: 245 240 225;
+  --c-surface: 251 248 239;
+  --c-raised: 236 229 208;
+  --c-text: 35 40 36;
+  --c-muted: 88 95 86;
+  --c-line: 35 40 36;
+  --c-forest: 41 76 61;
+  --c-gold: 216 170 85;
+  --c-terra: 201 112 82;
+  --c-terra-ink: 156 78 52;
+  --c-sage: 188 201 182;
+  --c-on-forest: 245 240 225;
+  --c-shadow: 35 40 36;
+  color-scheme: light;
+}
+
+.dark {
+  --c-bg: 24 28 25;
+  --c-surface: 33 38 34;
+  --c-raised: 44 50 45;
+  --c-text: 240 234 216;
+  --c-muted: 172 178 164;
+  --c-line: 196 188 166;
+  --c-forest: 126 172 145;
+  --c-gold: 226 186 108;
+  --c-terra: 214 128 98;
+  --c-terra-ink: 232 150 120;
+  --c-sage: 64 80 62;
+  --c-on-forest: 20 24 21;
+  --c-shadow: 8 10 9;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.14 0 0 0 0 0.16 0 0 0 0 0.14 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  ::selection {
+    background: rgb(var(--c-gold) / 0.55);
+  }
+  :focus-visible {
+    outline: 3px solid rgb(var(--c-gold));
+    outline-offset: 2px;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .font-pixel {
+    font-weight: 400;
+    font-synthesis: none;
+    letter-spacing: 0.01em;
+  }
+  .panel {
+    @apply border-2 border-line bg-surface shadow-offset;
+  }
+  .panel-flat {
+    @apply border-2 border-line bg-surface;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-line px-4 py-2 text-sm font-semibold shadow-offset-sm transition-[transform,box-shadow] duration-100 select-none;
+  }
+  .btn:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 0 rgb(var(--c-shadow));
+  }
+  .btn:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 0 rgb(var(--c-shadow));
+  }
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-forest text-onforest;
+  }
+  .btn-gold {
+    @apply btn bg-gold text-[#232824];
+  }
+  .btn-terra {
+    @apply btn bg-terra text-[#232824];
+  }
+  .btn-ghost {
+    @apply btn bg-surface text-ink;
+  }
+  .btn-sm {
+    @apply px-2.5 py-1 text-xs;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 border border-line/70 bg-raised px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wider text-muted;
+  }
+  .input {
+    @apply w-full border-2 border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted/70 focus:outline-none focus-visible:outline-none focus:ring-0 focus:border-forest;
+  }
+  .window-bar {
+    @apply flex items-center justify-between gap-2 border-b-2 border-line bg-forest px-3 py-1.5 text-onforest;
+  }
+  .stamp {
+    @apply inline-flex items-center justify-center border-2 border-dashed px-2 py-1 font-pixel text-xs uppercase;
+  }
+  .demo-label {
+    @apply inline-flex items-center gap-1 border border-dashed border-terra/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-terraink;
+  }
+}
+
+@layer utilities {
+  .crisp {
+    shape-rendering: crispEdges;
+    image-rendering: pixelated;
+  }
+  .stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(var(--c-line) / 0.12) 0 4px,
+      transparent 4px 8px
+    );
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-line) / 0.35);
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
