@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { AppState } from "./types";
 import type { Action } from "./actions";
 import { createSeedState, STATE_VERSION } from "./seed";
+import { setDisplayCurrency } from "./format";
 
 const KEY = "bridgefund-state";
 
@@ -72,6 +73,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     toast("Demo reset", { description: "All demonstration data has been restored." });
   }, []);
 
+  if (state) setDisplayCurrency(state.display.currency); // display-only conversion; calculations stay in USD
   const value = useMemo(() => (state ? { state, dispatch, reset } : null), [state, dispatch, reset]);
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

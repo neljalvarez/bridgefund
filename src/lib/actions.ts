@@ -5,7 +5,7 @@
 import type { AppState, CalculatorScenario, Contribution, Expense, FundingRequest, Opportunity, Reduction, RequestStatus, Resource, Role } from "./types";
 import type { EnginePlan } from "./engine";
 import { planFindings } from "./engine";
-import { r2, uid, usd } from "./format";
+import { isoDaysFromNow, r2, uid, usd } from "./format";
 import { WAIVERS } from "./knowledge";
 
 export type Action = (s: AppState) => AppState;
@@ -203,12 +203,36 @@ export const startReview = (id: string): Action => (s) => {
 };
 
 /** Verify the need. Estimated savings found by BridgeEngine become confirmed assistance. */
-export const approveRequest = (id: string): Action => (s) => {
+export const approveRequest = (id: string): Action => (s0) => {
+  let s = s0;
   const r = s.requests.find((x) => x.id === id);
   if (!r || !["Submitted", "Under Review", "Additional Information Required"].includes(r.status)) return s;
+  // Cash-based assistance (grants, institutional funds) is only confirmed if the budget still exists.
+  let budgets = { ...s.programFunds };
+  let instFund = s.institutions.find((i) => i.id === r.institutionId)?.fund ?? 0;
+  const notes: string[] = [];
+  const settled = r.reductions.map((x) => {
+    if (x.confirmed) return x;
+    if (x.kind === "grant") {
+      const left = budgets[x.sourceId] ?? 0;
+      const amt = r2(Math.min(x.amount, left));
+      budgets = { ...budgets, [x.sourceId]: r2(left - amt) };
+      if (amt < x.amount) notes.push(`${x.title} reduced to ${usd(amt)} — programme budget exhausted`);
+      return { ...x, amount: amt, confirmed: true };
+    }
+    if (x.kind === "institutional") {
+      const amt = r2(Math.min(x.amount, instFund));
+      instFund = r2(instFund - amt);
+      if (amt < x.amount) notes.push(`${x.title} reduced to ${usd(amt)} — institution fund insufficient`);
+      return { ...x, amount: amt, confirmed: true };
+    }
+    return { ...x, confirmed: true };
+  }).filter((x) => x.amount > 0);
+  const shortfallAdded = r2(r.reductions.reduce((a, x) => a + x.amount, 0) - settled.reduce((a, x) => a + x.amount, 0));
+  s = { ...s, programFunds: budgets, institutions: s.institutions.map((i) => (i.id === r.institutionId ? { ...i, fund: instFund } : i)) };
   let next = patchRequest(s, id, (r) => {
     const reviewed = r.status === "Submitted" ? withStatus(r, "Under Review", "Institution started verification", "institution") : r;
-    const confirmed = { ...reviewed, infoRequested: undefined, reductions: reviewed.reductions.map((x) => ({ ...x, confirmed: true })) };
+    const confirmed = { ...reviewed, infoRequested: undefined, reductions: settled, amount: r2(reviewed.amount + shortfallAdded), checks: { enrollment: true, opportunity: true, expenses: true, ...reviewed.checks }, history: notes.length ? [...reviewed.history, { at: now(), status: reviewed.status, note: notes.join("; "), actor: "system" as const }] : reviewed.history };
     const verified = withStatus(confirmed, "Verified", "Need verified by institution — visible to sponsors", "institution");
     return verified.amount <= 0 ? withStatus(verified, "Fully Funded", "Gap fully closed by confirmed savings", "system") : verified;
   });
@@ -264,10 +288,10 @@ export const assignWaiver = (id: string, waiverId: string, amount: number): Acti
 };
 
 /** Fund a request from the active sponsor, the shared pool, or the verifying institution's fund. Never exceeds the remaining gap. */
-export const fundRequest = (id: string, amount: number, source: Contribution["source"]): Action => (s0) => {
+export const fundRequest = (id: string, amount: number, source: Contribution["source"], sponsorId?: string): Action => (s0) => {
   const r = s0.requests.find((x) => x.id === id);
   if (!r || !["Verified", "Partially Funded"].includes(r.status)) return s0;
-  const sponsor = currentSponsor(s0);
+  const sponsor = s0.sponsors.find((x) => x.id === (sponsorId ?? s0.currentSponsorId))!;
   const inst = s0.institutions.find((i) => i.id === r.institutionId);
   const available = source === "sponsor" ? sponsor.balance : source === "pool" ? s0.pool : inst?.fund ?? 0;
   const amt = r2(Math.min(amount, remainingOf(r), available));
@@ -312,7 +336,10 @@ export const contributeToPool = (amount: number): Action => (s) => {
 export const confirmCompleted = (id: string): Action => (s) => {
   const r = s.requests.find((x) => x.id === id);
   if (!r || r.status !== "Fully Funded") return s;
-  let next = patchRequest(s, id, (r) => withStatus(r, "Completed", "Provider paid directly and completion confirmed", "institution"));
+  const provider = s.opportunities.find((o) => o.id === r.opportunityId)?.provider ?? "Education provider";
+  const payment = { id: uid("pay"), requestId: id, provider, amount: r2(r.funded), at: now(), reference: `SIM-${r.ref.replace("BF-", "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}` };
+  let next = patchRequest(s, id, (r) => withStatus(r, "Completed", `Simulated payment of ${usd(r.funded)} sent directly to ${provider} (ref ${payment.reference})`, "institution"));
+  next = { ...next, payments: [payment, ...next.payments] };
   next = { ...next, distribution: [{ id: uid("d"), at: now(), label: `Paid ${r.purpose.toLowerCase()} to provider`, amount: r.funded, requestRef: r.ref, institutionId: r.institutionId, kind: "completion" }, ...next.distribution] };
   next = log(next, "institution", `Confirmed completion of ${r.ref}`);
   next = notify(next, "student", "Assistance completed", `${r.purpose} has been paid. Good luck!`, "/student/tracker");
@@ -365,3 +392,173 @@ export const setEligibility = (patch: Partial<import("./types").EligibilityProfi
 });
 
 export const addMilestone = (label: string): Action => (s) => log({ ...s, milestones: [...s.milestones, { id: uid("m"), at: now(), label }] }, "student", `Milestone added: ${label}`);
+
+/* ---------------- BridgeEngine 2.0 ---------------- */
+
+/** Apply one of the optimiser's strategies as the student's request. Replaces earlier estimates. */
+export const applyStrategy = (oppId: string, strategy: import("./optimizer").Strategy, submit: boolean): Action => (s0) => {
+  let s = s0;
+  const opp = s.opportunities.find((o) => o.id === oppId);
+  if (!opp) return s;
+  const existing = s.requests.find((r) => r.opportunityId === oppId && r.status !== "Rejected");
+  if (existing && !["Draft", "Submitted", "Under Review", "Additional Information Required"].includes(existing.status)) return s;
+  for (const o of strategy.options.filter((o) => o.kind === "borrow")) {
+    if (!s.reservations.some((r) => r.resourceId === o.sourceId && r.studentId === opp.studentId && r.status !== "Cancelled")) s = reserveResource(o.sourceId, opp.studentId, opp.deadline)(s);
+  }
+  const reductions: Reduction[] = strategy.options.map((o) => ({ id: uid("rd"), kind: o.kind, sourceId: o.sourceId, title: o.title, amount: o.amount, expenseId: o.expenseId, confirmed: o.status === "Confirmed" }));
+  const base: FundingRequest = existing ?? {
+    id: uid("r"),
+    ref: nextRef(s),
+    studentId: opp.studentId,
+    opportunityId: oppId,
+    institutionId: opp.institutionId,
+    purpose: opp.title,
+    totalCost: strategy.totalCost,
+    studentFunds: strategy.studentPays,
+    reductions: [],
+    amount: 0,
+    funded: 0,
+    deadline: opp.deadline,
+    expenses: opp.expenses,
+    explanation: "Remaining cost after the assistance identified by BridgeEngine.",
+    documents: [
+      { name: "Proof of enrollment", attached: true, review: "Pending" },
+      { name: "Official cost confirmation", attached: opp.expenses.every((e) => e.confirmed), review: "Pending" },
+    ],
+    status: "Draft",
+    history: [],
+    createdAt: now(),
+    checks: {},
+    flags: [],
+  };
+  const amount = r2(strategy.totalCost - strategy.studentPays - reductions.reduce((a, x) => a + x.amount, 0));
+  const req = withStatus(
+    { ...base, studentFunds: strategy.studentPays, reductions, amount, strategy: strategy.id, totalCost: strategy.totalCost, expenses: opp.expenses, deadline: opp.deadline },
+    submit ? "Submitted" : "Draft",
+    `${strategy.name} strategy ${submit ? "submitted" : "saved"}: ${usd(strategy.costReductions + strategy.externalCash)} in estimated assistance, ${usd(amount)} requested`,
+    "student",
+  );
+  s = { ...s, requests: existing ? s.requests.map((r) => (r.id === existing.id ? req : r)) : [req, ...s.requests] };
+  s = log(s, "student", `${submit ? "Submitted" : "Saved"} ${req.ref} using the “${strategy.name}” strategy`);
+  if (submit) {
+    s = notify(s, "institution", `New request ${req.ref}`, `${studentName(s, opp.studentId)} · ${opp.title} — ${usd(amount)} requested (${strategy.name}).`, `/institution?focus=${req.id}`);
+    s = notify(s, "student", "Request submitted", `${req.ref} was sent to your institution for verification.`, "/student/requests");
+  }
+  return s;
+};
+
+/* ---------------- verification & review ---------------- */
+
+export const setCheck = (id: string, key: "enrollment" | "opportunity" | "expenses", value: boolean): Action => (s) => {
+  const r = s.requests.find((x) => x.id === id);
+  if (!r) return s;
+  return log(patchRequest(s, id, (r) => ({ ...r, checks: { ...r.checks, [key]: value }, history: [...r.history, { at: now(), status: r.status, note: `${key === "enrollment" ? "Enrollment" : key === "opportunity" ? "Opportunity" : "Expense documentation"} check ${value ? "completed" : "reopened"}`, actor: "institution" }] })), "institution", `${r.ref}: ${key} check ${value ? "completed" : "reopened"}`);
+};
+
+export const reviewDocument = (id: string, name: string, review: "Accepted" | "Rejected"): Action => (s) => {
+  const r = s.requests.find((x) => x.id === id);
+  if (!r) return s;
+  let next = patchRequest(s, id, (r) => ({ ...r, documents: r.documents.map((d) => (d.name === name ? { ...d, review } : d)), history: [...r.history, { at: now(), status: r.status, note: `Document “${name}” ${review.toLowerCase()}`, actor: "institution" }] }));
+  next = log(next, "institution", `${r.ref}: ${name} ${review.toLowerCase()}`);
+  return review === "Rejected" ? notify(next, "student", `${r.ref}: document needs replacing`, `${name} could not be accepted. Please upload a clearer copy.`, "/student/requests") : next;
+};
+
+export const addFlag = (id: string, note: string): Action => (s) => {
+  const r = s.requests.find((x) => x.id === id);
+  if (!r) return s;
+  return log(patchRequest(s, id, (r) => ({ ...r, flags: [...(r.flags ?? []), { id: uid("fl"), note, at: now(), by: "institution" }], history: [...r.history, { at: now(), status: r.status, note: `Flagged for manual review: ${note}`, actor: "institution" }] })), "institution", `${r.ref} flagged for manual review`);
+};
+
+export const resolveFlag = (id: string, flagId: string): Action => (s) => {
+  const r = s.requests.find((x) => x.id === id);
+  if (!r) return s;
+  return log(patchRequest(s, id, (r) => ({ ...r, flags: (r.flags ?? []).map((f) => (f.id === flagId ? { ...f, resolved: true } : f)), history: [...r.history, { at: now(), status: r.status, note: "Review flag resolved by staff", actor: "institution" }] })), "institution", `${r.ref}: review flag resolved`);
+};
+
+export const setPriority = (id: string, priority: boolean): Action => (s) => {
+  const r = s.requests.find((x) => x.id === id);
+  if (!r) return s;
+  return log(patchRequest(s, id, (r) => ({ ...r, priority, history: [...r.history, { at: now(), status: r.status, note: priority ? "Marked for priority review (deadline risk)" : "Priority review removed", actor: "institution" }] })), "institution", `${r.ref} ${priority ? "marked" : "unmarked"} for priority review`);
+};
+
+export const recordOutcome = (id: string, outcome: NonNullable<FundingRequest["outcome"]>): Action => (s) => {
+  const r = s.requests.find((x) => x.id === id);
+  if (!r || r.status !== "Completed") return s;
+  return log(patchRequest(s, id, (r) => ({ ...r, outcome, history: [...r.history, { at: now(), status: r.status, note: `Educational outcome recorded: ${outcome}`, actor: "institution" }] })), "institution", `${r.ref}: outcome recorded (${outcome})`);
+};
+
+/* ---------------- supply & demand matching ---------------- */
+
+export const assignMatch = (m: import("./matching").MatchSuggestion): Action => (s0) => {
+  let s = s0;
+  if (s.matches.some((x) => x.key === m.key && x.status === "Assigned")) return s; // never assign twice
+  const r = m.requestId ? s.requests.find((x) => x.id === m.requestId) : undefined;
+  const editable = r && ["Submitted", "Under Review", "Additional Information Required", "Verified", "Partially Funded"].includes(r.status);
+  if (m.kind === "resource") {
+    const res = s.resources.find((x) => x.id === m.sourceId);
+    if (!res || res.available <= 0) return s;
+    s = reserveResource(m.sourceId, m.studentId, isoDaysFromNow(2))(s);
+  } else if (!editable) {
+    // No request to attach to yet — record the match and tell the student.
+    s = { ...s, matches: [{ key: m.key, studentId: m.studentId, sourceId: m.sourceId, status: "Suggested", at: now(), label: `${m.sourceName} → ${m.expense.label}` }, ...s.matches.filter((x) => x.key !== m.key)] };
+    return notify(log(s, "institution", `Suggested ${m.sourceName} for ${studentName(s, m.studentId)}`), "student", "Your institution found assistance", `${m.sourceName} may cover ${m.expense.label}. Run BridgeEngine to include it.`, "/student/engine");
+  } else if (m.kind === "grant") {
+    const left = s.programFunds[m.sourceId] ?? 0;
+    if (left < m.amount) return s;
+    s = { ...s, programFunds: { ...s.programFunds, [m.sourceId]: r2(left - m.amount) } };
+  } else if (m.kind === "transport") {
+    const inst = s.institutions.find((i) => i.id === r!.institutionId);
+    if (!inst || inst.fund < m.amount) return s;
+    s = { ...s, institutions: s.institutions.map((i) => (i.id === inst.id ? { ...i, fund: r2(i.fund - m.amount) } : i)) };
+  }
+  if (editable && r && !r.reductions.some((x) => x.sourceId === m.sourceId)) {
+    const amt = r2(Math.min(m.amount, remainingOf(r)));
+    if (amt > 0) {
+      const kind: Reduction["kind"] = m.kind === "resource" ? "borrow" : m.kind === "transport" ? "institutional" : m.kind === "grant" ? "grant" : "waiver";
+      s = patchRequest(s, r.id, (r) => {
+        const updated = { ...r, amount: r2(r.amount - amt), reductions: [...r.reductions, { id: uid("rd"), kind, sourceId: m.sourceId, title: m.sourceName, amount: amt, expenseId: m.expense.id, confirmed: true }], history: [...r.history, { at: now(), status: r.status, note: `Matched and confirmed by staff: ${m.sourceName} (−${usd(amt)})`, actor: "institution" as const }] };
+        if (["Verified", "Partially Funded"].includes(r.status)) {
+          const st = fundingStatus(updated);
+          return st !== r.status ? withStatus(updated, st, "Funding status updated", "system") : updated;
+        }
+        return updated;
+      });
+      s = { ...s, distribution: [{ id: uid("d"), at: now(), label: `Match: ${m.sourceName}`, amount: amt, requestRef: r.ref, institutionId: r.institutionId, kind: m.kind === "resource" ? "resource" : "waiver" }, ...s.distribution] };
+    }
+  }
+  s = { ...s, matches: [{ key: m.key, studentId: m.studentId, sourceId: m.sourceId, status: "Assigned", at: now(), label: `${m.sourceName} → ${m.expense.label}` }, ...s.matches.filter((x) => x.key !== m.key)] };
+  s = log(s, "institution", `Confirmed availability and assigned ${m.sourceName} to ${studentName(s, m.studentId)}`);
+  return notify(s, "student", "Assistance matched", `${m.sourceName} was assigned for ${m.expense.label}.`, "/student/requests");
+};
+
+/* ---------------- sponsor pledges (institution reviews) ---------------- */
+
+export const createPledges = (items: { requestId: string; amount: number }[], approach: string): Action => (s0) => {
+  const sp = currentSponsor(s0);
+  const total = r2(items.reduce((a, i) => a + i.amount, 0));
+  if (total <= 0 || total > sp.balance) return s0;
+  let s: AppState = {
+    ...s0,
+    sponsors: s0.sponsors.map((x) => (x.id === sp.id ? { ...x, balance: r2(x.balance - total) } : x)),
+    pledges: [...items.filter((i) => i.amount > 0).map((i) => ({ id: uid("pl"), sponsorId: sp.id, requestId: i.requestId, amount: i.amount, at: now(), approach, status: "Pending review" as const })), ...s0.pledges],
+  };
+  s = log(s, "sponsor", `${sp.name} proposed ${usd(total)} across ${items.length} needs (${approach}) — awaiting institutional review`);
+  return notify(s, "institution", "Sponsor allocation to review", `${sp.name} proposed ${usd(total)} across ${items.length} verified needs.`, "/institution/urgent");
+};
+
+export const reviewPledge = (id: string, approve: boolean): Action => (s0) => {
+  const p = s0.pledges.find((x) => x.id === id);
+  if (!p || p.status !== "Pending review") return s0;
+  // Release the held amount back to the sponsor, then (if approved) fund — capped at the remaining gap.
+  let s: AppState = { ...s0, sponsors: s0.sponsors.map((x) => (x.id === p.sponsorId ? { ...x, balance: r2(x.balance + p.amount) } : x)), pledges: s0.pledges.map((x) => (x.id === id ? { ...x, status: approve ? "Approved" : "Declined" } : x)) };
+  if (approve) s = fundRequest(p.requestId, p.amount, "sponsor", p.sponsorId)(s);
+  const sp = s.sponsors.find((x) => x.id === p.sponsorId)!;
+  const r = s.requests.find((x) => x.id === p.requestId);
+  s = log(s, "institution", `${approve ? "Approved" : "Declined"} ${sp.name}'s ${usd(p.amount)} allocation to ${r?.ref}`);
+  return notify(s, "sponsor", approve ? "Allocation approved" : "Allocation declined", `${usd(p.amount)} to ${r?.ref} was ${approve ? "approved and applied" : "declined and returned to your balance"}.`, "/sponsor");
+};
+
+/* ---------------- settings & pilot ---------------- */
+
+export const setDisplay = (patch: Partial<AppState["display"]>): Action => (s) => ({ ...s, display: { ...s.display, ...patch } });
+export const setPilot = (patch: Partial<AppState["pilot"]>): Action => (s) => ({ ...s, pilot: { ...s.pilot, ...patch, updatedAt: now() } });

@@ -5,8 +5,9 @@
  */
 import type { AppState, Contribution, DistributionEvent, Expense, FundingRequest, Institution, Opportunity, Reduction, RequestStatus, Resource, Sponsor, Student } from "./types";
 import { isoDaysFromNow } from "./format";
+import { GRANT_BUDGETS } from "./knowledge";
 
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 export const DEMO_STUDENT_ID = "s-amina";
 export const DEMO_OPPORTUNITY_ID = "o-amina-cert";
 export const DEMO_SPONSOR_ID = "sp-juniper";
@@ -90,6 +91,10 @@ interface ReqSeed {
   expenses: Expense[];
   reductions: Reduction[];
   infoRequested?: string;
+  institutionId?: string;
+  flag?: string;
+  docsAttached?: boolean;
+  result?: FundingRequest["outcome"];
 }
 
 const REQUESTS: ReqSeed[] = [
@@ -105,8 +110,10 @@ const REQUESTS: ReqSeed[] = [
   { id: "r-ayesha", ref: "BF-2052", studentId: "s-ayesha", days: 8, funded: 0, status: "Verified", explanation: "The test centre is in another city and registration is due before the family's next income.", title: "Engineering university entrance test", provider: "University entrance testing service", category: "examination", outcome: "Eligibility for engineering programmes at public universities.", studentFunds: 15, expenses: [exp("e1", "Test registration", "examination", 70), exp("e2", "Intercity bus fare", "transportation", 40)], reductions: [] },
   { id: "r-kofi", ref: "BF-2053", studentId: "s-kofi", days: 14, funded: 0, status: "Verified", explanation: "The research station is 300 km away and the stipend starts after week one.", title: "Agricultural research internship — first week", provider: "National crop research station", category: "internship", outcome: "A paid research internship with a recommendation letter.", studentFunds: 10, expenses: [exp("e1", "Bus to research station", "transportation", 35), exp("e2", "First-week hostel stay", "accommodation", 125)], reductions: [] },
   { id: "r-mariana", ref: "BF-2054", studentId: "s-mariana", days: 26, funded: 0, status: "Verified", explanation: "The national team requires members to bring their own sensor kit.", title: "National youth robotics team — sensor kit", provider: "National Youth Robotics Programme", category: "competition", outcome: "A place on the national youth robotics team.", studentFunds: 30, expenses: [exp("e1", "Advanced sensor kit (team spec)", "equipment", 150)], reductions: [] },
-  { id: "r-fatima", ref: "BF-2031", studentId: "s-fatima", days: -10, funded: 55, status: "Completed", explanation: "The practical exam fee was due before the bursary payment.", title: "A-level chemistry practical exam fee", provider: "National examinations council", category: "examination", outcome: "Sat the chemistry practical exam.", studentFunds: 0, expenses: [exp("e1", "Practical exam fee", "examination", 55)], reductions: [] },
-  { id: "r-tomas", ref: "BF-2028", studentId: "s-tomas", days: -20, funded: 40, status: "Completed", explanation: "Travel to the regional finals.", title: "Regional robotics finals travel", provider: "Regional Robotics League", category: "competition", outcome: "Competed at the regional finals.", studentFunds: 0, expenses: [exp("e1", "Bus and ferry fare", "transportation", 40)], reductions: [] },
+  { id: "r-diego-2", ref: "BF-2056", studentId: "s-diego", days: 4, funded: 0, status: "Submitted", explanation: "Bus ticket to the coding academy interview.", title: "Interview travel — coding academy", provider: "Puebla coding academy", category: "interview", outcome: "A place in a tuition-free coding academy cohort.", studentFunds: 0, expenses: [exp("e1", "Round-trip bus ticket", "transportation", 18)], reductions: [] },
+  { id: "r-mateus-2", ref: "BF-2057", studentId: "s-mateus", days: 5, funded: 0, status: "Submitted", explanation: "Need a laptop for the entrance exam preparation course.", title: "Laptop for exam preparation", provider: "Electronics retailer", category: "technology", outcome: "Access to online exam preparation.", studentFunds: 0, expenses: [exp("e1", "New laptop", "equipment", 420, false)], reductions: [], docsAttached: false, institutionId: "i-lakeshore", flag: "Requested amount is unusually high for an exam-prep need and no quote was attached." },
+  { id: "r-fatima", ref: "BF-2031", studentId: "s-fatima", days: -10, funded: 55, status: "Completed", explanation: "The practical exam fee was due before the bursary payment.", title: "A-level chemistry practical exam fee", provider: "National examinations council", category: "examination", outcome: "Sat the chemistry practical exam.", result: "Completed opportunity", studentFunds: 0, expenses: [exp("e1", "Practical exam fee", "examination", 55)], reductions: [] },
+  { id: "r-tomas", ref: "BF-2028", studentId: "s-tomas", days: -20, funded: 40, status: "Completed", explanation: "Travel to the regional finals.", title: "Regional robotics finals travel", provider: "Regional Robotics League", category: "competition", outcome: "Competed at the regional finals.", result: "Participated", studentFunds: 0, expenses: [exp("e1", "Bus and ferry fare", "transportation", 40)], reductions: [] },
 ];
 
 const FLOW: RequestStatus[] = ["Submitted", "Under Review", "Verified", "Partially Funded", "Fully Funded", "Completed"];
@@ -124,7 +131,8 @@ function build(s: ReqSeed, now: Date) {
   const st = STUDENTS.find((x) => x.id === s.studentId)!;
   const start = Math.min(s.days - 12, -3);
   const created = isoDaysFromNow(start, now);
-  const opp: Opportunity = { id: `o-${s.id}`, studentId: s.studentId, title: s.title, provider: s.provider, category: s.category, deadline: isoDaysFromNow(s.days, now), institutionId: st.institutionId, expenses: s.expenses, studentFunds: s.studentFunds, priorAssistance: 0, outcome: s.outcome, createdAt: created };
+  const opp: Opportunity = { id: `o-${s.id}`, studentId: s.studentId, title: s.title, provider: s.provider, category: s.category, deadline: isoDaysFromNow(s.days, now), institutionId: s.institutionId ?? st.institutionId, expenses: s.expenses, studentFunds: s.studentFunds, priorAssistance: 0, outcome: s.outcome, createdAt: created };
+  const verified = ["Verified", "Partially Funded", "Fully Funded", "Completed"].includes(s.status);
   const total = s.expenses.reduce((a, e) => a + e.amount, 0);
   const amount = Math.round((total - s.studentFunds - s.reductions.reduce((a, r) => a + r.amount, 0)) * 100) / 100;
   const path: RequestStatus[] = s.status === "Additional Information Required" ? ["Submitted", "Under Review", "Additional Information Required"] : FLOW.slice(0, FLOW.indexOf(s.status) + 1);
@@ -133,7 +141,7 @@ function build(s: ReqSeed, now: Date) {
     ref: s.ref,
     studentId: s.studentId,
     opportunityId: opp.id,
-    institutionId: st.institutionId,
+    institutionId: s.institutionId ?? st.institutionId,
     purpose: s.title,
     totalCost: total,
     studentFunds: s.studentFunds,
@@ -144,9 +152,12 @@ function build(s: ReqSeed, now: Date) {
     expenses: s.expenses,
     explanation: s.explanation,
     documents: [
-      { name: "Proof of enrollment", attached: true },
-      { name: "Official cost confirmation", attached: !["Submitted", "Additional Information Required"].includes(s.status) },
+      { name: "Proof of enrollment", attached: s.docsAttached ?? true, review: verified ? "Accepted" : "Pending" },
+      { name: "Official cost confirmation", attached: s.docsAttached ?? !["Submitted", "Additional Information Required"].includes(s.status), review: verified ? "Accepted" : "Pending" },
     ],
+    checks: verified ? { enrollment: true, opportunity: true, expenses: true } : {},
+    flags: s.flag ? [{ id: `fl-${s.id}`, note: s.flag, at: created, by: "system" }] : [],
+    outcome: s.result,
     status: s.status,
     infoRequested: s.infoRequested,
     history: path.map((st2, i) => ({ at: isoDaysFromNow(start + i, now), status: st2, note: NOTES[st2] ?? st2, actor: st2 === "Submitted" ? "student" : st2.includes("Funded") ? "sponsor" : "institution" })),
@@ -212,6 +223,14 @@ export function createSeedState(now = new Date()): AppState {
       { id: "m3", at: isoDaysFromNow(-6, now), label: "Earned a place on the certification exam register" },
     ],
     profile: { displayName: "Amina Y.", email: "amina.demo@bridgefund.example", emailUpdates: true, deadlineReminders: true },
+    payments: requests
+      .filter((r) => r.status === "Completed")
+      .map((r) => ({ id: `pay-${r.id}`, requestId: r.id, provider: built.find((b) => b.req.id === r.id)!.opp.provider, amount: r.funded, at: r.history[r.history.length - 1].at, reference: `SIM-${r.ref.replace("BF-", "")}-PAY` })),
+    pledges: [],
+    matches: [],
+    programFunds: { ...GRANT_BUDGETS },
+    display: { currency: "USD", locale: "en" },
+    pilot: { schools: 0, students: 0, requests: 0, resolved: 0, participated: 0, avgDaysToResolve: null, notes: "", updatedAt: null },
     onboarded: false,
     demo: { stage: 0, scanned: false },
   };

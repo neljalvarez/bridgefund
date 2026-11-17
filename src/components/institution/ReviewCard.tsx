@@ -4,7 +4,9 @@ import { useState } from "react";
 import { CheckCircle2, ChevronDown, FileCheck2, FileX2, HandCoins, Lock, MessageSquareWarning, Package, Ticket, XCircle } from "lucide-react";
 import type { FundingRequest } from "@/lib/types";
 import { useStore } from "@/lib/store";
-import { approveRequest, assignWaiver, confirmCompleted, fundRequest, rejectRequest, remainingOf, requestInfo, reserveResource, startReview } from "@/lib/actions";
+import { approveRequest, assignWaiver, confirmCompleted, fundRequest, recordOutcome, rejectRequest, remainingOf, requestInfo, reserveResource, setPriority, startReview } from "@/lib/actions";
+import { verificationChecks } from "@/lib/verification";
+import { VerificationPanel } from "./VerificationPanel";
 import { institutionOf, oppOf, studentOf } from "@/lib/selectors";
 import { WAIVERS } from "@/lib/knowledge";
 import { waiverValue } from "@/lib/engine";
@@ -23,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FieldError, StatusBadge, UrgencyBadge } from "@/components/shared/kit";
 import { RequestBreakdown } from "@/components/shared/RequestBreakdown";
 
-type DialogKind = null | "info" | "reject" | "waiver" | "resource" | "funds";
+type DialogKind = null | "info" | "reject" | "waiver" | "resource" | "funds" | "approve";
 const PENDING = ["Submitted", "Under Review", "Additional Information Required"];
 
 export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; defaultOpen?: boolean; highlight?: boolean }) {
@@ -51,6 +53,10 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
   const fundAmt = Number(amount);
   const fundErr = !(fundAmt > 0) ? "Enter an amount." : fundAmt > remaining ? `Only ${usd(remaining)} remains — contributions can't exceed the gap.` : fundAmt > fundsAvail ? "Not enough in this fund." : null;
 
+  const checks = verificationChecks(state, r);
+  const openIssues = checks.filter((c) => c.status !== "pass").length + (r.flags ?? []).filter((f) => !f.resolved).length;
+  const approve = () => dispatch(approveRequest(r.id), { success: `${r.ref} verified`, description: r.amount > 0 ? "Savings confirmed and the need is now visible to sponsors." : "Savings confirmed — the gap is closed." });
+
   const close = () => {
     setDialog(null);
     setText("");
@@ -72,6 +78,8 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {r.priority && <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-700 dark:bg-red-950 dark:text-red-300">Priority</span>}
+          {openIssues > 0 && PENDING.includes(r.status) && <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-300">{openIssues} to review</span>}
           <UrgencyBadge label={urgencyOf(r.deadline).label} />
           <span className="w-16 text-right font-semibold tabular">{usd(remaining)}</span>
           <StatusBadge status={r.status} />
@@ -111,7 +119,23 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
               {opp && <p className="mt-3 text-xs text-muted-foreground">Expected outcome: {opp.outcome}</p>}
             </div>
           </div>
+          <VerificationPanel r={r} />
+          {r.status === "Completed" && (
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm">
+              <span className="text-muted-foreground">Educational outcome:</span>
+              {(["Participated", "Completed opportunity", "Did not participate"] as const).map((o) => (
+                <Button key={o} size="sm" variant={r.outcome === o ? "default" : "outline"} onClick={() => dispatch(recordOutcome(r.id, o), { success: "Outcome recorded" })}>
+                  {o}
+                </Button>
+              ))}
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 border-t pt-4">
+            {!["Completed", "Rejected"].includes(r.status) && (
+              <Button size="sm" variant="ghost" onClick={() => dispatch(setPriority(r.id, !r.priority), { info: r.priority ? "Priority review removed" : "Marked for priority review" })}>
+                {r.priority ? "Remove priority" : "Mark priority review"}
+              </Button>
+            )}
             {r.status === "Submitted" && (
               <Button size="sm" variant="outline" onClick={() => dispatch(startReview(r.id), { info: `Reviewing ${r.ref}` })}>
                 Start review
@@ -119,7 +143,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
             )}
             {pending && (
               <>
-                <Button size="sm" onClick={() => dispatch(approveRequest(r.id), { success: `${r.ref} verified`, description: r.amount > 0 ? "Savings confirmed and the need is now visible to sponsors." : "Savings confirmed — the gap is closed." })}>
+                <Button size="sm" onClick={() => (openIssues > 0 ? setDialog("approve") : approve())}>
                   <CheckCircle2 /> Approve and verify
                 </Button>
                 {r.status !== "Additional Information Required" && (
@@ -183,6 +207,40 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
               }}
             >
               Send request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={dialog === "approve"} onOpenChange={(o) => !o && close()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Approve with open items?</DialogTitle>
+            <DialogDescription>{openIssues} verification item(s) are incomplete or flagged. Automated checks only advise — the decision is yours.</DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-1 text-sm">
+            {checks.filter((c) => c.status !== "pass").map((c) => (
+              <li key={c.key}>
+                <strong>{c.label}:</strong> <span className="text-muted-foreground">{c.detail}</span>
+              </li>
+            ))}
+            {(r.flags ?? []).filter((f) => !f.resolved).map((f) => (
+              <li key={f.id}>
+                <strong>Flag:</strong> <span className="text-muted-foreground">{f.note}</span>
+              </li>
+            ))}
+          </ul>
+          <DialogFooter>
+            <Button variant="outline" onClick={close}>
+              Keep reviewing
+            </Button>
+            <Button
+              onClick={() => {
+                approve();
+                close();
+              }}
+            >
+              Approve anyway
             </Button>
           </DialogFooter>
         </DialogContent>

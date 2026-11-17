@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import { Play, RotateCcw, Save, Send, Sparkles } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { applyEnginePlan } from "@/lib/actions";
-import { planFor } from "@/lib/plan";
+import { applyStrategy } from "@/lib/actions";
+import { planFor, strategiesFor } from "@/lib/plan";
+import type { StrategyId } from "@/lib/types";
+import { StrategyComparisonView } from "@/components/student/StrategyComparison";
 import { requestForOpp } from "@/lib/selectors";
 import { EXPENSE_LABEL, OPP_LABEL, fmtDateLong, usd } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -29,10 +31,13 @@ function EngineInner() {
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
   const plan = useMemo(() => (opp ? planFor(state, opp) : null), [opp, state]);
+  const cmp = useMemo(() => (opp ? strategiesFor(state, opp) : null), [opp, state]);
+  const [choice, setChoice] = useState<StrategyId | null>(null);
+  const chosen = cmp?.strategies.find((x) => x.id === (choice ?? cmp.recommended));
   const existing = opp ? requestForOpp(state, opp.id) : undefined;
   const locked = !!existing && LOCKED.includes(existing.status);
 
-  if (!opp || !plan) {
+  if (!opp || !plan || !cmp || !chosen) {
     return <EmptyState title="No opportunities yet" description="Scan a barrier first — BridgeEngine needs an opportunity to analyse." action={<Button asChild><Link href="/student/scanner">Open the barrier scanner</Link></Button>} />;
   }
 
@@ -43,7 +48,7 @@ function EngineInner() {
   };
 
   const apply = (submit: boolean) => {
-    dispatch(applyEnginePlan(opp.id, plan, submit), submit ? { success: "Submitted for verification", description: plan.sponsorAmount > 0 ? `${usd(plan.sponsorAmount)} requested after ${usd(plan.reductionsTotal)} in estimated savings.` : "Your institution will confirm the estimated savings." } : { info: "Plan saved as a draft" });
+    dispatch(applyStrategy(opp.id, chosen, submit), submit ? { success: "Submitted for verification", description: `${chosen.name}: ${usd(chosen.sponsorNeeded)} requested from sponsors.` } : { info: "Strategy saved as a draft" });
     router.push("/student/requests");
   };
 
@@ -92,9 +97,16 @@ function EngineInner() {
           <div className="flex items-center gap-2">
             {existing && <StatusBadge status={existing.status} />}
             {running ? (
-              <Button variant="outline" onClick={run}>
-                <RotateCcw /> Replay
-              </Button>
+              <>
+                {!finished && (
+                  <Button variant="ghost" onClick={() => setFinished(true)}>
+                    Skip to strategies
+                  </Button>
+                )}
+                <Button variant="outline" onClick={run}>
+                  <RotateCcw /> Replay
+                </Button>
+              </>
             ) : (
               <Button onClick={run} disabled={locked}>
                 <Play /> Run BridgeEngine
@@ -159,15 +171,16 @@ function EngineInner() {
         <>
           <EngineRun plan={plan} runKey={runKey} seededAt={state.seededAt} onDone={() => setFinished(true)} />
           {finished && (
-            <Card className="border-primary/30 bg-primary-light/40">
-              <CardContent className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
+            <section aria-labelledby="strategies" className="space-y-4 pt-2">
+              <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="text-lg font-semibold tracking-tight">
-                    {plan.sponsorAmount > 0 ? `Instead of requesting ${usd(plan.initialGap)}, BridgeFund reduces the uncovered cost to ${usd(plan.sponsorAmount)}.` : `The whole ${usd(plan.initialGap)} gap can be closed without sponsors.`}
+                  <p className="flex items-center gap-1.5 text-[13px] font-medium text-primary">
+                    <Sparkles className="h-3.5 w-3.5" /> BridgeEngine 2.0 · optimisation
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {usd(plan.reductionsTotal)} in estimated savings across {plan.phases.filter((p) => p.kind !== "sponsor" && p.findings.length).length} steps. Re-running replaces earlier estimates — savings are never counted twice.
-                  </p>
+                  <h2 id="strategies" className="text-xl font-semibold tracking-tight">
+                    Three ways to close this gap
+                  </h2>
+                  <p className="text-sm text-muted-foreground">Calculated from eligibility, programme deadlines, processing times, institutional funds, equipment availability and confirmed assistance.</p>
                 </div>
                 {!locked && (
                   <div className="flex shrink-0 gap-2">
@@ -175,12 +188,13 @@ function EngineInner() {
                       <Save /> Save draft
                     </Button>
                     <Button onClick={() => apply(true)}>
-                      <Send /> {plan.sponsorAmount > 0 ? `Request ${usd(plan.sponsorAmount)}` : "Submit for verification"}
+                      <Send /> {chosen.sponsorNeeded > 0 ? `Submit · request ${usd(chosen.sponsorNeeded)}` : "Submit for verification"}
                     </Button>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+              <StrategyComparisonView cmp={cmp} selected={chosen.id} onSelect={locked ? undefined : setChoice} />
+            </section>
           )}
         </>
       )}

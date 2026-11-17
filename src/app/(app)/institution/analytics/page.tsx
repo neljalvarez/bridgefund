@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DemoBadge, PageHeader, StatCard } from "@/components/shared/kit";
 import { ChartTooltip } from "@/components/shared/ChartTooltip";
+import { fmtMultiplier, portfolioImpact, requestImpact, RESOLVED } from "@/lib/impact";
 
 const PIE = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))", "hsl(166 57% 15%)", "hsl(215 16% 75%)"];
 const axis = { fontSize: 12, stroke: "hsl(var(--muted-foreground))", tickLine: false, axisLine: false } as const;
@@ -67,6 +68,14 @@ export default function AnalyticsPage() {
     return { name: i === 0 ? "This week" : `Week ${i + 1}`, value: sum(xs.map(remainingOf)) };
   });
   const remaining = ["Submitted", "Under Review", "Additional Information Required", "Verified", "Partially Funded", "Fully Funded"].map((s) => ({ name: s === "Additional Information Required" ? "Info required" : s, value: reqs.filter((r) => r.status === s).length }));
+  const impact = portfolioImpact(reqs, state.contributions);
+  const multByCat = Object.entries(OPP_LABEL)
+    .map(([k, v]) => {
+      const p = portfolioImpact(reqs.filter((r) => oppOf(state, r.opportunityId)?.category === k), state.contributions);
+      return { name: v, resolved: p.resolved, sponsor: p.sponsor, multiplier: p.multiplier ?? 0 };
+    })
+    .filter((x) => x.resolved > 0);
+  const noSponsor = reqs.filter((r) => RESOLVED.includes(r.status) && requestImpact(r, state.contributions).sponsor === 0).length;
   const funded = Object.entries(OPP_LABEL)
     .map(([k, v]) => ({ name: v, value: reqs.filter((r) => oppOf(state, r.opportunityId)?.category === k && ["Fully Funded", "Completed"].includes(r.status)).length }))
     .filter((x) => x.value > 0);
@@ -107,13 +116,40 @@ export default function AnalyticsPage() {
       <div className="mb-4">
         <DemoBadge>Aggregated demonstration data</DemoBadge>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Requests analysed" value={reqs.length} money={false} />
         <StatCard label="Average funding gap" value={avgGap} hint="Before BridgeEngine" />
         <StatCard label="Average sponsor ask" value={avgAsk} tone="primary" hint={avgGap ? `${Math.round((1 - avgAsk / avgGap) * 100)}% smaller` : undefined} />
         <StatCard label="Total expenses reduced" value={reduced} tone="primary" />
         <StatCard label="Opportunities funded" value={reqs.filter((r) => ["Fully Funded", "Completed"].includes(r.status)).length} money={false} />
+        <StatCard label="Impact multiplier" value={fmtMultiplier(impact.multiplier)} tone="primary" hint={impact.sponsor > 0 ? `${usd(impact.resolved)} resolved ÷ ${usd(impact.sponsor)} sponsor funds` : "No sponsor funds used yet"} />
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Barriers resolved vs. sponsor funding, by category</CardTitle>
+          <CardDescription>
+            Impact multiplier = financial barriers resolved (confirmed reductions + institutional + sponsor) ÷ sponsor funding used. Students&apos; own funds are excluded. Fully-funded requests only
+            {noSponsor > 0 && ` — ${noSponsor} were resolved with no sponsor money at all`}.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="h-64">
+          {multByCat.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No fully-funded requests in this filter.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={multByCat} margin={{ left: -10 }}>
+                <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" interval={0} {...axis} />
+                <YAxis {...axis} tickFormatter={(v) => usd(v)} width={70} />
+                <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
+                <Bar dataKey="resolved" name="Barriers resolved" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="sponsor" name="Sponsor funding used" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} maxBarSize={36} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <ChartCard title="Most common financial barriers" description="Expense items by category">

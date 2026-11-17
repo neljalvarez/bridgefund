@@ -22,6 +22,7 @@ function Dashboard() {
   const scoped = state.requests.filter((r) => inInstitutionScope(state, r));
   const queue = scoped.filter((r) => PENDING_STATUSES.includes(r.status)).sort((a, b) => a.deadline.localeCompare(b.deadline));
   const approved = scoped.filter((r) => ["Verified", "Partially Funded", "Fully Funded"].includes(r.status)).sort((a, b) => a.deadline.localeCompare(b.deadline));
+  const completed = scoped.filter((r) => r.status === "Completed").sort((a, b) => b.deadline.localeCompare(a.deadline));
   const unresolved = scoped.filter((r) => !["Completed", "Rejected", "Draft"].includes(r.status));
   const focused = state.requests.find((r) => r.id === focus);
   const [tab, setTab] = useState(focused && !PENDING_STATUSES.includes(focused.status) ? "approved" : "queue");
@@ -44,12 +45,15 @@ function Dashboard() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_320px]">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList>
+          <TabsList className="h-auto flex-wrap">
             <TabsTrigger value="queue">
               Verification queue <Badge variant="neutral">{queue.length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="approved">
               Approved <Badge variant="neutral">{approved.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="completed">
+              Completed <Badge variant="neutral">{completed.length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="history">Distribution history</TabsTrigger>
           </TabsList>
@@ -58,6 +62,9 @@ function Dashboard() {
           </TabsContent>
           <TabsContent value="approved" className="space-y-3">
             {approved.length === 0 ? <EmptyState title="No approved requests in progress" /> : approved.map((r) => <ReviewCard key={r.id} r={r} highlight={focus === r.id} />)}
+          </TabsContent>
+          <TabsContent value="completed" className="space-y-3">
+            {completed.length === 0 ? <EmptyState title="No completed assistance yet" /> : completed.map((r) => <ReviewCard key={r.id} r={r} highlight={focus === r.id} />)}
           </TabsContent>
           <TabsContent value="history">
             <Card>

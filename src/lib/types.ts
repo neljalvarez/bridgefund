@@ -126,11 +126,62 @@ export interface FundingRequest {
   deadline: string;
   expenses: Expense[];
   explanation: string;
-  documents: { name: string; attached: boolean }[];
+  documents: RequestDocument[];
   status: RequestStatus;
   infoRequested?: string;
   history: StatusEvent[];
   createdAt: string;
+  /** Checks completed manually by institutional staff. */
+  checks?: { enrollment?: boolean; opportunity?: boolean; expenses?: boolean };
+  flags?: ReviewFlag[];
+  /** Staff marked this case for priority (fast-track) review. Never auto-approves. */
+  priority?: boolean;
+  strategy?: StrategyId;
+  outcome?: "Participated" | "Completed opportunity" | "Did not participate";
+}
+
+export type StrategyId = "lowest-cost" | "fastest" | "independent";
+
+export interface RequestDocument {
+  name: string;
+  attached: boolean;
+  review?: "Pending" | "Accepted" | "Rejected";
+}
+
+export interface ReviewFlag {
+  id: string;
+  note: string;
+  at: string;
+  by: Role | "system";
+  resolved?: boolean;
+}
+
+export interface Payment {
+  id: string;
+  requestId: string;
+  provider: string;
+  amount: number;
+  at: string;
+  reference: string;
+}
+
+export interface Pledge {
+  id: string;
+  sponsorId: string;
+  requestId: string;
+  amount: number;
+  at: string;
+  approach: string;
+  status: "Pending review" | "Approved" | "Declined";
+}
+
+export interface Match {
+  key: string;
+  studentId: string;
+  sourceId: string;
+  status: "Suggested" | "Assigned";
+  at: string;
+  label: string;
 }
 
 /** Shared metadata every recommendation source carries, so each one can explain itself. */
@@ -155,6 +206,8 @@ export interface Waiver extends ProgramMeta {
   maxSavings?: number;
   requires: Partial<EligibilityProfile>;
   kind: "waiver" | "discount" | "institutional";
+  /** Programmes that cannot be combined with this one on the same expense. */
+  conflictsWith?: string[];
 }
 
 export interface Alternative extends ProgramMeta {
@@ -280,6 +333,13 @@ export interface AppState {
   scenarios: CalculatorScenario[];
   milestones: { id: string; at: string; label: string }[];
   profile: { displayName: string; email: string; emailUpdates: boolean; deadlineReminders: boolean };
+  payments: Payment[];
+  pledges: Pledge[];
+  matches: Match[];
+  /** Remaining budget of each grant programme across the network. */
+  programFunds: Record<string, number>;
+  display: { currency: string; locale: "en" | "fr" | "es" };
+  pilot: { schools: number; students: number; requests: number; resolved: number; participated: number; avgDaysToResolve: number | null; notes: string; updatedAt: string | null };
   onboarded: boolean;
   demo: { stage: number; scanned: boolean };
 }

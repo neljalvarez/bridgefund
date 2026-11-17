@@ -20,11 +20,13 @@ import { RoleSwitcher } from "./RoleSwitcher";
 import { CommandSearch } from "./CommandSearch";
 import { NotificationCenter } from "./NotificationCenter";
 import { useTheme } from "./useTheme";
+import { t } from "@/lib/i18n";
 
 function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const pathname = usePathname();
   const { state } = useStore();
   const unread = state.notifications.filter((n) => n.role === state.role && !n.read).length;
+  const tr = (k: string) => t(state.display.locale, k);
   const link = (href: string, label: string, Icon: typeof Settings, root: boolean, badge?: number) => {
     const active = root ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
     return (
@@ -39,7 +41,7 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
           )}
         >
           <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden />
-          {label}
+          {tr(label)}
           {!!badge && <span className="ml-auto rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">{badge}</span>}
         </Link>
       </li>
@@ -49,12 +51,12 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
     <nav aria-label={`${ROLE_META[role].label} navigation`} className="flex flex-1 flex-col gap-5 overflow-y-auto">
       {ROLE_NAV[role].map((g) => (
         <div key={g.section}>
-          <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">{g.section}</p>
+          <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">{tr(g.section)}</p>
           <ul className="space-y-0.5">{g.items.map((i) => link(i.href, i.label, i.icon, i.href === ROLE_META[role].home))}</ul>
         </div>
       ))}
       <div className="mt-auto">
-        <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Account</p>
+        <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">{tr("Account")}</p>
         <ul className="space-y-0.5">{ACCOUNT_NAV.map((i) => link(i.href, i.label, i.icon, false, i.href === "/notifications" ? unread : undefined))}</ul>
       </div>
     </nav>

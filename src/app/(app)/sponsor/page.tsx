@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/shared/kit";
 import { ChartTooltip, CHART_COLORS as COLORS } from "@/components/shared/ChartTooltip";
+import { fmtMultiplier, portfolioImpact } from "@/lib/impact";
 
 export default function SponsorDashboard() {
   const { state, dispatch } = useStore();
@@ -27,6 +28,8 @@ export default function SponsorDashboard() {
   const completed = reqs.filter((r) => r.status === "Completed");
   const pending = sum(toNeeds.filter((c) => state.requests.find((r) => r.id === c.requestId)?.status !== "Completed").map((c) => c.amount));
   const students = new Set(reqs.map((r) => r.studentId)).size;
+  const impact = portfolioImpact(reqs, state.contributions);
+  const held = sum(state.pledges.filter((p) => p.sponsorId === sponsor.id && p.status === "Pending review").map((p) => p.amount));
 
   const byCategory = useMemo(() => {
     const m = new Map<string, number>();
@@ -91,6 +94,29 @@ export default function SponsorDashboard() {
         <StatCard label="Completed requests" value={completed.length} money={false} icon={<CheckCircle2 />} />
         <StatCard label="Pending contributions" value={pending} icon={<Clock />} hint="Awaiting provider payment" />
       </div>
+
+      <Card className="mt-6">
+        <CardContent className="grid gap-4 p-5 md:grid-cols-[auto_1fr_auto] md:items-center">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Impact multiplier</p>
+            <p className="text-3xl font-semibold tabular text-primary">{fmtMultiplier(impact.multiplier)}</p>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {impact.count > 0 ? (
+              <>
+                Across the {impact.count} fully-funded request{impact.count === 1 ? "" : "s"} you supported, BridgeFund resolved <strong className="text-foreground">{usd(impact.resolved)}</strong> of financial barriers using <strong className="text-foreground">{usd(impact.sponsor)}</strong> of sponsor money ({usd(impact.reductions)} from confirmed waivers, discounts and borrowed resources{impact.institutional > 0 ? `, ${usd(impact.institutional)} institutional` : ""}). Students&apos; own funds are excluded.
+              </>
+            ) : (
+              "Appears once a request you supported is fully funded. Multiplier = barriers resolved ÷ sponsor funding used; students' own funds are excluded."
+            )}
+          </p>
+          {held > 0 && (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/sponsor/allocate">{usd(held)} awaiting institutional review</Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Card>

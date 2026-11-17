@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { Moon, RotateCcw, Sun } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { setProfile } from "@/lib/actions";
+import { setDisplay, setProfile } from "@/lib/actions";
+import { CURRENCIES } from "@/lib/regions";
+import { LOCALES, type Locale } from "@/lib/i18n";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { currentStudent, institutionOf } from "@/lib/selectors";
 import { LEVEL_LABEL } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -93,6 +96,46 @@ export default function SettingsPage() {
             <Button variant="outline" onClick={toggle}>
               {dark ? <Sun /> : <Moon />} Switch to {dark ? "light" : "dark"}
             </Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Region and language</CardTitle>
+            <CardDescription>Display preferences for global use. Calculations always run in USD; converted amounts use illustrative fixed rates, not live exchange rates.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Display currency</Label>
+              <Select value={state.display.currency} onValueChange={(v) => dispatch(setDisplay({ currency: v }), { info: `Showing amounts in ${v}` })}>
+                <SelectTrigger aria-label="Display currency">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      {c.code} · {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Amount input fields remain in USD.</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Interface language</Label>
+              <Select value={state.display.locale} onValueChange={(v) => dispatch(setDisplay({ locale: v as Locale }), { info: "Language updated" })}>
+                <SelectTrigger aria-label="Interface language">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(LOCALES) as Locale[]).map((l) => (
+                    <SelectItem key={l} value={l}>
+                      {LOCALES[l]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Preview: navigation only. Full translation would be reviewed per market.</p>
+            </div>
           </CardContent>
         </Card>
         <Card>

@@ -1,9 +1,22 @@
 import type { EducationLevel, ExpenseCategory, OpportunityCategory, RequestStatus, ResourceType } from "./types";
 import { daysBetween, urgencyTier } from "./allocation";
+export { daysBetween };
 
+import { CURRENCIES } from "./regions";
+
+/** Display currency (all calculations stay in USD; conversion is display-only). */
+let display = { code: "USD", rate: 1 };
+export function setDisplayCurrency(code: string) {
+  const c = CURRENCIES.find((x) => x.code === code) ?? CURRENCIES[0];
+  display = { code: c.code, rate: c.rate };
+}
+export const displayCurrency = () => display.code;
+
+/** Formats a USD amount in the selected display currency. */
 export const usd = (n: number, cents?: boolean) => {
-  const showCents = cents ?? !Number.isInteger(Math.round(n * 100) / 100);
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: showCents ? 2 : 0, maximumFractionDigits: showCents ? 2 : 0 }).format(n);
+  const v = n * display.rate;
+  const showCents = display.code === "USD" ? (cents ?? !Number.isInteger(Math.round(v * 100) / 100)) : false;
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: display.code, currencyDisplay: display.code === "USD" ? "symbol" : "code", minimumFractionDigits: showCents ? 2 : 0, maximumFractionDigits: showCents ? 2 : 0 }).format(display.code === "USD" ? v : Math.round(v));
 };
 
 export const sum = (xs: number[]) => Math.round(xs.reduce((a, b) => a + b, 0) * 100) / 100;

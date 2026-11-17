@@ -7,6 +7,8 @@ import { useStore } from "@/lib/store";
 import { currentStudent, institutionOf, studentOverview } from "@/lib/selectors";
 import { planFor } from "@/lib/plan";
 import { planFindings } from "@/lib/engine";
+import { assessDeadline, RISK_ORDER } from "@/lib/deadline";
+import { DeadlineRiskPanel, RiskBadge } from "@/components/shared/DeadlineRisk";
 import { fmtDate, fmtDateTime, relDays, timeAgo, usd } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +39,11 @@ export default function StudentDashboard() {
     if (!state.savedWaivers.length) list.push({ icon: Ticket, text: "Check which fee waivers you may qualify for", href: "/student/waivers", cta: "Check" });
     return list.slice(0, 5);
   }, [ov, state]);
+
+  const risks = ov.active
+    .map((p) => ({ p, a: assessDeadline(state, p.opp, p.request) }))
+    .filter((x) => ["Critical", "At risk", "Watch"].includes(x.a.level))
+    .sort((a, b) => RISK_ORDER.indexOf(a.a.level) - RISK_ORDER.indexOf(b.a.level));
 
   const deadlines = ov.active.map((p) => ({ id: p.opp.id, label: p.opp.title, date: p.opp.deadline })).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
   const timeline = ov.requests.flatMap((r) => r.history.map((h) => ({ ...h, ref: r.ref }))).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 6);
@@ -91,6 +98,27 @@ export default function StudentDashboard() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="space-y-6">
+          {risks.length > 0 && (
+            <Card className="border-amber-200 dark:border-amber-900">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-warning" /> Financial deadline rescue
+                </CardTitle>
+                <CardDescription>Opportunities that could be missed if the gap isn&apos;t resolved in time.</CardDescription>
+              </CardHeader>
+              <CardContent className="divide-y">
+                {risks.map(({ p, a }) => (
+                  <div key={p.opp.id} className="space-y-3 py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium">{p.opp.title}</p>
+                      <RiskBadge level={a.level} />
+                    </div>
+                    <DeadlineRiskPanel a={a} compact />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
           {sel && (
             <Card>
               <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">

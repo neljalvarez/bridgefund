@@ -171,6 +171,7 @@ export const WAIVERS: Waiver[] = [
     processingDays: 1,
     deadlineDays: 45,
     kind: "discount",
+    conflictsWith: ["w-cert-hardship"],
   },
   {
     id: "d-tech-access",
@@ -265,6 +266,9 @@ export const ALTERNATIVES: Alternative[] = [
     deadlineDays: 30,
   },
 ];
+
+/** Starting budgets for network-wide grant programmes (simulated). */
+export const GRANT_BUDGETS: Record<string, number> = { "g-community": 400, "g-stem": 600 };
 
 export const GRANTS: Grant[] = [
   {

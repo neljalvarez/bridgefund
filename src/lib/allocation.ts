@@ -17,6 +17,8 @@ export interface AllocNeed {
   amount: number; // total sponsor amount requested
   funded: number; // already secured
   deadline: string; // ISO
+  category?: string;
+  studentId?: string;
 }
 
 export interface AllocItem {
@@ -100,3 +102,89 @@ export function suggestAllocation(needs: AllocNeed[], budget: number, today: Dat
   const allocated = Math.round((budget - left) * 100) / 100;
   return { items, allocated, remainingBudget: left, fullyCovered: items.filter((i) => i.completes).length };
 }
+
+/* ------------------------------------------------------------------ */
+/* Sponsor Impact Planner — the same budget under different approaches  */
+/* ------------------------------------------------------------------ */
+
+export type Approach = "most" | "urgent" | "category";
+
+export const APPROACHES: Record<Approach, { name: string; tagline: string; tradeoff: string }> = {
+  most: {
+    name: "Support the most verified needs",
+    tagline: "Smallest remaining gaps first, so the budget completes as many requests as possible.",
+    tradeoff: "Larger or more expensive needs may wait, even when their deadlines are close.",
+  },
+  urgent: {
+    name: "Prioritise urgent deadlines",
+    tagline: "Needs closest to their deadline first, then the smallest amount that completes them.",
+    tradeoff: "A single expensive urgent need can absorb a large share of the budget.",
+  },
+  category: {
+    name: "Focus on one category",
+    tagline: "Only needs in the chosen opportunity category, most urgent first.",
+    tradeoff: "Needs outside the category receive nothing; part of the budget may stay unallocated.",
+  },
+};
+
+export interface PlanSummary {
+  approach: Approach;
+  items: AllocItem[];
+  allocated: number;
+  unallocated: number;
+  fullyCovered: number;
+  partial: number;
+  students: number;
+  urgentCovered: number; // fully covered needs due within 7 days
+  urgentLeft: number; // urgent needs left with a remaining gap
+  avgDaysToDeadline: number | null;
+}
+
+export function planAllocation(needs: AllocNeed[], budget: number, today: Date, approach: Approach, category?: string): PlanSummary {
+  const base = rankNeeds(needs, today);
+  const pool = approach === "category" ? base.filter((r) => r.need.category === category) : base;
+  const ordered =
+    approach === "most"
+      ? [...pool].sort((a, b) => a.remaining - b.remaining || a.days - b.days || a.need.ref.localeCompare(b.need.ref))
+      : pool; // rankNeeds already orders by urgency tier, then remaining amount
+  let left = Math.max(budget, 0);
+  const items: AllocItem[] = [];
+
+  ordered.forEach((r, i) => {
+    if (r.remaining <= left + 1e-9) {
+      left = Math.round((left - r.remaining) * 100) / 100;
+      const reasons = [
+        approach === "most" ? `Among the smallest remaining gaps (${usd0(r.remaining)})` : `Deadline in ${r.days} day${r.days === 1 ? "" : "s"} (${urgencyTier(r.days).label.toLowerCase()} urgency)`,
+        `${usd0(r.remaining)} completes this request`,
+      ];
+      if (approach === "category") reasons.unshift(`Matches your focus: ${category}`);
+      if (r.need.funded > 0) reasons.push(`${usd0(r.need.funded)} already secured from others`);
+      items.push({ needId: r.need.id, amount: r.remaining, completes: true, rank: i + 1, reasons });
+    }
+  });
+  if (left > 0) {
+    const next = ordered.find((r) => !items.some((it) => it.needId === r.need.id));
+    if (next) {
+      const amt = Math.round(Math.min(left, next.remaining) * 100) / 100;
+      left = Math.round((left - amt) * 100) / 100;
+      items.push({ needId: next.need.id, amount: amt, completes: false, rank: ordered.indexOf(next) + 1, reasons: [`Partial support for the next need in line`, `${usd0(Math.round((next.remaining - amt) * 100) / 100)} would still remain`] });
+    }
+  }
+
+  const covered = items.filter((i) => i.completes).map((i) => base.find((b) => b.need.id === i.needId)!);
+  const urgent = base.filter((b) => b.days <= 7);
+  return {
+    approach,
+    items,
+    allocated: Math.round((budget - left) * 100) / 100,
+    unallocated: left,
+    fullyCovered: covered.length,
+    partial: items.filter((i) => !i.completes).length,
+    students: new Set(items.map((i) => needs.find((n) => n.id === i.needId)?.studentId ?? i.needId)).size,
+    urgentCovered: covered.filter((c) => c.days <= 7).length,
+    urgentLeft: urgent.filter((u) => !covered.some((c) => c.need.id === u.need.id)).length,
+    avgDaysToDeadline: covered.length ? Math.round(covered.reduce((a, c) => a + c.days, 0) / covered.length) : null,
+  };
+}
+
+const usd0 = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;

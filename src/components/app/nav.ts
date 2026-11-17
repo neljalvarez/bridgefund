@@ -12,6 +12,9 @@ import {
   Package,
   PieChart,
   ScanSearch,
+  ScrollText,
+  Shuffle,
+  Siren,
   Settings,
   Sparkles,
   Store,
@@ -59,7 +62,7 @@ export const ROLE_NAV: Record<Role, { section: string; items: NavItem[] }[]> = {
       items: [
         { href: "/sponsor", label: "Dashboard", icon: LayoutDashboard, description: "Contributions and impact" },
         { href: "/sponsor/marketplace", label: "Opportunity marketplace", icon: Store, description: "Verified educational needs" },
-        { href: "/sponsor/allocate", label: "Smart allocation", icon: PieChart, description: "Spread a budget across needs" },
+        { href: "/sponsor/allocate", label: "Impact planner", icon: PieChart, description: "Plan a budget across verified needs" },
       ],
     },
   ],
@@ -68,8 +71,16 @@ export const ROLE_NAV: Record<Role, { section: string; items: NavItem[] }[]> = {
       section: "Institution",
       items: [
         { href: "/institution", label: "Dashboard", icon: LayoutDashboard, description: "Verification queue and funding" },
+        { href: "/institution/urgent", label: "Urgent cases", icon: Siren, description: "Deadline risks, manual reviews and sponsor allocations" },
+        { href: "/institution/matching", label: "Needs matching", icon: Shuffle, description: "Match student needs with resources and programmes" },
+      ],
+    },
+    {
+      section: "Operations",
+      items: [
         { href: "/institution/resources", label: "Lending inventory", icon: Package, description: "Manage equipment loans" },
         { href: "/institution/analytics", label: "Barrier analytics", icon: BarChart3, description: "Aggregated insights" },
+        { href: "/institution/audit", label: "Audit log", icon: ScrollText, description: "Every verification and funding action" },
       ],
     },
   ],
