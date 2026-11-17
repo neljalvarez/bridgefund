@@ -41,7 +41,7 @@ export default function AuditPage() {
 
   return (
     <>
-      <PageHeader title="Audit log" description="An immutable, timestamped trail of every submission, verification check, document review, flag, allocation and payment." actions={<Button variant="outline" onClick={exportCsv}><Download /> Export CSV</Button>} />
+      <PageHeader title="Audit log" description="Every check, decision and payment, timestamped." actions={<Button variant="outline" onClick={exportCsv}><Download /> Export CSV</Button>} />
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Provider payments</CardTitle>

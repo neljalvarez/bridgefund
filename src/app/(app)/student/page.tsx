@@ -1,177 +1,162 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { AlertCircle, ArrowRight, CalendarClock, CheckCircle2, Clock, Package, ScanSearch, Sparkles, Target, Ticket, Wallet } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Plus } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { currentStudent, institutionOf, studentOverview } from "@/lib/selectors";
-import { planFor } from "@/lib/plan";
-import { planFindings } from "@/lib/engine";
+import { currentStudent, studentOverview } from "@/lib/selectors";
 import { assessDeadline, RISK_ORDER } from "@/lib/deadline";
-import { DeadlineRiskPanel, RiskBadge } from "@/components/shared/DeadlineRisk";
 import { fmtDate, fmtDateTime, relDays, timeAgo, usd } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/shared/kit";
-import { GapBreakdown } from "@/components/shared/GapBreakdown";
-import { OpportunityCard } from "@/components/student/OpportunityCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState, StatCard, StatusBadge } from "@/components/shared/kit";
+import { DashboardFocus, ListRow, MoreDetails } from "@/components/shared/Focus";
+import { DeadlineRiskPanel, RiskBadge } from "@/components/shared/DeadlineRisk";
 
 export default function StudentDashboard() {
   const { state } = useStore();
   const student = currentStudent(state);
-  const inst = institutionOf(state, student.institutionId);
   const ov = studentOverview(state);
+  const active = [...ov.active].sort((a, b) => a.opp.deadline.localeCompare(b.opp.deadline));
   const ordered = [...ov.all].sort((a, b) => Number(a.secured) - Number(b.secured) || a.opp.deadline.localeCompare(b.opp.deadline));
-  const [selId, setSelId] = useState<string | null>(null);
-  const sel = ordered.find((p) => p.opp.id === selId) ?? ordered.find((p) => p.request && !p.secured) ?? ordered[0];
-  const justFunded = ov.all.find((p) => p.request?.status === "Fully Funded");
+  const next = active.find((p) => !p.secured) ?? active[0];
+  const funded = ov.all.find((p) => p.request?.status === "Fully Funded");
 
-  const actions = useMemo(() => {
-    const list: { icon: typeof Sparkles; text: string; href: string; cta: string }[] = [];
-    ov.requests.filter((r) => r.status === "Additional Information Required").forEach((r) => list.push({ icon: AlertCircle, text: `${r.ref}: your institution needs more information`, href: "/student/requests", cta: "Respond" }));
-    ov.active.filter((p) => !p.request).forEach((p) => {
-      const plan = planFor(state, p.opp);
-      list.push({ icon: Sparkles, text: `Run BridgeEngine on ${p.opp.title} — up to ${usd(plan.reductionsTotal)} in savings found`, href: `/student/engine?opp=${p.opp.id}`, cta: "Resolve" });
-    });
-    ov.requests.filter((r) => r.status === "Draft").forEach((r) => list.push({ icon: Clock, text: `${r.ref} is still a draft`, href: "/student/requests", cta: "Submit" }));
-    const borrow = ov.active.filter((p) => !p.request).flatMap((p) => planFindings(planFor(state, p.opp)).filter((f) => f.kind === "borrow"));
-    borrow.slice(0, 1).forEach((f) => list.push({ icon: Package, text: `${f.title.replace("Borrow: ", "")} is available to borrow`, href: `/student/resources?r=${f.sourceId}`, cta: "Reserve" }));
-    if (!state.savedWaivers.length) list.push({ icon: Ticket, text: "Check which fee waivers you may qualify for", href: "/student/waivers", cta: "Check" });
-    return list.slice(0, 5);
-  }, [ov, state]);
+  // One recommended next step, in priority order.
+  const info = ov.requests.find((r) => r.status === "Additional Information Required");
+  const unplanned = active.find((p) => !p.request && p.remaining > 0);
+  const draft = ov.requests.find((r) => r.status === "Draft");
+  const action = info
+    ? { title: `Send the documents your school asked for`, text: `${info.ref} · ${info.purpose}`, href: "/student/requests", cta: "Respond" }
+    : unplanned
+      ? { title: `Close the ${usd(unplanned.remaining)} gap for ${unplanned.opp.title}`, text: "BridgeEngine finds savings before asking anyone for money.", href: `/student/engine?opp=${unplanned.opp.id}`, cta: "Get assistance" }
+      : draft
+        ? { title: `Submit your draft request`, text: `${draft.ref} · ${draft.purpose}`, href: `/student/engine?opp=${draft.opportunityId}`, cta: "Review and submit" }
+        : { title: "Track your requests", text: "We'll notify you when anything changes.", href: "/student/requests", cta: "View requests" };
 
-  const risks = ov.active
+  const risks = active
     .map((p) => ({ p, a: assessDeadline(state, p.opp, p.request) }))
-    .filter((x) => ["Critical", "At risk", "Watch"].includes(x.a.level))
+    .filter((x) => ["Critical", "At risk"].includes(x.a.level))
     .sort((a, b) => RISK_ORDER.indexOf(a.a.level) - RISK_ORDER.indexOf(b.a.level));
-
-  const deadlines = ov.active.map((p) => ({ id: p.opp.id, label: p.opp.title, date: p.opp.deadline })).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
   const timeline = ov.requests.flatMap((r) => r.history.map((h) => ({ ...h, ref: r.ref }))).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 6);
   const activity = state.activity.filter((a) => a.role === "student").slice(0, 5);
 
   return (
-    <>
-      <PageHeader
-        eyebrow={inst?.name}
-        title={`Welcome back, ${student.firstName}`}
-        description={`Goal: ${student.goal}. Here's where every opportunity stands.`}
-        actions={
-          <>
-            <Button asChild variant="outline">
-              <Link href="/student/scanner">
-                <ScanSearch /> Scan a barrier
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link href="/student/engine">
-                <Sparkles /> Run BridgeEngine
-              </Link>
-            </Button>
-          </>
-        }
-      />
-
-      {justFunded && (
-        <Card className="mb-6 border-primary/30 bg-primary-light/50">
-          <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="flex items-center gap-2.5 text-sm">
-              <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
-              <span>
-                <strong>Your opportunity is now fully funded.</strong> {justFunded.opp.title} — remaining gap {usd(justFunded.remaining)}.
-              </span>
-            </p>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/student/requests">View breakdown</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
-        <StatCard label="Active opportunities" value={ov.active.length} money={false} icon={<Target />} />
-        <StatCard label="Total required" value={ov.total} icon={<Wallet />} />
-        <StatCard label="Available funds" value={ov.personal} />
-        <StatCard label="Remaining gap" value={ov.remaining} tone={ov.remaining > 0 ? "warning" : "primary"} />
-        <StatCard label="Potential savings" value={ov.savings} tone="primary" hint={`${usd(ov.confirmedSavings)} confirmed`} />
-        <StatCard label="Assistance received" value={ov.assistance} />
+    <div className="mx-auto max-w-5xl">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-sm text-muted-foreground">Hi {student.firstName}</p>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">Your dashboard</h1>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/student/scanner">
+            <Plus /> Add opportunity
+          </Link>
+        </Button>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
-        <div className="space-y-6">
-          {risks.length > 0 && (
-            <Card className="border-amber-200 dark:border-amber-900">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-warning" /> Financial deadline rescue
-                </CardTitle>
-                <CardDescription>Opportunities that could be missed if the gap isn&apos;t resolved in time.</CardDescription>
-              </CardHeader>
-              <CardContent className="divide-y">
-                {risks.map(({ p, a }) => (
-                  <div key={p.opp.id} className="space-y-3 py-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium">{p.opp.title}</p>
-                      <RiskBadge level={a.level} />
-                    </div>
-                    <DeadlineRiskPanel a={a} compact />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-          {sel && (
-            <Card>
-              <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
-                <div>
-                  <CardTitle>{sel.opp.title}</CardTitle>
-                  <CardDescription className="mt-1">How each source contributes to resolving this expense</CardDescription>
-                </div>
-                {sel.request && <StatusBadge status={sel.request.status} />}
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap items-end justify-between gap-4">
-                  <div>
-                    <p className="text-[13px] text-muted-foreground">Remaining financial gap</p>
-                    <p className="text-3xl font-semibold tracking-tight tabular">{usd(sel.remaining)}</p>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {usd(sel.covered)} of {usd(sel.total)} covered · due {fmtDate(sel.opp.deadline)}
-                  </p>
-                </div>
-                <GapBreakdown b={sel} className="mt-4" height="h-3.5" />
-                {sel.estimatedSavings > 0 && <p className="mt-3 text-xs text-muted-foreground">Striped savings are estimates from BridgeEngine. They become confirmed once your institution verifies them.</p>}
-              </CardContent>
-            </Card>
-          )}
+      {funded && (
+        <p className="mb-4 flex items-center gap-2.5 rounded-xl border border-primary/25 bg-card px-4 py-3 text-sm">
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+          <span>
+            <strong>Your opportunity is now fully funded.</strong> {funded.opp.title}
+          </span>
+        </p>
+      )}
+      {risks.length > 0 && (
+        <p className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span className="flex-1">
+            <strong>{risks[0].p.opp.title}</strong> could miss its deadline ({relDays(risks[0].p.opp.deadline)}).
+          </span>
+          <Link href={`/student/engine?opp=${risks[0].p.opp.id}`} className="font-medium underline">
+            Fix it
+          </Link>
+        </p>
+      )}
 
-          <section aria-labelledby="opps">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 id="opps" className="text-base font-semibold">
-                Your opportunities
-              </h2>
-              <Link href="/student/tracker" className="text-sm font-medium text-primary hover:underline">
-                Open tracker
-              </Link>
-            </div>
-            {ordered.length === 0 ? (
-              <EmptyState title="No opportunities yet" description="Use the barrier scanner to add your first one." action={<Button asChild><Link href="/student/scanner">Scan a barrier</Link></Button>} />
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {ordered.map((p) => (
-                  <OpportunityCard key={p.opp.id} p={p} selected={sel?.opp.id === p.opp.id} onSelect={() => setSelId(p.opp.id)} />
-                ))}
-              </div>
-            )}
-          </section>
+      <DashboardFocus
+        figures={[
+          { label: "Remaining gap", value: ov.remaining, tone: ov.remaining > 0 ? "warning" : "primary", sub: `across ${active.length} opportunit${active.length === 1 ? "y" : "ies"}` },
+          { label: "Assistance found", value: ov.savings + ov.assistance, tone: "primary", sub: `${usd(ov.confirmedSavings + ov.assistance)} confirmed` },
+          { label: "Next deadline", value: next ? fmtDate(next.opp.deadline, { month: "short", day: "numeric" }) : "—", sub: next ? `${next.opp.title} · ${relDays(next.opp.deadline)}` : "No upcoming deadlines" },
+        ]}
+        action={action}
+      />
 
+      <Card className="mt-8">
+        <CardHeader className="flex-row items-center justify-between space-y-0">
+          <CardTitle>Your opportunities</CardTitle>
+          <Link href="/student/tracker" className="text-sm font-medium text-primary hover:underline">
+            Calendar
+          </Link>
+        </CardHeader>
+        {ordered.length === 0 ? (
+          <CardContent>
+            <EmptyState title="No opportunities yet" action={<Button asChild><Link href="/student/scanner">Add your first</Link></Button>} />
+          </CardContent>
+        ) : (
+          <div className="divide-y border-t">
+            {ordered.map((p) => {
+              const pct = p.total ? Math.round((p.covered / p.total) * 100) : 0;
+              return (
+                <ListRow
+                  key={p.opp.id}
+                  href={`/student/engine?opp=${p.opp.id}`}
+                  title={p.opp.title}
+                  meta={
+                    <span className="mt-1.5 flex items-center gap-3">
+                      <span className="h-1.5 w-24 overflow-hidden rounded-full bg-secondary sm:w-40">
+                        <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                      </span>
+                      <span>{relDays(p.opp.deadline)}</span>
+                    </span>
+                  }
+                  right={
+                    <>
+                      {p.request && <StatusBadge status={p.request.status} className="hidden md:inline-flex" />}
+                      <span className="w-16 text-right font-semibold tabular">{p.remaining > 0 ? usd(p.remaining) : "Funded"}</span>
+                    </>
+                  }
+                />
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
+      <MoreDetails title="More details">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard label="Total cost" value={ov.total} />
+          <StatCard label="Your own funds" value={ov.personal} />
+          <StatCard label="Savings found" value={ov.savings} tone="primary" hint={`${usd(ov.confirmedSavings)} confirmed`} />
+          <StatCard label="Sponsor help received" value={ov.assistance} />
+        </div>
+        {risks.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Financial assistance timeline</CardTitle>
-              <CardDescription>Every status change on your requests</CardDescription>
+              <CardTitle>Deadline risks</CardTitle>
+            </CardHeader>
+            <CardContent className="divide-y">
+              {risks.map(({ p, a }) => (
+                <div key={p.opp.id} className="space-y-3 py-4 first:pt-0 last:pb-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium">{p.opp.title}</p>
+                    <RiskBadge level={a.level} />
+                  </div>
+                  <DeadlineRiskPanel a={a} compact />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Request timeline</CardTitle>
             </CardHeader>
             <CardContent>
               {timeline.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Your timeline starts when you submit your first request.</p>
+                <p className="text-sm text-muted-foreground">Starts when you submit a request.</p>
               ) : (
                 <ol className="relative space-y-4 border-l pl-5">
                   {timeline.map((t, i) => (
@@ -187,54 +172,6 @@ export default function StudentDashboard() {
               )}
             </CardContent>
           </Card>
-        </div>
-
-        <aside className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommended actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              {actions.length === 0 && <p className="text-sm text-muted-foreground">You&apos;re all set for now.</p>}
-              {actions.map((a, i) => (
-                <Link key={i} href={a.href} className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary-light text-primary">
-                    <a.icon className="h-4 w-4" />
-                  </span>
-                  <span className="flex-1 text-[13px] leading-snug">{a.text}</span>
-                  <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
-                    {a.cta} <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0">
-              <CardTitle>Upcoming deadlines</CardTitle>
-              <Link href="/student/tracker" className="text-xs font-medium text-primary hover:underline">
-                Calendar
-              </Link>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {deadlines.map((d) => (
-                <div key={d.id} className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg border">
-                    <span className="text-[10px] font-medium uppercase text-muted-foreground">{fmtDate(d.date, { month: "short" })}</span>
-                    <span className="text-sm font-semibold leading-none">{new Date(d.date).getDate()}</span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{d.label}</p>
-                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <CalendarClock className="h-3 w-3" /> {relDays(d.date)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0">
               <CardTitle>Recent activity</CardTitle>
@@ -251,8 +188,8 @@ export default function StudentDashboard() {
               ))}
             </CardContent>
           </Card>
-        </aside>
-      </div>
-    </>
+        </div>
+      </MoreDetails>
+    </div>
   );
 }

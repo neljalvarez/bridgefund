@@ -207,7 +207,7 @@ export function createSeedState(now = new Date()): AppState {
       { id: "n1", role: "student", title: "Waiver deadline approaching", body: "A fee waiver that may apply to your certification exam closes in 21 days.", href: "/student/waivers", at: isoDaysFromNow(-1, now), read: false },
       { id: "n2", role: "student", title: "Welcome to BridgeFund", body: "Run BridgeEngine on an opportunity to build your action plan.", href: "/student/engine", at: isoDaysFromNow(-2, now), read: true },
       { id: "n3", role: "sponsor", title: "2 verified needs close within 7 days", body: "Smart Impact Allocation can suggest how to cover them.", href: "/sponsor/allocate", at: isoDaysFromNow(-1, now), read: false },
-      { id: "n4", role: "institution", title: "2 requests awaiting verification", body: "New submissions from Recife and Amman.", href: "/institution", at: isoDaysFromNow(-1, now), read: false },
+      { id: "n4", role: "institution", title: "2 requests awaiting verification", body: "New submissions from Recife and Amman.", href: "/institution/requests", at: isoDaysFromNow(-1, now), read: false },
     ],
     activity: [
       { id: "a1", role: "system", text: "Demo environment seeded with fictional data", at: now.toISOString() },

@@ -30,7 +30,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" description="Profile and preferences for this demonstration account." />
+      <PageHeader title="Settings" description="Profile, region and appearance." />
       <div className="grid max-w-3xl gap-6">
         <Card>
           <CardHeader>

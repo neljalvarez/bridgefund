@@ -39,7 +39,7 @@ export default function InventoryPage() {
 
   return (
     <>
-      <PageHeader title="Lending inventory" description="Manage equipment students can borrow instead of buying. Changes appear in Resource Rescue and BridgeEngine immediately." actions={<Button onClick={() => setOpen(true)}><Plus /> Add item</Button>} />
+      <PageHeader title="Lending inventory" description="Equipment students can borrow instead of buying." actions={<Button onClick={() => setOpen(true)}><Plus /> Add item</Button>} />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard label="Items in inventory" value={sum(resources.map((r) => r.total))} money={false} />
         <StatCard label="Currently on loan" value={loans.length} money={false} />

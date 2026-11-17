@@ -72,55 +72,68 @@ Open `/present` or click **Present**. Use ← → (or Space, PageUp/PageDown), n
 | 7 | Business model and scalability | 20s | Revenue streams, break-even, markets |
 | 8 | Future vision | 10s | Pilot → year one → beyond |
 
-### Option B — Guided interactive demo (about 2 minutes)
+### Option B — 90-second demo
 
-Click **Launch Interactive Demo** or go to `/demo`. Each scene has a real button that performs the action. **Do it for me** runs the action for you, **Next** moves on, and the ← → keys also work. **Restart Demo** resets all data.
+Click **See how it works** on the landing page, **Launch Interactive Demo** in the app, or go to `/demo`. One fictional student, five steps, one button per step (→ also works). Every step performs the real action, so the student, school and sponsor dashboards update too.
 
-| # | Scene | What to show |
-| --- | --- | --- |
-| 1 | Student problem | Amina needs **$180** for a certification exam and has **$70**, leaving a **$110** gap. |
-| 2 | Financial analysis | Run the **Barrier Scanner**. |
-| 3 | BridgeEngine | A **$50 fee waiver** cuts the gap from $110 to **$60**. Submit the request. |
-| 4 | Verification | The institution verifies the request; the waiver becomes *Confirmed*. |
-| 5 | Funding | The sponsor contributes $60; the balance goes from **$500 to $440**. |
-| 6 | Opportunity secured | “**Your opportunity is now fully funded.**” — $70 + $50 + $60, gap **$0**. |
-| 7 | Impact | Impact receipt plus the **1.83x** Impact Multiplier; optionally confirm the provider payment. |
+| # | Step | Big number | Button |
+| --- | --- | --- | --- |
+| 1 | The barrier | **$110** missing ($180 exam, $70 saved) | Run BridgeEngine |
+| 2 | BridgeEngine | **$60** left after a $50 fee waiver | Verify as her school |
+| 3 | Verified | **$60** verified need | Fund as a sponsor |
+| 4 | Funded | **$0** — sponsor balance $500 → $440 | See the impact (pays the provider) |
+| 5 | Impact | **1.83x** impact multiplier | Replay (resets the data) |
 
-### Option C — Explore the new features
+### Option C — Explore the features
 
-1. **Student → BridgeEngine**: run the engine, compare the three strategies, choose one and submit.
+1. **Student → Get assistance**: costs, BridgeEngine, choose a plan, submit, track — all on one page.
 2. **Student → Dashboard**: the *Financial deadline rescue* card lists at-risk opportunities.
 3. **Institution → Urgent cases**: deadline-risk cases, requests flagged for manual review (try BF-2056, a possible duplicate, and BF-2057, an institution mismatch with missing documents), and sponsor allocations awaiting approval.
-4. **Institution → Dashboard**: expand a request to see the verification checklist, accept or reject documents, raise or resolve flags, and approve (a confirmation lists any open items).
+4. **Institution → Requests**: expand a request to see the verification checklist, accept or reject documents, raise or resolve flags, and approve (a confirmation lists any open items).
 5. **Institution → Needs matching**: confirm availability and assign a match; it disappears from the list.
-6. **Sponsor → Impact planner**: compare approaches, adjust amounts, submit for review — then approve or decline it under Institution → Urgent cases.
+6. **Sponsor → Budget planner**: compare approaches, adjust amounts, submit for review — then approve or decline it under Institution → Urgent cases.
 7. **Institution → Audit log**: every action, plus the simulated provider-payment ledger, exportable to CSV.
 8. Public pages: `/simulator`, `/impact`, `/business#simulator`, `/why`, `/scale`, `/pilot`.
 9. **Settings**: switch the display currency (e.g. KES) and preview French or Spanish navigation.
 
 ## Features
 
-**Three connected roles.** You can switch between Student, Sponsor and Institution at any time, and every action updates all three views. A simulated sign-in at `/signin` lets you pick a demo account. Institutions can switch between 13 fictional institutional accounts, and sponsors between three funding pools.
+**Navigation.** Every role has the same five sections — **Overview, Find Assistance, My Opportunities, Resources, Impact** — with role-specific pages inside each:
+
+| Section | Student | Sponsor | Institution |
+| --- | --- | --- | --- |
+| Overview | Dashboard | Dashboard | Dashboard |
+| Find Assistance | Get assistance (BridgeEngine), Fee waivers | Verified needs | Needs matching, Urgent cases |
+| My Opportunities | My requests | My contributions | Requests (verification queue) |
+| Resources | Borrow equipment, Cost calculator | Budget planner | Lending inventory |
+| Impact | My progress | My impact | Analytics, Audit log |
+
+**Dashboards.** Each dashboard leads with three numbers (remaining gap, available assistance, next deadline) and one **Next step** with a single primary button. Secondary statistics, timelines and activity sit in a collapsed **More details** section.
+
+**One assistance journey.** *Get assistance* (`/student/engine`) walks students through five steps on one page: **Costs → Solutions (BridgeEngine's seven checks) → Savings (choose one of three plans) → Request → Track**. *Add opportunity* (`/student/scanner`) feeds straight into it.
 
 ### Student
-- **Dashboard** (`/student`). Shows active opportunities, total required expenses, available funds, remaining gap, potential and confirmed savings, assistance received, deadlines, recommended actions, recent activity and application progress. It also has a breakdown of where each opportunity's funding came from and a timeline of financial assistance.
-- **Financial Barrier Scanner** (`/student/scanner`). A six-step questionnaire covering opportunity type, institution, deadline, expenses (added one by one), funds and existing assistance, and eligibility. It produces a professional barrier report with a live preview from BridgeEngine.
-- **BridgeEngine** (`/student/engine`). An animated, explainable plan with a running financial breakdown (see below).
+- **Dashboard** (`/student`). Remaining gap, assistance found, next deadline, one recommended next step, and a progress list of opportunities.
+- **Add opportunity** (`/student/scanner`). A six-step questionnaire covering opportunity type, institution, deadline, expenses (added one by one), funds and existing assistance, and eligibility. It produces a professional barrier report with a live preview from BridgeEngine.
+- **Get assistance** (`/student/engine`). The five-step journey above, with BridgeEngine at its centre.
 - **Assistance requests** (`/student/requests`). Each request has a purpose, exact amount, deadline, breakdown, private explanation, document placeholders and a verifying institution. Requests move through **Draft → Submitted → Under Review → Additional Information Required → Verified → Partially Funded → Fully Funded → Completed**.
 - **Opportunity cost calculator** (`/student/calculator`). Compares up to three opportunities across eight cost categories and shows total cost, available assistance, out-of-pocket cost, remaining gap and an affordability chart.
 - **Fee waiver finder** (`/student/waivers`). Filter by country, opportunity type, education level, eligibility, deadline and estimated savings, and save waivers. A personalised eligibility assessment labels each result *likely*, *check requirements* or *not available*, and never guarantees eligibility.
-- **Resource Rescue** (`/student/resources`). Search and filter by category and location, then reserve an item and track it from Reserved to Collected to Returned. Each item shows how much borrowing saves.
-- **Opportunity tracker** (`/student/tracker`). A calendar view, per-deadline reminders, documents still required, money saved and personal milestones.
+- **Borrow equipment** (`/student/resources`). Search and filter by category and location, then reserve an item and track it from Reserved to Collected to Returned. Each item shows how much borrowing saves.
+- **My progress** (`/student/tracker`). A calendar view, per-deadline reminders, documents still required, money saved and personal milestones.
 
 ### Sponsor
-- **Dashboard** (`/sponsor`). Shows total contributions, expenses covered, students supported, completed requests and pending contributions. It includes Recharts charts of impact by category and contribution status, a filterable history, impact receipts and the shared opportunity pool.
-- **Opportunity marketplace** (`/sponsor/marketplace`). Filter by category, financial gap, location, deadline, institution and urgency, and save needs. Each need has its own detail page at `/sponsor/marketplace/[id]`. Needs are **never ranked by popularity**.
-- **Impact planner** (`/sponsor/allocate`). Enter a budget and compare three approaches side by side — *support the most verified needs*, *prioritise urgent deadlines*, or *focus on one category* — with needs covered, students reached, urgent needs covered, money left unallocated and each approach's trade-off. Every amount can be edited. Submitting **holds** the amount from the sponsor balance as pending allocations; institutions approve (applied, capped at the remaining gap) or decline (returned) each one.
+- **Dashboard** (`/sponsor`). Balance, open verified needs, next deadline, and the need to fund next.
+- **My contributions** (`/sponsor/contributions`). Filterable history, receipts and the shared pool.
+- **My impact** (`/sponsor/impact`). Impact Multiplier and charts by category and status.
+- **Verified needs** (`/sponsor/marketplace`). Filter by category, financial gap, location, deadline, institution and urgency, and save needs. Each need has its own detail page at `/sponsor/marketplace/[id]`. Needs are **never ranked by popularity**.
+- **Budget planner** (`/sponsor/allocate`). Enter a budget and compare three approaches side by side — *support the most verified needs*, *prioritise urgent deadlines*, or *focus on one category* — with needs covered, students reached, urgent needs covered, money left unallocated and each approach's trade-off. Every amount can be edited. Submitting **holds** the amount from the sponsor balance as pending allocations; institutions approve (applied, capped at the remaining gap) or decline (returned) each one.
 - **Impact Multiplier** on the dashboard for the requests the sponsor supported.
 - **Impact receipts** (`/receipt/[id]`). Show the contribution, the expense it covered, an anonymous recipient reference, verification status, completion date, a breakdown and the educational outcome. They can be printed or downloaded as HTML.
 
 ### Institution
-- **Dashboard** (`/institution`). Includes the verification queue, approved assistance, available funds and shared pool, upcoming deadlines, inventory summary, distribution history and unresolved barriers. From here an institution can approve or reject a request, ask for more documentation, verify a need (which confirms the estimated savings), assign fee waivers, reserve equipment, allocate funding and confirm that assistance was completed.
+- **Dashboard** (`/institution`). Unresolved gaps, available assistance, next deadline, the request to review next, and cases needing attention.
+- **Requests** (`/institution/requests`). The verification queue, approved, completed and history tabs. Approve or reject, request documents, confirm savings, assign waivers, reserve equipment, allocate funds and confirm completion.
 - **Urgent cases** (`/institution/urgent`). Deadline-risk cases sorted by severity, with countdown, gap, processing estimate, next action and alternatives; *mark priority review* and *cover from emergency fund* (with confirmation). Also lists requests needing manual review and sponsor allocations awaiting approval.
 - **Verification panel** on every request: institutional, opportunity and expense checks; document Accept/Reject; duplicate detection; amount consistency; manual flags; funding history with simulated provider payments; outcome recording (participated / completed / did not participate).
 - **Needs matching** (`/institution/matching`). See below.

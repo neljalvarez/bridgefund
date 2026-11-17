@@ -14,7 +14,7 @@ export default function ActivityPage() {
   const list = state.activity.filter((a) => filter === "all" || a.role === filter);
   return (
     <>
-      <PageHeader title="Activity history" description="A complete, timestamped record of everything that happened in this demonstration environment." />
+      <PageHeader title="Activity history" description="Everything that happened in this demo." />
       <Tabs value={filter} onValueChange={setFilter} className="mb-4">
         <TabsList>
           {["all", "student", "institution", "sponsor", "system"].map((t) => (

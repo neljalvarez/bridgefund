@@ -25,14 +25,13 @@ export function HeroPreview() {
 
   return (
     <div className="relative">
-      <div className="absolute -inset-4 -z-10 rounded-[28px] bg-gradient-to-b from-primary/10 to-transparent blur-2xl" aria-hidden />
-      <div className="rounded-2xl border bg-card p-5 shadow-elevated md:p-6" role="img" aria-label="Product preview: a $180 exam gap closing to $0 as personal funds, a fee waiver and a sponsor are applied">
+            <div className="rounded-2xl border bg-card p-5 shadow-elevated md:p-6" role="img" aria-label="Product preview: a $180 exam gap closing to $0 as personal funds, a fee waiver and a sponsor are applied">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Associate Data Analyst Certification</p>
             <p className="font-medium">Exam fee · due in 18 days</p>
           </div>
-          <span className="rounded-md bg-primary-light px-2 py-1 text-xs font-medium text-primary">BridgeEngine</span>
+          
         </div>
         <div className="mt-6 flex items-end justify-between">
           <div>
@@ -63,12 +62,12 @@ export function HeroPreview() {
         <AnimatePresence>
           {gap === 0 && (
             <motion.p initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-4 flex items-center gap-2 rounded-lg bg-primary-light/70 px-3 py-2.5 text-sm font-medium text-primary">
-              <BadgeCheck className="h-4 w-4" /> Fully funded — sponsor asked for $60, not $110
+              <BadgeCheck className="h-4 w-4" /> Funded — sponsors asked for $60, not $110
             </motion.p>
           )}
         </AnimatePresence>
       </div>
-      <p className="mt-3 text-center text-xs text-muted-foreground">Illustrative example with fictional data</p>
+      <p className="mt-3 text-center text-xs text-muted-foreground">Fictional example</p>
     </div>
   );
 }

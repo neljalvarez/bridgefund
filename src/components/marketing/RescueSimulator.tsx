@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { DemoBadge } from "@/components/shared/kit";
+import { MoreDetails } from "@/components/shared/Focus";
 import { ChartTooltip } from "@/components/shared/ChartTooltip";
 import { fmtMultiplier } from "@/lib/impact";
 
@@ -153,13 +154,12 @@ export function RescueSimulator() {
           </CardContent>
         </Card>
 
-        <Card className="border-dashed">
-          <CardContent className="space-y-2 p-5 text-xs leading-relaxed text-muted-foreground">
-            <p className="font-medium text-foreground">Method and limitations</p>
-            <p>Scenario A assumes donors cover the entire shortfall (cost − student funds), with the fee assumption deducted from donations. Scenario B applies reductions first (capped at the shortfall), then institutional assistance, and asks sponsors only for the remainder. BridgeFund&apos;s own fees are charged to institutions and programmes, so none are deducted from sponsor money here.</p>
-            <p>Crowdfunding campaigns may not reach their target, and waivers or assistance are not available to every student — this simulator does not model success rates. All figures are illustrative estimates, not predictions or real-world results.</p>
-          </CardContent>
-        </Card>
+        <MoreDetails title="How this is calculated">
+          <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+            <p>Crowdfunding: donors cover the whole shortfall, minus the fee assumption. BridgeFund: savings first, then school help, then sponsors for the rest. BridgeFund&apos;s fees are paid by schools, not taken from sponsor money.</p>
+            <p>Campaigns can fall short and not every student qualifies for savings — success rates aren&apos;t modelled. Illustrative estimates only.</p>
+          </div>
+        </MoreDetails>
       </div>
     </div>
   );

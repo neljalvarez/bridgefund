@@ -1,155 +1,103 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-import { ArrowRight, CalendarClock, ClipboardCheck, Landmark, Package, ShieldCheck, Wallet } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { remainingOf } from "@/lib/actions";
-import { inInstitutionScope } from "@/lib/selectors";
+import { inInstitutionScope, studentOf } from "@/lib/selectors";
+import { assessDeadline, RISK_ORDER } from "@/lib/deadline";
+import { needsReview } from "@/lib/verification";
 import { PENDING_STATUSES, daysUntil, fmtDate, relDays, sum, usd } from "@/lib/format";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmptyState, PageHeader, StatCard } from "@/components/shared/kit";
-import { ReviewCard } from "@/components/institution/ReviewCard";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState, StatCard } from "@/components/shared/kit";
+import { DashboardFocus, ListRow, MoreDetails } from "@/components/shared/Focus";
+import { RiskBadge } from "@/components/shared/DeadlineRisk";
 
-function Dashboard() {
+export default function InstitutionOverview() {
   const { state } = useStore();
-  const params = useSearchParams();
-  const focus = params.get("focus");
   const scoped = state.requests.filter((r) => inInstitutionScope(state, r));
   const queue = scoped.filter((r) => PENDING_STATUSES.includes(r.status)).sort((a, b) => a.deadline.localeCompare(b.deadline));
-  const approved = scoped.filter((r) => ["Verified", "Partially Funded", "Fully Funded"].includes(r.status)).sort((a, b) => a.deadline.localeCompare(b.deadline));
-  const completed = scoped.filter((r) => r.status === "Completed").sort((a, b) => b.deadline.localeCompare(a.deadline));
-  const unresolved = scoped.filter((r) => !["Completed", "Rejected", "Draft"].includes(r.status));
-  const focused = state.requests.find((r) => r.id === focus);
-  const [tab, setTab] = useState(focused && !PENDING_STATUSES.includes(focused.status) ? "approved" : "queue");
+  const open = scoped.filter((r) => !["Completed", "Rejected", "Draft"].includes(r.status));
+  const upcoming = open.filter((r) => daysUntil(r.deadline) >= 0).sort((a, b) => a.deadline.localeCompare(b.deadline));
   const funds = state.currentInstitutionId === "all" ? sum(state.institutions.map((i) => i.fund)) : state.institutions.find((i) => i.id === state.currentInstitutionId)?.fund ?? 0;
-  const upcoming = unresolved.filter((r) => daysUntil(r.deadline) >= 0 && daysUntil(r.deadline) <= 21).sort((a, b) => a.deadline.localeCompare(b.deadline));
-  const history = state.distribution.filter((d) => state.currentInstitutionId === "all" || d.institutionId === state.currentInstitutionId);
-  const resources = state.resources.filter((r) => state.currentInstitutionId === "all" || r.institutionId === state.currentInstitutionId);
   const instName = state.currentInstitutionId === "all" ? "Partner network" : state.institutions.find((i) => i.id === state.currentInstitutionId)?.name;
+  const pledges = state.pledges.filter((p) => p.status === "Pending review" && scoped.some((r) => r.id === p.requestId));
+  const fullyFunded = scoped.filter((r) => r.status === "Fully Funded");
+
+  const attention = open
+    .map((r) => ({ r, a: assessDeadline(state, state.opportunities.find((o) => o.id === r.opportunityId)!, r) }))
+    .filter((x) => ["Critical", "At risk"].includes(x.a.level))
+    .sort((a, b) => RISK_ORDER.indexOf(a.a.level) - RISK_ORDER.indexOf(b.a.level) || a.a.daysLeft - b.a.daysLeft)
+    .slice(0, 4);
+
+  const first = queue[0];
+  const action = first
+    ? { title: `Review ${first.ref} · ${first.purpose}`, text: `${studentOf(state, first.studentId)?.firstName} · ${usd(first.amount)} requested · due ${relDays(first.deadline)}`, href: `/institution/requests?focus=${first.id}`, cta: "Review request" }
+    : pledges.length
+      ? { title: `Approve ${pledges.length} sponsor allocation${pledges.length === 1 ? "" : "s"}`, text: `${usd(sum(pledges.map((p) => p.amount)))} waiting for your decision.`, href: "/institution/urgent", cta: "Review allocations" }
+      : fullyFunded.length
+        ? { title: `Confirm payment for ${fullyFunded[0].ref}`, text: "Fully funded — pay the provider and close it.", href: `/institution/requests?focus=${fullyFunded[0].id}`, cta: "Confirm payment" }
+        : { title: "Nothing waiting", text: "New requests will appear here.", href: "/institution/matching", cta: "Match resources" };
 
   return (
-    <>
-      <PageHeader eyebrow={instName} title="Verification & assistance" description="Review requests privately, confirm savings, assign waivers and equipment, and allocate funding. Every action updates the student and sponsor views instantly." />
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-        <StatCard label="Pending requests" value={queue.length} money={false} icon={<ClipboardCheck />} />
-        <StatCard label="Approved assistance" value={approved.length} money={false} icon={<ShieldCheck />} />
-        <StatCard label="Institution funds" value={funds} icon={<Landmark />} hint="Simulated assistance budget" />
-        <StatCard label="Shared opportunity pool" value={state.pool} icon={<Wallet />} hint="Sponsor contributions" />
-        <StatCard label="Unresolved barriers" value={sum(unresolved.map(remainingOf))} tone="warning" hint={`${unresolved.length} open requests`} />
+    <div className="mx-auto max-w-5xl">
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground">{instName}</p>
+        <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">Your dashboard</h1>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_320px]">
-        <Tabs value={tab} onValueChange={setTab} className="min-w-0">
-          <TabsList className="h-auto max-w-full flex-wrap justify-start">
-            <TabsTrigger value="queue">
-              Verification queue <Badge variant="neutral">{queue.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="approved">
-              Approved <Badge variant="neutral">{approved.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="completed">
-              Completed <Badge variant="neutral">{completed.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="history">Distribution history</TabsTrigger>
-          </TabsList>
-          <TabsContent value="queue" className="space-y-3">
-            {queue.length === 0 ? <EmptyState title="The verification queue is clear" description="New student requests appear here as soon as they're submitted." /> : queue.map((r, i) => <ReviewCard key={r.id} r={r} defaultOpen={i === 0 && !focus} highlight={focus === r.id} />)}
-          </TabsContent>
-          <TabsContent value="approved" className="space-y-3">
-            {approved.length === 0 ? <EmptyState title="No approved requests in progress" /> : approved.map((r) => <ReviewCard key={r.id} r={r} highlight={focus === r.id} />)}
-          </TabsContent>
-          <TabsContent value="completed" className="space-y-3">
-            {completed.length === 0 ? <EmptyState title="No completed assistance yet" /> : completed.map((r) => <ReviewCard key={r.id} r={r} highlight={focus === r.id} />)}
-          </TabsContent>
-          <TabsContent value="history">
-            <Card>
-              <ul className="divide-y">
-                {history.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No distribution recorded yet.</li>}
-                {history.slice(0, 30).map((d) => (
-                  <li key={d.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                    <span className="min-w-0">
-                      <Badge variant={d.kind === "completion" ? "success" : d.kind === "waiver" ? "accent" : "neutral"} className="mr-2 capitalize">
-                        {d.kind}
-                      </Badge>
-                      {d.label}
-                      {d.requestRef && <span className="text-muted-foreground"> · {d.requestRef}</span>}
-                    </span>
-                    <span className="shrink-0 text-right">
-                      <span className="font-medium tabular">{usd(d.amount)}</span>
-                      <span className="block text-xs text-muted-foreground">{fmtDate(d.at)}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </TabsContent>
-        </Tabs>
+      <DashboardFocus
+        figures={[
+          { label: "Unresolved gaps", value: sum(open.map(remainingOf)), tone: "warning", sub: `${open.length} open requests · ${queue.length} to review` },
+          { label: "Available assistance", value: funds + state.pool, tone: "primary", sub: `${usd(funds)} fund · ${usd(state.pool)} shared pool` },
+          { label: "Next deadline", value: upcoming[0] ? fmtDate(upcoming[0].deadline, { month: "short", day: "numeric" }) : "—", sub: upcoming[0] ? `${upcoming[0].ref} · ${relDays(upcoming[0].deadline)}` : "Nothing due" },
+        ]}
+        action={action}
+      />
 
-        <aside className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarClock className="h-4 w-4 text-muted-foreground" /> Upcoming deadlines
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {upcoming.length === 0 && <p className="text-sm text-muted-foreground">Nothing due in the next three weeks.</p>}
-              {upcoming.slice(0, 6).map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  className="block w-full text-left text-sm hover:underline"
-                  onClick={() => {
-                    setTab(PENDING_STATUSES.includes(r.status) ? "queue" : "approved");
-                    setTimeout(() => document.getElementById(`req-${r.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
-                  }}
-                >
-                  <span className="font-medium">{r.ref}</span> · {usd(remainingOf(r))} remaining
-                  <span className="block text-xs text-muted-foreground">
-                    {r.status} · {relDays(r.deadline)}
-                  </span>
-                </button>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0">
-              <CardTitle className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" /> Resource inventory
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {resources.slice(0, 5).map((r) => (
-                <div key={r.id} className="flex justify-between gap-2">
-                  <span className="truncate text-muted-foreground">{r.name}</span>
-                  <span className="tabular">
-                    {r.available}/{r.total}
-                  </span>
-                </div>
-              ))}
-              <Button asChild variant="outline" size="sm" className="mt-2 w-full">
-                <Link href="/institution/resources">
-                  Manage inventory <ArrowRight />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-          <p className="rounded-lg border border-dashed p-3 text-xs text-muted-foreground">Institutions retain final approval authority. Sponsor allocations are paid to providers only after you confirm completion.</p>
-        </aside>
-      </div>
-    </>
-  );
-}
+      <Card className="mt-8">
+        <CardHeader className="flex-row items-center justify-between space-y-0">
+          <CardTitle>Needs attention</CardTitle>
+          <Link href="/institution/urgent" className="text-sm font-medium text-primary hover:underline">
+            All urgent cases
+          </Link>
+        </CardHeader>
+        {attention.length === 0 ? (
+          <div className="px-5 pb-5">
+            <EmptyState title="No deadline risks" />
+          </div>
+        ) : (
+          <div className="divide-y border-t">
+            {attention.map(({ r, a }) => (
+              <ListRow
+                key={r.id}
+                href={`/institution/requests?focus=${r.id}`}
+                title={`${r.ref} · ${r.purpose}`}
+                meta={`${studentOf(state, r.studentId)?.firstName} · ${a.nextAction}`}
+                right={
+                  <>
+                    <RiskBadge level={a.level} />
+                    <span className="w-14 text-right font-semibold tabular">{usd(a.gap)}</span>
+                  </>
+                }
+              />
+            ))}
+          </div>
+        )}
+      </Card>
 
-export default function InstitutionPage() {
-  return (
-    <Suspense>
-      <Dashboard />
-    </Suspense>
+      <MoreDetails title="More analytics">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard label="Waiting for review" value={queue.length} money={false} />
+          <StatCard label="Requests needing a closer look" value={queue.filter((r) => needsReview(state, r)).length} money={false} />
+          <StatCard label="Verified, being funded" value={scoped.filter((r) => ["Verified", "Partially Funded"].includes(r.status)).length} money={false} />
+          <StatCard label="Completed" value={scoped.filter((r) => r.status === "Completed").length} money={false} />
+        </div>
+        <p className="text-sm">
+          <Link href="/institution/analytics" className="font-medium text-primary hover:underline">
+            Open full analytics →
+          </Link>
+        </p>
+      </MoreDetails>
+    </div>
   );
 }

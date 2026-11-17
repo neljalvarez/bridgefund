@@ -84,7 +84,7 @@ export default function AnalyticsPage() {
     <>
       <PageHeader
         title="Financial barrier analytics"
-        description="Aggregated patterns across verified requests, so institutions can plan for the barriers that recur. No individual student is identifiable here."
+        description="Which barriers recur, and what resolved them. No student is identifiable."
         actions={
           <>
             <Select value={range} onValueChange={setRange}>

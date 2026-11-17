@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DemoBadge, StatCard } from "@/components/shared/kit";
+import { MoreDetails } from "@/components/shared/Focus";
 import { ChartTooltip } from "@/components/shared/ChartTooltip";
 
 const axis = { fontSize: 12, stroke: "hsl(var(--muted-foreground))", tickLine: false, axisLine: false } as const;
@@ -148,13 +149,12 @@ function Dashboard() {
         </CardContent>
       </Card>
 
-      <Card className="border-dashed">
-        <CardContent className="space-y-1.5 p-5 text-xs leading-relaxed text-muted-foreground">
-          <p className="font-medium text-foreground">How these numbers are calculated</p>
+        <MoreDetails title="How these numbers are calculated">
+          <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
           <p>Every figure is computed live from the fictional demonstration data stored in this browser, so it changes as you use the demo. “Barriers resolved” counts confirmed cost reductions, institutional assistance and sponsor money on fully-funded requests — never the student&apos;s own savings. Average time to resolve runs from submission to the request becoming fully funded. Participation and outcomes count only what an institution has recorded.</p>
           <p>BridgeFund has not yet run a pilot. Real results will be published on the pilot dashboard once they exist.</p>
-        </CardContent>
-      </Card>
+          </div>
+        </MoreDetails>
     </div>
   );
 }

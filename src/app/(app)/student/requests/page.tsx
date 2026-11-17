@@ -133,7 +133,7 @@ export default function RequestsPage() {
     <>
       <PageHeader
         title="Assistance requests"
-        description="Targeted, verified and private. Each request shows exactly how personal funds, savings and assistance add up."
+        description="Private, verified and tracked to the last dollar."
         actions={
           <Button
             onClick={() => {
@@ -146,7 +146,7 @@ export default function RequestsPage() {
         }
       />
       {mine.length === 0 ? (
-        <EmptyState title="No requests yet" description="Most students start with BridgeEngine — it often closes much of the gap before any request is needed." action={<Button asChild><Link href="/student/engine">Open BridgeEngine</Link></Button>} />
+        <EmptyState title="No requests yet" description="Start with Get assistance — savings come first." action={<Button asChild><Link href="/student/engine">Open BridgeEngine</Link></Button>} />
       ) : (
         <div className="space-y-4">
           {mine.map((r) => (

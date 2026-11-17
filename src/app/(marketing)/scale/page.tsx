@@ -11,19 +11,19 @@ import { WAIVERS } from "@/lib/knowledge";
 export const metadata: Metadata = { title: "Global scalability" };
 
 const LAYERS = [
-  { icon: Coins, t: "Multiple currencies", b: "Every amount is stored in a base currency with the local currency recorded alongside it. This prototype shows display conversion in Settings; production would settle locally through regulated payment partners." },
-  { icon: ListChecks, t: "Country-specific programmes", b: "Each waiver, discount and grant carries the countries, education levels and opportunity types it applies to. BridgeEngine only proposes programmes valid where the student lives." },
-  { icon: GraduationCap, t: "Different education systems", b: "Grades, exams and qualification names are configured per market — a KCSE candidate in Kenya and a WASSCE candidate in Ghana are described in their own terms." },
-  { icon: Building2, t: "Local eligibility rules", b: "Eligibility signals (income-based support, enrolment, prior aid) are defined per programme, so evidence requirements can differ by country and provider." },
-  { icon: Handshake, t: "Regional institutional partners", b: "Schools and nonprofits verify needs and run lending inventories. Expansion follows partner networks rather than direct-to-student marketing." },
-  { icon: Languages, t: "Multilingual readiness", b: "Interface text is moving into a message catalogue — navigation already switches between English, French and Spanish previews. Translations would be reviewed locally before launch." },
+  { icon: Coins, t: "Local currencies", b: "Stored with each amount; settled by local payment partners." },
+  { icon: ListChecks, t: "Country programmes", b: "Each waiver and grant knows where it applies." },
+  { icon: GraduationCap, t: "Education systems", b: "Grades and exams named the local way." },
+  { icon: Building2, t: "Local eligibility", b: "Evidence rules set per programme." },
+  { icon: Handshake, t: "School partners", b: "Growth through school and nonprofit networks." },
+  { icon: Languages, t: "Multilingual", b: "Navigation already previews French and Spanish." },
 ];
 
 const STEPS = [
-  { t: "Map the local rules", b: "With a partner, catalogue the fee waivers, exam subsidies, lending schemes and hardship funds that already exist — and who is eligible for each." },
-  { t: "Configure the market", b: "Add the currency, education system, programme rules and verification documents. No assistance rule is copied from another country." },
-  { t: "Launch through institutions", b: "Start with a small number of verifying schools or nonprofits, then grow through their networks, district offices and associations." },
-  { t: "Add regional sponsors", b: "Invite local businesses, alumni groups and foundations to fund verified needs in their own communities." },
+  { t: "Map local help", b: "List existing waivers, subsidies and funds with a partner." },
+  { t: "Configure", b: "Currency, programmes, documents. Nothing copied." },
+  { t: "Launch with schools", b: "Start small, grow through their networks." },
+  { t: "Add local sponsors", b: "Businesses, alumni and foundations nearby." },
 ];
 
 export default function ScalePage() {
@@ -31,8 +31,8 @@ export default function ScalePage() {
   const global = WAIVERS.filter((w) => w.countries.includes("Global")).length;
   return (
     <>
-      <PageIntro eyebrow="Global scalability" title="Designed to expand one market — and one partner — at a time.">
-        Financial assistance works differently in every country. BridgeFund&apos;s architecture keeps money, programmes, eligibility and language configurable per market, so expanding never means assuming that rules are the same everywhere.
+      <PageIntro eyebrow="Global plan" title="One market, one partner at a time">
+        Every country has its own rules. Money, programmes, eligibility and language are set per market.
       </PageIntro>
 
       <section className="border-b">
@@ -120,7 +120,7 @@ export default function ScalePage() {
 
       <section className="border-b">
         <div className="container py-14 md:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How expansion would work</h2>
+          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How we expand</h2>
           <ol className="mt-8 grid gap-4 md:grid-cols-4">
             {STEPS.map((s, i) => (
               <li key={s.t} className="rounded-xl border p-5">

@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/shared/kit";
-import { ROLE_META } from "@/components/app/nav";
 
 export default function NotificationsPage() {
   const { state, dispatch } = useStore();
@@ -18,7 +17,7 @@ export default function NotificationsPage() {
     <>
       <PageHeader
         title="Notifications"
-        description={`Deadline reminders and request status updates for the ${ROLE_META[state.role].label.toLowerCase()} view.`}
+        description="Reminders and status updates."
         actions={
           mine.some((n) => !n.read) && (
             <Button variant="outline" onClick={() => dispatch(markAllRead(state.role), { info: "All notifications marked as read" })}>

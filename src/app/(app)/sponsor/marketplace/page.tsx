@@ -86,7 +86,7 @@ export default function MarketplacePage() {
     <>
       <PageHeader
         title="Opportunity marketplace"
-        description="Verified educational needs, already reduced by waivers, free alternatives and borrowed equipment. You only see — and fund — what genuinely remains."
+        description="Checked by schools and already reduced by savings. You fund only what remains."
         actions={
           <>
             <DemoBadge>Fictional students</DemoBadge>

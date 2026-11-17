@@ -11,24 +11,19 @@ import { Logo } from "@/components/shared/Logo";
 import { useTheme } from "@/components/app/useTheme";
 import { cn } from "@/lib/utils";
 
-export const SOLUTIONS = [
-  { href: "/#students", label: "For Students", description: "Find and close the gap" },
-  { href: "/#sponsors", label: "For Sponsors", description: "Fund verified needs" },
-  { href: "/#institutions", label: "For Institutions", description: "Verify and allocate" },
-];
 export const COMPANY = [
-  { href: "/business", label: "Business model", description: "Revenue and simulator" },
-  { href: "/scale", label: "Global scalability", description: "Markets and expansion" },
-  { href: "/pilot", label: "Pilot programme", description: "Proposed validation" },
+  { href: "/simulator", label: "Rescue simulator", description: "Crowdfunding vs BridgeFund" },
+  { href: "/business", label: "Business model", description: "How it pays for itself" },
+  { href: "/scale", label: "Global plan", description: "Markets and expansion" },
+  { href: "/pilot", label: "Pilot", description: "How we'll test it" },
 ];
 export const MARKETING_LINKS = [
-  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#how-it-works", label: "How it works" },
   { href: "/impact", label: "Impact" },
-  { href: "/why", label: "Why BridgeFund?" },
-  { href: "/simulator", label: "Simulator" },
+  { href: "/why", label: "Why BridgeFund" },
 ];
 
-function Menu2({ label, items }: { label: string; items: typeof SOLUTIONS }) {
+function Menu2({ label, items }: { label: string; items: typeof COMPANY }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-1 rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:text-foreground">
@@ -59,13 +54,12 @@ export function MarketingNav() {
       <div className="container flex h-16 items-center gap-6">
         <Logo />
         <nav aria-label="Main" className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex">
-          <Menu2 label="Solutions" items={SOLUTIONS} />
           {MARKETING_LINKS.map((l) => (
             <Link key={l.href} href={l.href} aria-current={pathname === l.href ? "page" : undefined} className={cn("transition-colors hover:text-foreground", pathname === l.href && "font-medium text-foreground")}>
               {l.label}
             </Link>
           ))}
-          <Menu2 label="Company" items={COMPANY} />
+          <Menu2 label="More" items={COMPANY} />
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
@@ -79,9 +73,6 @@ export function MarketingNav() {
           <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/signin">Sign In</Link>
           </Button>
-          <Button asChild className="hidden sm:inline-flex">
-            <Link href="/signin?start=1">Get Started</Link>
-          </Button>
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
             <Menu />
           </Button>
@@ -91,7 +82,7 @@ export function MarketingNav() {
         <SheetContent side="right" className="overflow-y-auto">
           <SheetTitle>Menu</SheetTitle>
           <nav aria-label="Mobile" className="flex flex-col gap-1">
-            {[...MARKETING_LINKS, ...SOLUTIONS, ...COMPANY].map((l) => (
+            {[...MARKETING_LINKS, ...COMPANY].map((l) => (
               <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-md px-2 py-2 text-sm hover:bg-muted">
                 {l.label}
               </Link>
@@ -105,9 +96,6 @@ export function MarketingNav() {
             </Button>
             <Button asChild variant="outline">
               <Link href="/signin">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signin?start=1">Get Started</Link>
             </Button>
             <Button asChild variant="soft">
               <Link href="/demo">

@@ -10,8 +10,8 @@ export default function ImpactPage() {
   return (
     <>
       <PageIntro
-        eyebrow="Social impact dashboard"
-        title="Transparent impact, measured in three separate steps."
+        eyebrow="Impact"
+        title="Impact, measured honestly"
         actions={
           <>
             <Button asChild>
@@ -23,7 +23,7 @@ export default function ImpactPage() {
           </>
         }
       >
-        BridgeFund reports the cost barriers it resolves, whether the student then took part, and whether the opportunity was completed — and never mixes them up. The figures below are fictional demonstration data.
+        Costs resolved, students who took part, and outcomes — counted separately. Demo data only.
       </PageIntro>
       <div className="container py-10 md:py-14">
         <ImpactDashboard />

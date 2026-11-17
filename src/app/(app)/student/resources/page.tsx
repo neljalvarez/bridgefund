@@ -219,7 +219,7 @@ function Rescue() {
 export default function ResourcesPage() {
   return (
     <>
-      <PageHeader title="Resource Rescue" description="Borrow the calculators, laptops, lab kits and textbooks partner schools already own — instead of buying them." />
+      <PageHeader title="Borrow equipment" description="Calculators, laptops and lab kits your schools already own." />
       <Suspense>
         <Rescue />
       </Suspense>

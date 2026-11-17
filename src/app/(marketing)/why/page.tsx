@@ -8,31 +8,11 @@ import { PageIntro } from "@/components/marketing/PageIntro";
 export const metadata: Metadata = { title: "Why BridgeFund?" };
 
 const ALTERNATIVES = [
-  {
-    name: "Traditional crowdfunding",
-    good: "Fast to set up, open to anyone, and can mobilise a personal network quickly. Major platforms publish transparent fees.",
-    differ: "Campaigns usually ask for the full amount, and research finds outcomes track the strength of the organiser's network. BridgeFund removes cost before asking, and sponsors fund needs an institution has verified.",
-  },
-  {
-    name: "Scholarship directories",
-    good: "Help students discover large awards for tuition and living costs, often across many providers.",
-    differ: "Directories list opportunities; the student still applies to each and waits for decisions. BridgeFund targets small, specific, deadline-bound costs — an exam fee or a calculator — and applies waivers and loans of equipment automatically.",
-  },
-  {
-    name: "Student loan platforms",
-    good: "Can finance large, long-term costs such as tuition when grants are not enough, with regulated terms.",
-    differ: "BridgeFund never lends and never charges interest. It is designed for gaps small enough that debt would be disproportionate.",
-  },
-  {
-    name: "Financial literacy apps",
-    good: "Build lasting budgeting and saving skills, which help students plan for future costs.",
-    differ: "Skills do not close an exam-fee gap due next week. BridgeFund complements literacy tools by resolving the immediate barrier.",
-  },
-  {
-    name: "Conventional emergency assistance",
-    good: "Institutions know their students, and well-run emergency grant programmes have measurable benefits (see research below).",
-    differ: "Processes are often manual and fund the full cost. BridgeFund gives staff a shared verification workflow, applies reductions first, adds outside sponsors, and reports impact transparently.",
-  },
+  { name: "Crowdfunding", good: "Fast, open to anyone, transparent fees.", differ: "Asks for the full amount; results depend on the student's network." },
+  { name: "Scholarship directories", good: "Great for finding large awards.", differ: "Discovery isn't delivery — and rarely covers a $40 fee." },
+  { name: "Student loans", good: "Can finance big, long-term costs.", differ: "BridgeFund never lends. Debt is too much for a small gap." },
+  { name: "Financial literacy apps", good: "Build lasting money skills.", differ: "Skills can't pay a fee due next week." },
+  { name: "Emergency funds", good: "Schools know their students; research shows small grants help.", differ: "Often manual, and pay full price for costs that could be waived." },
 ];
 
 const MATRIX: { capability: string; values: [string, string, string, string, string, string] }[] = [
@@ -47,12 +27,12 @@ const MATRIX: { capability: string; values: [string, string, string, string, str
 const COLS = ["Crowdfunding", "Scholarship directories", "Student loans", "Financial literacy apps", "Emergency assistance", "BridgeFund (proposed)"];
 
 const DIFFERENTIATION = [
-  { icon: ScanSearch, t: "Specific barrier identification", b: "The Barrier Scanner breaks an opportunity into its exact expenses — fees, materials, travel — so help is aimed at what is actually missing." },
-  { icon: Scissors, t: "Cost reduction before fundraising", b: "BridgeEngine applies waivers, free alternatives, discounts and borrowed equipment first. Sponsors fund only what remains." },
-  { icon: CalendarClock, t: "Deadline-aware assistance matching", b: "Options that cannot be processed before the deadline are excluded, and at-risk cases are escalated to staff." },
-  { icon: BadgeCheck, t: "Institutional verification", b: "A school or nonprofit confirms enrolment, the opportunity and the expenses before any sponsor sees a need." },
-  { icon: Target, t: "Targeted financial support", b: "Money is tied to one verified expense and paid to the provider — never to a general-purpose account." },
-  { icon: Gauge, t: "Transparent impact measurement", b: "The Impact Multiplier shows barriers resolved per sponsor dollar, excluding the student's own funds." },
+  { icon: ScanSearch, t: "Finds the exact barrier", b: "Each expense, itemised." },
+  { icon: Scissors, t: "Cuts costs first", b: "Waivers, discounts and borrowing before money." },
+  { icon: CalendarClock, t: "Deadline-aware", b: "Only options that arrive in time." },
+  { icon: BadgeCheck, t: "School-verified", b: "Every need checked before sponsors see it." },
+  { icon: Target, t: "Targeted", b: "Paid to the provider, never as cash." },
+  { icon: Gauge, t: "Measurable", b: "Impact per sponsor dollar, published." },
 ];
 
 const SOURCES = [
@@ -100,7 +80,7 @@ export default function WhyPage() {
     <>
       <PageIntro
         eyebrow="Why BridgeFund?"
-        title="Built for the small, specific cost that stands between a student and an opportunity."
+        title="Built for the small cost in the way"
         actions={
           <>
             <Button asChild>
@@ -114,19 +94,19 @@ export default function WhyPage() {
           </>
         }
       >
-        Many good tools help students pay for education. Each was designed for a different job. Here is an honest look at where they are strong, and where BridgeFund&apos;s proposed approach is different.
+        Good tools exist. Each solves a different problem. Here&apos;s an honest comparison.
       </PageIntro>
 
       <section className="border-b">
         <div className="container py-14 md:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How existing approaches compare</h2>
+          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How approaches compare</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {ALTERNATIVES.map((a) => (
               <Card key={a.name} className="p-5">
                 <h3 className="font-semibold">{a.name}</h3>
-                <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">What it does well</p>
+                <p className="mt-3 text-xs font-medium text-muted-foreground">Strength</p>
                 <p className="mt-1 text-sm leading-relaxed">{a.good}</p>
-                <p className="mt-3 text-xs font-medium uppercase tracking-wide text-primary">Where BridgeFund differs</p>
+                <p className="mt-3 text-xs font-medium text-primary">BridgeFund</p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{a.differ}</p>
               </Card>
             ))}
@@ -164,14 +144,14 @@ export default function WhyPage() {
             </table>
           </div>
           <p className="mt-3 max-w-3xl text-xs text-muted-foreground">
-            “Varies” means it depends on the provider or programme; “Not the focus” means it is not what the category is designed for — not that no provider offers it. BridgeFund&apos;s column describes the proposed design shown in this prototype, which has not yet been tested in a pilot.
+            “Varies” depends on the provider; “Not the focus” means it isn&apos;t what the category is built for. BridgeFund&apos;s column describes the untested prototype.
           </p>
         </div>
       </section>
 
       <section className="border-b bg-card">
         <div className="container py-14 md:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">BridgeFund&apos;s proposed differentiation</h2>
+          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">What&apos;s different</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {DIFFERENTIATION.map((d) => (
               <div key={d.t} className="flex gap-3 rounded-xl border bg-background p-5">
@@ -191,7 +171,7 @@ export default function WhyPage() {
       <section id="evidence" className="scroll-mt-20">
         <div className="container py-14 md:py-20">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Research and evidence</h2>
-          <p className="mt-3 max-w-2xl text-muted-foreground">External claims on this site link to their sources. These findings motivate the design; they are not evidence that BridgeFund itself works — that is what the pilot is for.</p>
+          <p className="mt-3 max-w-2xl text-muted-foreground">Why the problem matters — not proof that BridgeFund works. That&apos;s what the pilot is for.</p>
           <ol className="mt-8 grid gap-3">
             {SOURCES.map((s, i) => (
               <li key={s.href} className="flex gap-4 rounded-xl border p-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bus, Check, Gift, Package, Shuffle, Ticket } from "lucide-react";
+import { Bus, Check, Gift, Package, Ticket } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { assignMatch } from "@/lib/actions";
 import { findMatches, type MatchKind, type MatchSuggestion } from "@/lib/matching";
@@ -33,13 +33,8 @@ export default function MatchingPage() {
   return (
     <>
       <PageHeader
-        eyebrow={
-          <span className="flex items-center gap-1.5">
-            <Shuffle className="h-3.5 w-3.5" /> Supply & demand matching
-          </span>
-        }
         title="Needs matching"
-        description="Specific student needs paired with lending inventory, fee reductions, transport assistance and grants. Confirm availability before assigning — each unit or allocation can only be assigned once."
+        description="Needs paired with resources and programmes. Confirm, then assign — once."
       />
       <Tabs value={kind} onValueChange={(v) => setKind(v as typeof kind)} className="mb-4">
         <TabsList className="h-auto flex-wrap">

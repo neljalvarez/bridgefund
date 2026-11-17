@@ -319,7 +319,7 @@ function Finder() {
 export default function WaiversPage() {
   return (
     <>
-      <PageHeader title="Fee waiver finder" description="A searchable directory of educational fee waivers, discounts and institutional programmes." actions={<DemoBadge>Simulated directory</DemoBadge>} />
+      <PageHeader title="Fee waivers" description="Waivers and discounts you may qualify for." actions={<DemoBadge>Simulated directory</DemoBadge>} />
       <Suspense>
         <Finder />
       </Suspense>

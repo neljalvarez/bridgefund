@@ -114,8 +114,8 @@ export default function ScannerPage() {
   return (
     <>
       <PageHeader
-        title="Financial Barrier Scanner"
-        description="Six short questions turn “I can't afford it” into an exact, itemised barrier report."
+        title="Add an opportunity"
+        description="Six quick questions. Then BridgeEngine takes over."
         actions={
           <Button variant="outline" onClick={example}>
             <Sparkles /> Load an example

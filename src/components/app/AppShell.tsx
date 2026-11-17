@@ -48,7 +48,7 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
     );
   };
   return (
-    <nav aria-label={`${ROLE_META[role].label} navigation`} className="flex flex-1 flex-col gap-5 overflow-y-auto">
+    <nav aria-label={`${ROLE_META[role].label} navigation`} className="flex flex-1 flex-col gap-4 overflow-y-auto">
       {ROLE_NAV[role].map((g) => (
         <div key={g.section}>
           <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">{tr(g.section)}</p>

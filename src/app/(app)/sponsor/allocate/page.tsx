@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Check, CheckCircle2, Info, RotateCcw, Scale, ShieldCheck } from "lucide-react";
+import { Check, CheckCircle2, Info, RotateCcw, ShieldCheck } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { createPledges, currentSponsor } from "@/lib/actions";
 import { APPROACHES, planAllocation, rankNeeds, type Approach } from "@/lib/allocation";
@@ -110,13 +110,8 @@ export default function ImpactPlannerPage() {
   return (
     <>
       <PageHeader
-        eyebrow={
-          <span className="flex items-center gap-1.5">
-            <Scale className="h-3.5 w-3.5" /> Sponsor impact planner
-          </span>
-        }
-        title="Plan your budget"
-        description="Compare how the same budget performs under different approaches, adjust any amount, then submit. Institutions review every allocation before funds move."
+        title="Budget planner"
+        description="Compare three ways to spend a budget. Schools approve the final allocation."
       />
       {needs.length === 0 ? (
         <EmptyState title="No open verified needs" description="New needs appear here once institutions verify them." />

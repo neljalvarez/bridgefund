@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Building2, ClipboardCheck, HandCoins, LineChart, Package, UserPlus } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PageIntro } from "@/components/marketing/PageIntro";
 import { PilotDashboard } from "@/components/marketing/PilotDashboard";
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Pilot programme" };
 const PILLARS = [
   {
     icon: Building2,
-    t: "Partner institution requirements",
+    t: "Partner school requirements",
     items: ["A secondary school, college or education nonprofit with a named staff lead", "An existing hardship fund, fee-waiver process or lending cupboard — however small", "Willingness to verify requests within an agreed service time", "A data-sharing and safeguarding agreement approved by the institution"],
   },
   {
@@ -19,12 +19,12 @@ const PILLARS = [
   },
   {
     icon: ClipboardCheck,
-    t: "Manual assistance verification",
+    t: "Manual verification",
     items: ["Staff confirm enrolment, the opportunity and each expense before sponsors see a need", "Automated checks only flag issues; a person makes every approval or rejection", "Documents are reviewed and recorded in the audit log", "Payments go to the exam board, provider or vendor — not to the student"],
   },
   {
     icon: Package,
-    t: "Resource inventory management",
+    t: "Lending inventory",
     items: ["Catalogue calculators, laptops, lab kits and uniforms the school can lend", "Track condition, borrower and return date", "Match items to verified needs before any money is requested", "Review unused and over-demanded items at the end of each term"],
   },
   {
@@ -49,29 +49,33 @@ const TIMELINE = [
 export default function PilotPage() {
   return (
     <>
-      <PageIntro eyebrow="Pilot programme and validation" title="A proposed pilot to test BridgeFund with one school, one term.">
-        BridgeFund has not been piloted yet. This page sets out how a first pilot would run, what it would measure, and where verified results would be published. No users, partners or results are claimed.
+      <PageIntro eyebrow="Pilot" title="One school. One term. Real results.">
+        No pilot has run yet. Here&apos;s the plan — and where real results will appear.
       </PageIntro>
 
       <section className="border-b">
         <div className="container py-14 md:py-20">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How the pilot works</h2>
+          <Accordion type="multiple" className="mt-6 max-w-3xl">
             {PILLARS.map((p) => (
-              <Card key={p.t} className="p-5">
-                <p className="flex items-center gap-2 font-medium">
-                  <p.icon className="h-4 w-4 text-primary" /> {p.t}
-                </p>
-                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
-                  {p.items.map((x) => (
-                    <li key={x} className="flex gap-2">
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary" aria-hidden />
-                      {x}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
+              <AccordionItem key={p.t} value={p.t}>
+                <AccordionTrigger>
+                  <span className="flex items-center gap-3">
+                    <p.icon className="h-4 w-4 text-primary" strokeWidth={1.75} /> {p.t}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-1.5 pl-7">
+                    {p.items.map((x) => (
+                      <li key={x} className="list-disc">
+                        {x}
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       </section>
 
@@ -87,7 +91,7 @@ export default function PilotPage() {
             ))}
           </ol>
           <p className="mt-6 max-w-3xl text-sm text-muted-foreground">
-            Success criteria agreed before the pilot starts: median verification time, share of the gap removed by cost reduction, share of resolved students who took part, and staff time per request compared with the school&apos;s current process.
+            Success is agreed up front: verification time, share of each gap removed by savings, and how many students took part.
           </p>
         </div>
       </section>

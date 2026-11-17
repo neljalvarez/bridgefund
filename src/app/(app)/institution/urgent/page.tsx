@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Check, HandCoins, ShieldAlert, Siren, X } from "lucide-react";
+import { ArrowRight, Check, HandCoins, ShieldAlert, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { fundRequest, remainingOf, reviewPledge, setPriority } from "@/lib/actions";
 import { assessDeadline, RISK_ORDER } from "@/lib/deadline";
@@ -35,13 +35,8 @@ export default function UrgentPage() {
   return (
     <>
       <PageHeader
-        eyebrow={
-          <span className="flex items-center gap-1.5">
-            <Siren className="h-3.5 w-3.5" /> Financial deadline rescue
-          </span>
-        }
         title="Urgent cases"
-        description="Students at risk of missing an opportunity, requests that need a closer look, and sponsor allocations awaiting your approval. Recommendations are advisory — staff make every decision."
+        description="Deadline risks, requests to check, and allocations to approve. You make every decision."
       />
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Critical or at-risk cases" value={cases.filter((c) => c.a.level !== "Deadline passed").length} money={false} tone="warning" />
@@ -80,7 +75,7 @@ export default function UrgentPage() {
                     <DeadlineRiskPanel a={a} />
                     <div className="flex flex-wrap gap-2">
                       <Button asChild size="sm" variant="outline">
-                        <Link href={`/institution?focus=${r.id}`}>
+                        <Link href={`/institution/requests?focus=${r.id}`}>
                           Open case <ArrowRight />
                         </Link>
                       </Button>
@@ -136,7 +131,7 @@ export default function UrgentPage() {
                       </ul>
                     </div>
                     <Button asChild size="sm" variant="outline" className="shrink-0">
-                      <Link href={`/institution?focus=${r.id}`}>Review</Link>
+                      <Link href={`/institution/requests?focus=${r.id}`}>Review</Link>
                     </Button>
                   </li>
                 );

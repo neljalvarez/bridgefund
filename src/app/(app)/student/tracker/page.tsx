@@ -72,7 +72,7 @@ export default function TrackerPage() {
 
   return (
     <>
-      <PageHeader title="Opportunity tracker" description="Every opportunity, deadline, document and milestone on your educational journey — with reminders so nothing slips." />
+      <PageHeader title="My progress" description="Deadlines, savings and milestones." />
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
         <StatCard label="Upcoming opportunities" value={ov.active.length} money={false} />
         <StatCard label="Completed" value={completed.length} money={false} />

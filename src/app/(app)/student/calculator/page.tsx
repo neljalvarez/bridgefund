@@ -75,7 +75,7 @@ export default function CalculatorPage() {
     <>
       <PageHeader
         title="Opportunity cost calculator"
-        description="The fee is only part of the price. Compare the real cost of opportunities side by side — and how affordable each becomes after BridgeEngine."
+        description="Compare the real cost of opportunities side by side."
         actions={
           <>
             <Button variant="outline" onClick={() => setScenarios(fromJournal())}>

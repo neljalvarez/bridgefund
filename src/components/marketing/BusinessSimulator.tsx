@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DemoBadge } from "@/components/shared/kit";
+import { MoreDetails } from "@/components/shared/Focus";
 import { ChartTooltip } from "@/components/shared/ChartTooltip";
 
 const DEFAULTS: BizInput = { clients: 12, price: 250, programs: 2, programFee: 400, opex: 7000, requestsPerClient: 15, verificationCost: 2.5, cac: 800 };
@@ -160,13 +161,12 @@ export function BusinessSimulator() {
           </CardContent>
         </Card>
 
-        <Card className="border-dashed">
-          <CardContent className="space-y-1.5 p-5 text-xs leading-relaxed text-muted-foreground">
-            <p className="font-medium text-foreground">Model and limitations</p>
+        <MoreDetails title="Model and limitations">
+          <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
             <p>Revenue = institutions × subscription + programmes × management fee. Costs = fixed operating expenses + institutions × requests × verification cost + new institutions × acquisition cost. Break-even institutions = (fixed costs − programme revenue) ÷ (subscription − verification cost per institution).</p>
             <p>Students are never charged — requesting assistance is free under every scenario. No figure here reflects real customers, contracts or revenue; pricing would be validated during the pilot.</p>
-          </CardContent>
-        </Card>
+          </div>
+        </MoreDetails>
       </div>
     </div>
   );

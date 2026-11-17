@@ -128,7 +128,7 @@ export const applyEnginePlan = (oppId: string, plan: EnginePlan, submit: boolean
   s = { ...s, requests: existing ? s.requests.map((r) => (r.id === existing.id ? req : r)) : [req, ...s.requests] };
   s = log(s, "student", `${submit ? "Submitted" : "Saved"} ${req.ref}: ${opp.title} (${usd(plan.sponsorAmount)} requested)`);
   if (submit) {
-    s = notify(s, "institution", `New request ${req.ref}`, `${studentName(s, opp.studentId)} · ${opp.title} — ${usd(plan.sponsorAmount)} after ${usd(plan.reductionsTotal)} in estimated savings.`, `/institution?focus=${req.id}`);
+    s = notify(s, "institution", `New request ${req.ref}`, `${studentName(s, opp.studentId)} · ${opp.title} — ${usd(plan.sponsorAmount)} after ${usd(plan.reductionsTotal)} in estimated savings.`, `/institution/requests?focus=${req.id}`);
     s = notify(s, "student", "Request submitted", `${req.ref} was sent to your institution for verification.`, "/student/requests");
   }
   return s;
@@ -174,14 +174,14 @@ export const createRequest = (d: RequestDraft, submit: boolean): Action => (s0) 
     createdAt: now(),
   };
   s = log({ ...s, requests: [req, ...s.requests] }, "student", `${submit ? "Submitted" : "Drafted"} ${req.ref}: ${d.purpose}`);
-  return submit ? notify(s, "institution", `New request ${req.ref}`, `${d.purpose} — ${usd(d.amount)}.`, `/institution?focus=${req.id}`) : s;
+  return submit ? notify(s, "institution", `New request ${req.ref}`, `${d.purpose} — ${usd(d.amount)}.`, `/institution/requests?focus=${req.id}`) : s;
 };
 
 export const submitRequest = (id: string): Action => (s) => {
   const r = s.requests.find((x) => x.id === id);
   if (!r || r.status !== "Draft") return s;
   const next = log(patchRequest(s, id, (r) => withStatus(r, "Submitted", "Request submitted by student", "student")), "student", `Submitted ${r.ref}`);
-  return notify(next, "institution", `New request ${r.ref}`, `${r.purpose} — ${usd(r.amount)}.`, `/institution?focus=${r.id}`);
+  return notify(next, "institution", `New request ${r.ref}`, `${r.purpose} — ${usd(r.amount)}.`, `/institution/requests?focus=${r.id}`);
 };
 
 export const deleteDraft = (id: string): Action => (s) => ({ ...s, requests: s.requests.filter((r) => !(r.id === id && r.status === "Draft")) });
@@ -191,7 +191,7 @@ export const respondToInfo = (id: string, note: string): Action => (s) => {
   if (!r || r.status !== "Additional Information Required") return s;
   let next = patchRequest(s, id, (r) => withStatus({ ...r, infoRequested: undefined, documents: r.documents.map((d) => ({ ...d, attached: true })) }, "Under Review", `Student responded: ${note || "documents attached"}`, "student"));
   next = log(next, "student", `Provided additional information for ${r.ref}`);
-  return notify(next, "institution", `${r.ref}: information provided`, note || "The student attached the requested documents.", `/institution?focus=${r.id}`);
+  return notify(next, "institution", `${r.ref}: information provided`, note || "The student attached the requested documents.", `/institution/requests?focus=${r.id}`);
 };
 
 /* ---------------- institution ---------------- */
@@ -315,7 +315,7 @@ export const fundRequest = (id: string, amount: number, source: Contribution["so
   const after = s.requests.find((x) => x.id === id)!;
   s = log(s, source === "sponsor" ? "sponsor" : "institution", `${label} contributed ${usd(amt)} to ${r.ref}`);
   s = notify(s, "student", after.status === "Fully Funded" ? "Your opportunity is fully funded" : "New assistance received", `${usd(amt)} toward ${r.purpose}. Remaining gap: ${usd(remainingOf(after))}.`, "/student");
-  s = notify(s, "institution", `${r.ref} received ${usd(amt)}`, after.status === "Fully Funded" ? "Fully funded — confirm completion once the provider is paid." : "Partially funded.", `/institution?focus=${r.id}`);
+  s = notify(s, "institution", `${r.ref} received ${usd(amt)}`, after.status === "Fully Funded" ? "Fully funded — confirm completion once the provider is paid." : "Partially funded.", `/institution/requests?focus=${r.id}`);
   if (source === "sponsor") s = notify(s, "sponsor", "Contribution recorded", `Your impact receipt for ${r.ref} is ready.`, `/receipt/${c.id}`);
   return s;
 };
@@ -443,7 +443,7 @@ export const applyStrategy = (oppId: string, strategy: import("./optimizer").Str
   s = { ...s, requests: existing ? s.requests.map((r) => (r.id === existing.id ? req : r)) : [req, ...s.requests] };
   s = log(s, "student", `${submit ? "Submitted" : "Saved"} ${req.ref} using the “${strategy.name}” strategy`);
   if (submit) {
-    s = notify(s, "institution", `New request ${req.ref}`, `${studentName(s, opp.studentId)} · ${opp.title} — ${usd(amount)} requested (${strategy.name}).`, `/institution?focus=${req.id}`);
+    s = notify(s, "institution", `New request ${req.ref}`, `${studentName(s, opp.studentId)} · ${opp.title} — ${usd(amount)} requested (${strategy.name}).`, `/institution/requests?focus=${req.id}`);
     s = notify(s, "student", "Request submitted", `${req.ref} was sent to your institution for verification.`, "/student/requests");
   }
   return s;

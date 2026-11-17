@@ -24,7 +24,7 @@ import { DemoBadge } from "@/components/shared/kit";
 import { EngineRun } from "@/components/student/EngineRun";
 import { StrategyComparisonView } from "@/components/student/StrategyComparison";
 import { RequestBreakdown, StatusTrack } from "@/components/shared/RequestBreakdown";
-import { MultiplierStrip } from "@/components/demo/scenes";
+import { MultiplierStrip } from "@/components/shared/MultiplierStrip";
 import { GapDemo } from "@/components/marketing/GapDemo";
 
 /* -------------------------------------------------------------- */
