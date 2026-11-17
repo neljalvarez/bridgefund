@@ -5,7 +5,7 @@
 import type { AppState, CalculatorScenario, Contribution, Expense, FundingRequest, Opportunity, Reduction, RequestStatus, Resource, Role } from "./types";
 import type { EnginePlan } from "./engine";
 import { planFindings } from "./engine";
-import { isoDaysFromNow, r2, uid, usd } from "./format";
+import { daysUntil, isoDaysFromNow, r2, uid, usd } from "./format";
 import { WAIVERS } from "./knowledge";
 
 export type Action = (s: AppState) => AppState;
@@ -291,6 +291,8 @@ export const assignWaiver = (id: string, waiverId: string, amount: number): Acti
 export const fundRequest = (id: string, amount: number, source: Contribution["source"], sponsorId?: string): Action => (s0) => {
   const r = s0.requests.find((x) => x.id === id);
   if (!r || !["Verified", "Partially Funded"].includes(r.status)) return s0;
+  // Sponsors and the shared pool can't fund a need whose deadline has passed; the institution may (e.g. after a provider extension).
+  if (source !== "institution" && daysUntil(r.deadline) < 0) return s0;
   const sponsor = s0.sponsors.find((x) => x.id === (sponsorId ?? s0.currentSponsorId))!;
   const inst = s0.institutions.find((i) => i.id === r.institutionId);
   const available = source === "sponsor" ? sponsor.balance : source === "pool" ? s0.pool : inst?.fund ?? 0;

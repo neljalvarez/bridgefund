@@ -60,7 +60,7 @@ const CAPABILITIES = [
 
 const AUDIENCES = [
   { id: "students", icon: GraduationCap, title: "For students", points: ["Free to use — always", "See exactly what stands between you and an opportunity", "Discover waivers and free alternatives you didn't know existed", "Private: sponsors never see your circumstances"], cta: ["Find your opportunity", "/signin?role=student"] },
-  { id: "sponsors", icon: HandCoins, title: "For sponsors", points: ["Fund verified, specific educational expenses", "Every dollar goes further — costs are reduced first", "Smart allocation across urgent needs", "Downloadable impact receipts for every contribution"], cta: ["Explore the marketplace", "/signin?role=sponsor"] },
+  { id: "sponsors", icon: HandCoins, title: "For sponsors", points: ["Fund verified, specific educational expenses", "Every dollar goes further — costs are reduced first", "An impact planner to compare allocation approaches", "Downloadable impact receipts for every contribution"], cta: ["Explore the marketplace", "/signin?role=sponsor"] },
   { id: "institutions", icon: Building2, title: "For institutions", points: ["One private verification workflow", "Assign waivers and lend equipment in a click", "Allocate funds with full distribution history", "Understand recurring barriers with analytics"], cta: ["Open the institution view", "/signin?role=institution"] },
 ];
 

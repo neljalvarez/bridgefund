@@ -170,3 +170,16 @@ test("applying a strategy reconciles cost, savings and request amount", () => {
   s = applyStrategy(opp.id, cmp.strategies[0], true)(s);
   assert.equal(s.requests.filter((x) => x.opportunityId === opp.id).length, 1, "re-applying replaces, never duplicates");
 });
+
+test("sponsors cannot fund a request whose deadline has passed; the institution still can", () => {
+  let { s, r } = demoFlow();
+  s = approveRequest(r.id)(s);
+  const past = new Date(Date.now() - 3 * 86_400_000).toISOString();
+  s = { ...s, requests: s.requests.map((x) => (x.id === r.id ? { ...x, deadline: past } : x)) };
+  const before = s.sponsors.find((x) => x.id === DEMO_SPONSOR_ID)!.balance;
+  s = fundRequest(r.id, 60, "sponsor")(s);
+  assert.equal(req(s, r.id).funded, 0);
+  assert.equal(s.sponsors.find((x) => x.id === DEMO_SPONSOR_ID)!.balance, before);
+  s = fundRequest(r.id, 60, "institution")(s);
+  assert.equal(req(s, r.id).funded, 60);
+});

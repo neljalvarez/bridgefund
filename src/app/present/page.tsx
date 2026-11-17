@@ -30,14 +30,14 @@ import { GapDemo } from "@/components/marketing/GapDemo";
 /* -------------------------------------------------------------- */
 
 const SECTIONS = [
-  { title: "The problem", seconds: 20 },
-  { title: "Existing solution limitations", seconds: 20 },
-  { title: "Introducing BridgeFund", seconds: 20 },
-  { title: "BridgeEngine demonstration", seconds: 30 },
-  { title: "Live student journey", seconds: 35 },
-  { title: "Measurable social impact", seconds: 25 },
-  { title: "Business model and scalability", seconds: 20 },
-  { title: "Future vision", seconds: 10 },
+  { title: "The problem", short: "Problem", seconds: 20 },
+  { title: "Existing solution limitations", short: "Limitations", seconds: 20 },
+  { title: "Introducing BridgeFund", short: "BridgeFund", seconds: 20 },
+  { title: "BridgeEngine demonstration", short: "BridgeEngine", seconds: 30 },
+  { title: "Live student journey", short: "Journey", seconds: 35 },
+  { title: "Measurable social impact", short: "Impact", seconds: 25 },
+  { title: "Business model and scalability", short: "Business", seconds: 20 },
+  { title: "Future vision", short: "Vision", seconds: 10 },
 ];
 const TOTAL = SECTIONS.reduce((a, s) => a + s.seconds, 0);
 
@@ -157,19 +157,13 @@ function EngineSection({ sb }: { sb: AppState }) {
         </div>
       </div>
       {view === "run" ? (
-        <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
-          <div className="min-w-0">
-            <EngineRun plan={plan} runKey={runKey} seededAt={sb.seededAt} speed={550} onDone={() => undefined} />
-          </div>
-          <Card className="h-fit space-y-3 p-5">
-            <p className="text-sm text-muted-foreground">Gap before</p>
-            <p className="text-3xl font-semibold tabular">{usd(plan.initialGap)}</p>
-            <p className="text-sm text-muted-foreground">Sponsor ask after</p>
-            <p className="text-3xl font-semibold tabular text-primary">{usd(plan.sponsorAmount)}</p>
+        <div className="min-w-0">
+          <div className="mb-3 flex justify-end">
             <Button variant="outline" size="sm" onClick={() => setRunKey((k) => k + 1)}>
-              <RotateCcw /> Replay
+              <RotateCcw /> Replay analysis
             </Button>
-          </Card>
+          </div>
+          <EngineRun plan={plan} runKey={runKey} seededAt={sb.seededAt} speed={550} onDone={() => undefined} />
         </div>
       ) : (
         <StrategyComparisonView cmp={cmp} selected={sel} onSelect={setSel} />
@@ -427,7 +421,7 @@ function Presentation() {
             {SECTIONS.map((s, n) => (
               <li key={s.title}>
                 <button type="button" onClick={() => go(n)} aria-current={n === i ? "step" : undefined} className={cn("rounded-md px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", n === i ? "bg-primary-light font-medium text-primary dark:bg-primary/15" : "text-muted-foreground hover:text-foreground")}>
-                  {n + 1}. {s.title}
+                  {n + 1}. {s.short}
                 </button>
               </li>
             ))}

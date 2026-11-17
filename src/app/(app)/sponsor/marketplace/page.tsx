@@ -92,7 +92,7 @@ export default function MarketplacePage() {
             <DemoBadge>Fictional students</DemoBadge>
             <Button asChild>
               <Link href="/sponsor/allocate">
-                <PieChart /> Smart allocation
+                <PieChart /> Impact planner
               </Link>
             </Button>
           </>

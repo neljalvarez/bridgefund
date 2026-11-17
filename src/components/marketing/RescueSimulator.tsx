@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { RotateCcw } from "lucide-react";
 import { simulate, type SimInput } from "@/lib/simulator";
 import { usd } from "@/lib/format";
@@ -37,8 +37,8 @@ export function RescueSimulator() {
   ];
   const curve = useMemo(() => {
     const max = Math.max(v.sponsorBudget, 100);
-    return Array.from({ length: 11 }, (_, i) => {
-      const b = Math.round((max * i) / 10);
+    return Array.from({ length: 5 }, (_, i) => {
+      const b = Math.round((max * (i + 1)) / 5);
       const s = simulate({ ...v, sponsorBudget: b });
       return { name: usd(b), Crowdfunding: Number.isFinite(s.opportunitiesA) ? s.opportunitiesA : null, BridgeFund: Number.isFinite(s.opportunitiesB) ? s.opportunitiesB : null };
     });
@@ -136,19 +136,19 @@ export function RescueSimulator() {
         <Card>
           <CardHeader>
             <CardTitle>Opportunities a sponsor budget could rescue</CardTitle>
-            <CardDescription>Whole opportunities of this size, from $0 up to your budget</CardDescription>
+            <CardDescription>Whole opportunities of this size at five budget levels up to yours</CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={curve} margin={{ left: -10, right: 10 }}>
+              <BarChart data={curve} margin={{ left: -10, right: 10 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" {...axis} interval="preserveStartEnd" />
+                <XAxis dataKey="name" {...axis} />
                 <YAxis allowDecimals={false} {...axis} />
-                <Tooltip content={<ChartTooltip money={false} />} />
+                <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip money={false} />} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Line type="stepAfter" dataKey="BridgeFund" stroke="hsl(var(--chart-1))" strokeWidth={2.5} dot={false} />
-                <Line type="stepAfter" dataKey="Crowdfunding" stroke="hsl(var(--chart-4))" strokeWidth={2} strokeDasharray="5 4" dot={false} />
-              </LineChart>
+                <Bar dataKey="Crowdfunding" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="BridgeFund" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} maxBarSize={36} />
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

@@ -63,7 +63,7 @@ export default function UrgentPage() {
               const inst = state.institutions.find((i) => i.id === r.institutionId);
               const canEmergency = ["Verified", "Partially Funded"].includes(r.status) && (inst?.fund ?? 0) >= remainingOf(r) && remainingOf(r) > 0;
               return (
-                <Card key={r.id}>
+                <Card key={r.id} className="min-w-0">
                   <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
                     <div className="min-w-0">
                       <CardTitle className="truncate">{r.purpose}</CardTitle>

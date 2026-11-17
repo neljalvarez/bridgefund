@@ -29,7 +29,7 @@ const hit = (text: string, keys: string[]) => keys.find((k) => text.toLowerCase(
 
 export function findMatches(state: AppState): MatchSuggestion[] {
   const out: MatchSuggestion[] = [];
-  const assigned = new Set(state.matches.filter((m) => m.status === "Assigned").map((m) => m.key));
+  const assigned = new Set(state.matches.map((m) => m.key)); // assigned or already suggested — never offered twice
   for (const opp of state.opportunities) {
     const st = state.students.find((s) => s.id === opp.studentId);
     if (!st) continue;

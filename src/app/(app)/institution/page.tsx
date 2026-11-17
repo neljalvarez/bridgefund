@@ -44,8 +44,8 @@ function Dashboard() {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_320px]">
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="h-auto flex-wrap">
+        <Tabs value={tab} onValueChange={setTab} className="min-w-0">
+          <TabsList className="h-auto max-w-full flex-wrap justify-start">
             <TabsTrigger value="queue">
               Verification queue <Badge variant="neutral">{queue.length}</Badge>
             </TabsTrigger>

@@ -28,7 +28,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
   const [open, setOpen] = useState(selected);
   return (
     <Card className={cn("flex flex-col transition-shadow", selected ? "ring-2 ring-primary" : "hover:shadow-elevated")}>
-      <button type="button" onClick={onSelect} disabled={!onSelect} className="flex-1 p-5 text-left focus-visible:outline-none disabled:cursor-default" aria-pressed={selected}>
+      <button type="button" onClick={onSelect} disabled={!onSelect} className="flex flex-1 flex-col justify-start p-5 text-left focus-visible:outline-none disabled:cursor-default" aria-pressed={selected}>
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -42,7 +42,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
               {best.independence === s.id && <Badge variant="neutral">Least external funding</Badge>}
             </div>
             <p className="mt-2 font-semibold">{s.name}</p>
-            <p className="mt-0.5 text-[13px] text-muted-foreground">{s.tagline}</p>
+            <p className="mt-0.5 min-h-[2.5rem] text-[13px] text-muted-foreground">{s.tagline}</p>
           </div>
           {onSelect && (
             <span className={cn("mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border", selected && "border-primary bg-primary text-primary-foreground")}>{selected && <Check className="h-3 w-3" />}</span>

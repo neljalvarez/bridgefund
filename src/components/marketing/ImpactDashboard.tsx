@@ -64,8 +64,8 @@ function Dashboard() {
         <StatCard label="Students supported" value={m.studentsSupported} money={false} />
         <StatCard label="Opportunities funded" value={m.opportunitiesFunded} money={false} hint={`of ${m.requests} requests submitted`} />
         <StatCard label="Financial barriers resolved" value={m.barriersResolved} tone="primary" />
-        <StatCard label="Sponsor contributions allocated" value={m.sponsorAllocated} />
-        <StatCard label="Impact multiplier" value={fmtMultiplier(m.multiplier)} tone="primary" hint="Barriers resolved ÷ sponsor funds" />
+        <StatCard label="Sponsor contributions allocated" value={m.sponsorAllocated} hint="Includes requests still being funded" />
+        <StatCard label="Impact multiplier" value={fmtMultiplier(m.multiplier)} tone="primary" hint="Fully-funded requests: barriers resolved ÷ sponsor funds used" />
         <StatCard label="Saved through fee waivers" value={m.waiverSavings} hint="Waivers, discounts, free alternatives" />
         <StatCard label="Saved through borrowing" value={m.borrowSavings} hint="Equipment lent, not bought" />
         <StatCard label="Average gap reduction" value={m.avgGapReduction === null ? "—" : `${m.avgGapReduction}%`} hint="Share of shortfall removed by reductions" />

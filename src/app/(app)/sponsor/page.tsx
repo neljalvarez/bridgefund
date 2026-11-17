@@ -152,7 +152,7 @@ export default function SponsorDashboard() {
               <>
                 <ResponsiveContainer width="55%" height="100%">
                   <PieChart>
-                    <Pie data={statusData} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="90%" paddingAngle={2} stroke="none">
+                    <Pie data={statusData} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="90%" paddingAngle={statusData.length > 1 ? 2 : 0} stroke="none">
                       {statusData.map((d) => (
                         <Cell key={d.name} fill={d.color} />
                       ))}
@@ -238,13 +238,13 @@ export default function SponsorDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PieIcon className="h-4 w-4 text-muted-foreground" /> Smart allocation
+                <PieIcon className="h-4 w-4 text-muted-foreground" /> Impact planner
               </CardTitle>
-              <CardDescription>Spread a budget across urgent verified needs with transparent reasoning.</CardDescription>
+              <CardDescription>Compare how a budget performs across verified needs, then submit it for institutional review.</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full">
-                <Link href="/sponsor/allocate">Plan an allocation</Link>
+                <Link href="/sponsor/allocate">Plan a budget</Link>
               </Button>
             </CardContent>
           </Card>

@@ -82,7 +82,7 @@ export default function BusinessPage() {
             <p className="mt-4 text-muted-foreground">Hardship funds already exist — but they pay full price for costs that could have been waived, and rarely know which barriers recur.</p>
           </div>
           <ul className="space-y-3">
-            {["One private, consistent verification workflow", "Waivers, alternatives and loans applied before any money is spent", "Shared equipment tracked and reused across year groups", "Aggregated analytics to plan next year's assistance budget", "Transparent receipts that help attract new sponsors"].map((x) => (
+            {["One private, consistent verification workflow", "Waivers, free alternatives and equipment lending applied before any money is spent", "Shared equipment tracked and reused across year groups", "Aggregated analytics to plan next year's assistance budget", "Transparent receipts that help attract new sponsors"].map((x) => (
               <li key={x} className="flex gap-3">
                 <Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" /> {x}
               </li>
