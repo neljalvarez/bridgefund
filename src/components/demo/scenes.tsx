@@ -328,7 +328,7 @@ export function SceneImpact({ state, request, onComplete }: { state: AppState; r
   );
 }
 
-function MultiplierStrip({ state, request }: { state: AppState; request: FundingRequest }) {
+export function MultiplierStrip({ state, request }: { state: AppState; request: FundingRequest }) {
   const i = requestImpact(request, state.contributions);
   if (!i.sponsor) return null;
   return (

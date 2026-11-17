@@ -29,7 +29,14 @@ export function CommandSearch({ open, onOpenChange }: { open: boolean; onOpenCha
     onOpenChange(false);
     router.push(href);
   };
-  const pages = [...Object.values(ROLE_NAV).flatMap((g) => g.flatMap((x) => x.items)), ...ACCOUNT_NAV, { href: "/demo", label: "Launch interactive demo", icon: LayoutGrid, description: "Guided two-minute walkthrough" }, { href: "/business", label: "Business model", icon: LayoutGrid, description: "How BridgeFund sustains itself" }];
+  const pages = [...Object.values(ROLE_NAV).flatMap((g) => g.flatMap((x) => x.items)), ...ACCOUNT_NAV, { href: "/demo", label: "Launch interactive demo", icon: LayoutGrid, description: "Guided two-minute walkthrough" }, { href: "/business", label: "Business model", icon: LayoutGrid, description: "How BridgeFund sustains itself" },
+    { href: "/present", label: "Presentation mode", icon: LayoutGrid, description: "Three-minute competition pitch" },
+    { href: "/simulator", label: "Opportunity Rescue Simulator", icon: LayoutGrid, description: "Crowdfunding vs reduce-first" },
+    { href: "/impact", label: "Social impact dashboard", icon: LayoutGrid, description: "Public demonstration metrics" },
+    { href: "/why", label: "Why BridgeFund?", icon: LayoutGrid, description: "Comparison and research" },
+    { href: "/scale", label: "Global scalability", icon: LayoutGrid, description: "Markets and expansion" },
+    { href: "/pilot", label: "Pilot programme", icon: LayoutGrid, description: "Proposed pilot and results dashboard" },
+  ];
   const needs = state.requests.filter((r) => ["Verified", "Partially Funded", "Fully Funded"].includes(r.status));
   const mine = state.requests.filter((r) => r.studentId === state.currentStudentId);
 

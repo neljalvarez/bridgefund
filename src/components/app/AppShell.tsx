@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Building2, LogOut, Menu, Moon, PlayCircle, RotateCcw, Search, Settings, Sun } from "lucide-react";
+import { Building2, LogOut, Menu, Moon, PlayCircle, Presentation, RotateCcw, Search, Settings, Sun } from "lucide-react";
 import type { Role } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { setInstitution, setRole } from "@/lib/actions";
@@ -154,6 +154,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
                 <Link href="/demo">
                   <PlayCircle /> Launch Interactive Demo
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex" aria-label="Presentation mode" title="Presentation mode">
+                <Link href="/present">
+                  <Presentation />
                 </Link>
               </Button>
               <Button variant="ghost" size="icon" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>

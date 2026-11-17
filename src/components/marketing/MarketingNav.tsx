@@ -1,38 +1,80 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, Moon, PlayCircle, Sun } from "lucide-react";
+import { ChevronDown, Menu, Moon, PlayCircle, Presentation, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/Logo";
 import { useTheme } from "@/components/app/useTheme";
+import { cn } from "@/lib/utils";
 
+export const SOLUTIONS = [
+  { href: "/#students", label: "For Students", description: "Find and close the gap" },
+  { href: "/#sponsors", label: "For Sponsors", description: "Fund verified needs" },
+  { href: "/#institutions", label: "For Institutions", description: "Verify and allocate" },
+];
+export const COMPANY = [
+  { href: "/business", label: "Business model", description: "Revenue and simulator" },
+  { href: "/scale", label: "Global scalability", description: "Markets and expansion" },
+  { href: "/pilot", label: "Pilot programme", description: "Proposed validation" },
+];
 export const MARKETING_LINKS = [
   { href: "/#how-it-works", label: "How It Works" },
-  { href: "/#students", label: "For Students" },
-  { href: "/#sponsors", label: "For Sponsors" },
-  { href: "/#institutions", label: "For Institutions" },
-  { href: "/#impact", label: "Our Impact" },
+  { href: "/impact", label: "Impact" },
+  { href: "/why", label: "Why BridgeFund?" },
+  { href: "/simulator", label: "Simulator" },
 ];
+
+function Menu2({ label, items }: { label: string; items: typeof SOLUTIONS }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex items-center gap-1 rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:text-foreground">
+        {label} <ChevronDown className="h-3.5 w-3.5" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-60">
+        <DropdownMenuLabel className="text-xs text-muted-foreground">{label}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {items.map((i) => (
+          <DropdownMenuItem key={i.href} asChild>
+            <Link href={i.href} className="flex flex-col items-start gap-0">
+              <span className="font-medium">{i.label}</span>
+              <span className="text-xs text-muted-foreground">{i.description}</span>
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export function MarketingNav() {
   const [open, setOpen] = useState(false);
   const { dark, toggle } = useTheme();
+  const pathname = usePathname();
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="container flex h-16 items-center gap-6">
         <Logo />
-        <nav aria-label="Main" className="hidden items-center gap-6 text-sm text-muted-foreground lg:flex">
+        <nav aria-label="Main" className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex">
+          <Menu2 label="Solutions" items={SOLUTIONS} />
           {MARKETING_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="transition-colors hover:text-foreground">
+            <Link key={l.href} href={l.href} aria-current={pathname === l.href ? "page" : undefined} className={cn("transition-colors hover:text-foreground", pathname === l.href && "font-medium text-foreground")}>
               {l.label}
             </Link>
           ))}
+          <Menu2 label="Company" items={COMPANY} />
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
             {dark ? <Sun /> : <Moon />}
+          </Button>
+          <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
+            <Link href="/present">
+              <Presentation /> Present
+            </Link>
           </Button>
           <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/signin">Sign In</Link>
@@ -46,19 +88,21 @@ export function MarketingNav() {
         </div>
       </div>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right">
+        <SheetContent side="right" className="overflow-y-auto">
           <SheetTitle>Menu</SheetTitle>
           <nav aria-label="Mobile" className="flex flex-col gap-1">
-            {MARKETING_LINKS.map((l) => (
+            {[...MARKETING_LINKS, ...SOLUTIONS, ...COMPANY].map((l) => (
               <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-md px-2 py-2 text-sm hover:bg-muted">
                 {l.label}
               </Link>
             ))}
-            <Link href="/business" onClick={() => setOpen(false)} className="rounded-md px-2 py-2 text-sm hover:bg-muted">
-              Business model
-            </Link>
           </nav>
           <div className="mt-auto grid gap-2">
+            <Button asChild variant="outline">
+              <Link href="/present" onClick={() => setOpen(false)}>
+                <Presentation /> Presentation mode
+              </Link>
+            </Button>
             <Button asChild variant="outline">
               <Link href="/signin">Sign In</Link>
             </Button>

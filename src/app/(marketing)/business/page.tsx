@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Ban, Briefcase, Building2, Check, HandHeart, Landmark, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { BusinessSimulator } from "@/components/marketing/BusinessSimulator";
 
 export const metadata: Metadata = { title: "Business model" };
 
@@ -59,6 +60,17 @@ export default function BusinessPage() {
                 <p className="mt-3 border-l-2 border-primary pl-3 text-sm text-muted-foreground">{s.value}</p>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="simulator" className="scroll-mt-20 border-b">
+        <div className="container py-16 md:py-20">
+          <p className="text-sm font-medium text-primary">Business model simulator</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight">Test the assumptions yourself.</h2>
+          <p className="mt-3 max-w-2xl text-muted-foreground">Change any input to see recurring revenue, costs, profit and break-even under three growth scenarios. Every value is a hypothetical projection for discussion, not a forecast.</p>
+          <div className="mt-10">
+            <BusinessSimulator />
           </div>
         </div>
       </section>

@@ -258,8 +258,17 @@ export default function LandingPage() {
 
       <Section id="impact" eyebrow="Our impact" title="Demonstration impact" intro="These figures come from the simulated demo environment and update as you use the prototype. BridgeFund has not yet operated with real students, and no real-world impact is claimed.">
         <ImpactStats />
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
           <DemoBadge>Simulated demonstration data</DemoBadge>
+          <Link href="/impact" className="text-sm font-medium text-primary hover:underline">
+            Full impact dashboard →
+          </Link>
+          <Link href="/simulator" className="text-sm font-medium text-primary hover:underline">
+            Opportunity Rescue Simulator →
+          </Link>
+          <Link href="/why" className="text-sm font-medium text-primary hover:underline">
+            Why BridgeFund? →
+          </Link>
         </div>
       </Section>
 

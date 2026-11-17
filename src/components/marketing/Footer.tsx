@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
 
 const COLS = [
-  { title: "Product", links: [["How it works", "/#how-it-works"], ["BridgeEngine", "/student/engine"], ["Opportunity marketplace", "/sponsor/marketplace"], ["Barrier analytics", "/institution/analytics"]] },
+  { title: "Product", links: [["How it works", "/#how-it-works"], ["BridgeEngine", "/student/engine"], ["Rescue simulator", "/simulator"], ["Impact dashboard", "/impact"], ["Opportunity marketplace", "/sponsor/marketplace"]] },
   { title: "Audiences", links: [["For students", "/#students"], ["For sponsors", "/#sponsors"], ["For institutions", "/#institutions"]] },
-  { title: "Company", links: [["Business model", "/business"], ["Interactive demo", "/demo"], ["FAQ", "/#faq"], ["Sign in", "/signin"]] },
+  { title: "Company", links: [["Why BridgeFund?", "/why"], ["Business model", "/business"], ["Global scalability", "/scale"], ["Pilot programme", "/pilot"], ["Presentation mode", "/present"], ["Interactive demo", "/demo"]] },
 ];
 
 export function Footer() {

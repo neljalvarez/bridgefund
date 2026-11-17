@@ -11,9 +11,9 @@ interface Item {
   payload?: { name?: string };
 }
 
-export function ChartTooltip({ active, payload, label, money = true }: { active?: boolean; payload?: Item[]; label?: string | number; money?: boolean }) {
+export function ChartTooltip({ active, payload, label, money = true, format }: { active?: boolean; payload?: Item[]; label?: string | number; money?: boolean; format?: (v: number) => string }) {
   if (!active || !payload?.length) return null;
-  const fmt = (v: number) => (money ? usd(v) : v.toLocaleString());
+  const fmt = (v: number) => (format ? format(v) : money ? usd(v) : v.toLocaleString());
   return (
     <div className="rounded-lg border bg-popover px-3 py-2 text-xs shadow-elevated">
       {(label ?? payload[0].payload?.name) && <p className="mb-1 font-medium text-foreground">{label ?? payload[0].payload?.name}</p>}
