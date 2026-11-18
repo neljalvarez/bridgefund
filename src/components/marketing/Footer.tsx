@@ -10,7 +10,7 @@ const COLS = [
 export function Footer() {
   return (
     <footer className="border-t bg-card">
-      <div className="container grid gap-10 py-14 md:grid-cols-[1.5fr_repeat(3,1fr)]">
+      <div className="container grid grid-cols-1 gap-10 py-14 md:grid-cols-[1.5fr_repeat(3,1fr)]">
         <div>
           <Logo />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">Small gaps. Big futures.</p>

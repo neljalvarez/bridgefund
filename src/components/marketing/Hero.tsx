@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, PlayCircle } from "lucide-react";
+import { JudgeMode } from "@/components/app/JudgeMode";
 import { useT } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 
@@ -13,12 +14,17 @@ export function Hero() {
         {tr("Small costs shouldn't stop")} <span className="text-primary">{tr("big futures.")}</span>
       </h1>
       <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">{tr("BridgeFund cuts the cost of an exam, application or trip first — then sponsors cover only what's left.")}</p>
-      <div className="mt-8">
+      <div className="mt-8 flex flex-wrap gap-3">
         <Button asChild size="lg">
           <Link href="/demo">
-            {tr("See how it works")} <ArrowRight />
+            <PlayCircle /> {tr("Watch the 90-second demo")}
           </Link>
         </Button>
+        <JudgeMode>
+          <Button size="lg" variant="outline">
+            {tr("Explore freely")} <ArrowRight />
+          </Button>
+        </JudgeMode>
       </div>
       <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
         {["Free for students", "No loans", "Verified by schools"].map((x) => (

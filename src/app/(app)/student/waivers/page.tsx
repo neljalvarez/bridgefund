@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { ArrowUpRight, CalendarDays, MapPin, Users } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { currentStudent } from "@/lib/selectors";
-import { ASSISTANCE, EMIRATES, OPPORTUNITIES, VERIFIED_ON, oppStatus, type OppStatus } from "@/lib/uae";
+import { ASSISTANCE, EMIRATES, EMIRATE_AR, OPPORTUNITIES, VERIFIED_ON, oppStatus, type OppStatus } from "@/lib/uae";
 import { OPP_LABEL, fmtDateLong } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -53,8 +53,8 @@ export default function OpportunitiesPage() {
           <SelectItem value="all">All emirates</SelectItem>
           {EMIRATES.map((e) => (
             <SelectItem key={e} value={e}>
-              {e}
-              {e === student.emirate ? " (yours)" : ""}
+              {state.display.locale === "ar" ? EMIRATE_AR[e] : e}
+              {e === student.emirate ? (state.display.locale === "ar" ? " (إمارتك)" : " (yours)") : ""}
             </SelectItem>
           ))}
         </Filter>
@@ -84,7 +84,7 @@ export default function OpportunitiesPage() {
           {opps.length === 0 ? (
             <EmptyState title="Nothing matches these filters" />
           ) : (
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {opps.map(({ o, st }) => (
                 <Card key={o.id} className="flex flex-col p-5">
                   <div className="flex items-start justify-between gap-3">
@@ -144,7 +144,7 @@ export default function OpportunitiesPage() {
         </TabsContent>
 
         <TabsContent value="help" className="mt-4">
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {help.map((a) => {
               const local = a.emirates === "All" || a.emirates.includes(student.emirate);
               return (

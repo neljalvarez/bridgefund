@@ -41,7 +41,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <form
-              className="grid gap-4 sm:grid-cols-2"
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!name.trim() || emailErr) return;
@@ -103,7 +103,7 @@ export default function SettingsPage() {
             <CardTitle>Currency and language</CardTitle>
             <CardDescription>Display preferences for global use. Everything is calculated in AED. Other currencies are for display only.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Display currency</Label>
               <Select value={state.display.currency} onValueChange={(v) => dispatch(setDisplay({ currency: v }), { info: `Showing amounts in ${v}` })}>

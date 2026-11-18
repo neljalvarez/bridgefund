@@ -93,11 +93,11 @@ function Rescue() {
         </div>
       </Card>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
         {list.length === 0 ? (
           <EmptyState title="No resources match" description="Try another category or location." />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {list.map((r) => {
               const Icon = RESOURCE_ICON[r.type];
               const inst = institutionOf(state, r.institutionId);

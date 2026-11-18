@@ -20,6 +20,8 @@ import { EmptyState, StatusBadge } from "@/components/shared/kit";
 import { EngineRun } from "@/components/student/EngineRun";
 import { StrategyComparisonView } from "@/components/student/StrategyComparison";
 import { RequestBreakdown, StatusTrack } from "@/components/shared/RequestBreakdown";
+import { AnimatedNumber } from "@/components/shared/kit";
+import { GapBar, GAP_COLORS } from "@/components/shared/GapBar";
 
 const STEPS = ["Costs", "Solutions", "Savings", "Request", "Track"] as const;
 const LOCKED = ["Submitted", "Under Review", "Additional Information Required", "Verified", "Partially Funded", "Fully Funded", "Completed", "Rejected"];
@@ -83,6 +85,7 @@ function Journey() {
   const cmp = useMemo(() => (opp ? strategiesFor(state, opp) : null), [opp, state]);
   const [choice, setChoice] = useState<StrategyId | null>(null);
   const [consent, setConsent] = useState(false);
+  const [found, setFound] = useState(0);
   const tr = useT();
   const student = state.students.find((x) => x.id === state.currentStudentId)!;
   const minor = student.age < 18;
@@ -157,6 +160,17 @@ function Journey() {
 
       <Stepper step={step} reached={reached} go={go} />
 
+      <GapMeter
+        total={plan.totalCost}
+        {...(step === 5 && existing
+          ? { own: existing.studentFunds, savings: existing.reductions.reduce((a, x) => a + x.amount, 0), sponsor: existing.funded, label: remainingOf(existing) > 0 ? "Still to secure" : "Fully covered" }
+          : step >= 3
+            ? { own: chosen.studentPays, savings: chosen.costReductions + chosen.externalCash, sponsor: chosen.alreadyFunded, label: "Left for sponsors" }
+            : step === 2
+              ? { own: plan.studentFunds, savings: found, sponsor: 0, label: "Left for sponsors" }
+              : { own: plan.studentFunds, savings: 0, sponsor: 0, label: tr("Your gap") })}
+      />
+
       <AnimatePresence mode="wait">
         <motion.div key={`${oppId}-${step}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}>
           {step === 1 && (
@@ -165,29 +179,25 @@ function Journey() {
                 {tr("What does it cost?")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">Every expense, minus what you already have.</p>
-              <div className="mt-6 grid gap-6 md:grid-cols-[1fr_260px]">
-                <Card>
-                  <CardContent className="divide-y p-0 text-sm">
-                    {opp.expenses.map((e) => (
-                      <div key={e.id} className="flex justify-between gap-3 px-5 py-3">
-                        <span>
-                          {e.label} {!e.confirmed && <span className="text-xs text-muted-foreground">(estimate)</span>}
-                        </span>
-                        <span className="tabular">{aed(e.amount)}</span>
-                      </div>
-                    ))}
-                    <div className="flex justify-between gap-3 px-5 py-3 text-muted-foreground">
-                      <span>Your own funds</span>
-                      <span className="tabular">−{aed(plan.studentFunds)}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-                <div className="rounded-xl border bg-card p-5">
-                  <p className="text-[13px] font-medium text-muted-foreground">{tr("Your gap")}</p>
-                  <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{aed(plan.initialGap)}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">of {aed(plan.totalCost)} total</p>
-                </div>
-              </div>
+              <Card className="mt-6">
+                <CardContent className="divide-y p-0 text-sm">
+                  {opp.expenses.map((e, i) => (
+                    <motion.div key={e.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-5 py-3.5 sm:grid-cols-[1fr_160px_auto]">
+                      <span className="min-w-0">
+                        {e.label} {!e.confirmed && <span className="text-xs text-muted-foreground">(estimate)</span>}
+                      </span>
+                      <span className="col-span-2 row-start-2 h-1.5 overflow-hidden rounded-full bg-secondary sm:col-span-1 sm:row-start-auto" aria-hidden>
+                        <motion.span className="block h-full rounded-full bg-slate-400 dark:bg-slate-500" initial={{ width: 0 }} animate={{ width: `${(e.amount / plan.totalCost) * 100}%` }} transition={{ duration: 0.6, delay: 0.1 + i * 0.08 }} />
+                      </span>
+                      <span className="text-end font-medium tabular">{aed(e.amount)}</span>
+                    </motion.div>
+                  ))}
+                  <div className="flex justify-between gap-3 px-5 py-3.5 text-muted-foreground">
+                    <span>Your own funds</span>
+                    <span className="tabular">−{aed(plan.studentFunds)}</span>
+                  </div>
+                </CardContent>
+              </Card>
               <Footer>
                 <Button size="lg" onClick={() => go(2)} disabled={plan.initialGap <= 0}>
                   {tr("Find solutions")} <ArrowRight />
@@ -201,9 +211,9 @@ function Journey() {
               <h2 id="s2" className="text-xl font-semibold tracking-tight">
                 BridgeEngine checks seven ways to cut the cost
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">Savings first. Sponsors only for what&apos;s left.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Savings first. Sponsors only for what&apos;s left. Estimates are confirmed by your school.</p>
               <div className="mt-6">
-                <EngineRun plan={plan} runKey={runKey} seededAt={state.seededAt} speed={700} />
+                <EngineRun plan={plan} runKey={runKey} seededAt={state.seededAt} speed={650} summary={false} onProgress={setFound} />
               </div>
               {tips.length > 0 && (
                 <div className="mt-6 rounded-xl border p-5">
@@ -254,7 +264,7 @@ function Journey() {
                 {tr("Request what's left")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">Your school checks it privately before sponsors see it.</p>
-              <div className="mt-6 grid gap-6 md:grid-cols-[1fr_280px]">
+              <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[1fr_280px]">
                 <Card>
                   <CardContent className="space-y-1 p-5 text-sm">
                     <Row label="Total cost" value={aed(plan.totalCost)} />
@@ -331,6 +341,32 @@ function Journey() {
         </motion.div>
       </AnimatePresence>
     </>
+  );
+}
+
+/** The journey's signature visual: one bar that fills as savings and sponsors close the gap. */
+function GapMeter({ total, own, savings, sponsor, label }: { total: number; own: number; savings: number; sponsor: number; label: string }) {
+  const tr = useT();
+  const left = Math.max(total - own - savings - sponsor, 0);
+  return (
+    <div className="mb-8 grid grid-cols-1 gap-5 rounded-2xl border bg-card p-5 sm:grid-cols-[200px_1fr] sm:items-center md:p-6">
+      <div>
+        <p className="text-[13px] font-medium text-muted-foreground">{tr(label)}</p>
+        <p className={cn("mt-1 text-4xl font-semibold tracking-tight md:text-5xl", left === 0 && "text-primary")} aria-live="polite">
+          <AnimatedNumber value={left} />
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{tr("of")} {aed(total)} {tr("total")}</p>
+      </div>
+      <GapBar
+        total={total}
+        size="lg"
+        segments={[
+          { key: "own", label: tr("Your funds"), value: own, color: GAP_COLORS.own },
+          { key: "savings", label: tr("Savings found"), value: savings, color: GAP_COLORS.school },
+          { key: "sponsor", label: tr("Sponsors"), value: sponsor, color: GAP_COLORS.sponsor },
+        ]}
+      />
+    </div>
   );
 }
 

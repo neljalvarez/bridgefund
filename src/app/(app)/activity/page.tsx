@@ -16,9 +16,9 @@ export default function ActivityPage() {
     <>
       <PageHeader title="Activity history" description="Everything that happened in this demo." />
       <Tabs value={filter} onValueChange={setFilter} className="mb-4">
-        <TabsList>
+        <TabsList className="h-auto flex-wrap">
           {["all", "student", "institution", "sponsor", "system"].map((t) => (
-            <TabsTrigger key={t} value={t} className="capitalize">
+            <TabsTrigger key={t} value={t} className="capitalize" aria-controls={undefined}>
               {t}
             </TabsTrigger>
           ))}

@@ -32,7 +32,7 @@ export default function SponsorContributionsPage() {
   return (
     <>
       <PageHeader title="My contributions" description="Every contribution and its receipt." />
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <Card>
           <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
             <div>

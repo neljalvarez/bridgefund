@@ -55,7 +55,6 @@ export const markAllRead = (role: Role): Action => (s) => ({ ...s, notifications
 export const saveScenarios = (scenarios: CalculatorScenario[]): Action => (s) => ({ ...s, scenarios });
 
 const toggle = (xs: string[], id: string) => (xs.includes(id) ? xs.filter((x) => x !== id) : [...xs, id]);
-export const toggleSavedWaiver = (id: string): Action => (s) => ({ ...s, savedWaivers: toggle(s.savedWaivers, id) });
 export const toggleSavedNeed = (id: string): Action => (s) => ({ ...s, savedNeeds: toggle(s.savedNeeds, id) });
 export const toggleReminder = (id: string, label: string): Action => (s) => {
   const on = !s.reminders.includes(id);
@@ -72,12 +71,6 @@ export const addOpportunity = (draft: OpportunityDraft, id = uid("o")): Action =
   s = log(s, "student", `Added opportunity: ${draft.title}`);
   return notify(s, "student", "Opportunity saved", `${draft.title} — run BridgeEngine to build your plan.`, `/student/engine?opp=${id}`);
 };
-
-export const removeOpportunity = (id: string): Action => (s) => ({
-  ...s,
-  opportunities: s.opportunities.filter((o) => o.id !== id),
-  requests: s.requests.filter((r) => r.opportunityId !== id || r.status !== "Draft"),
-});
 
 /** Turn a BridgeEngine plan into a funding request. Re-running replaces earlier estimates — never adds to them. */
 export const applyEnginePlan = (oppId: string, plan: EnginePlan, submit: boolean): Action => (s0) => {

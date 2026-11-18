@@ -52,7 +52,7 @@ export default function UrgentPage() {
         {cases.length === 0 ? (
           <EmptyState title="No students at risk right now" description="Cases appear here when estimated processing time approaches the deadline." />
         ) : (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {cases.map(({ r, a }) => {
               const st = studentOf(state, r.studentId);
               const inst = state.institutions.find((i) => i.id === r.institutionId);

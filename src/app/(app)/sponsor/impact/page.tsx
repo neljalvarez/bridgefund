@@ -43,7 +43,7 @@ export default function SponsorImpactPage() {
     <>
       <PageHeader title="My impact" description={`What ${sponsor.name}'s contributions resolved.`} />
       <Card>
-        <CardContent className="grid gap-4 p-5 md:grid-cols-[auto_1fr_auto] md:items-center">
+        <CardContent className="grid grid-cols-1 gap-4 p-5 md:grid-cols-[auto_1fr_auto] md:items-center">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Impact multiplier</p>
             <p className="text-3xl font-semibold tabular text-primary">{fmtMultiplier(impact.multiplier)}</p>
@@ -65,7 +65,7 @@ export default function SponsorImpactPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Card>
           <CardHeader>
             <CardTitle>Impact by educational category</CardTitle>

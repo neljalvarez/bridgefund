@@ -36,7 +36,7 @@ export function DashboardFocus({ figures, action }: { figures: Figure[]; action:
   );
   return (
     <section aria-label="Summary" className="space-y-4">
-      <Card className="grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+      <Card className="grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {figures.map((f) => (
           <div key={f.label} className="p-5 md:p-6">
             <p className="text-[13px] font-medium text-muted-foreground">{tr(f.label)}</p>

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { aed } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { GapBar, GAP_COLORS } from "@/components/shared/GapBar";
 import { AnimatedNumber, DemoBadge } from "@/components/shared/kit";
 
 const TOTAL = 700;
@@ -22,7 +22,7 @@ export function GapDemo() {
   const reduced = SOURCES.filter((s) => on[s.id]).reduce((a, s) => a + s.amount, 0);
   const gap = TOTAL - PERSONAL - reduced;
   return (
-    <Card className="grid overflow-hidden md:grid-cols-[1.1fr_1fr]">
+    <Card className="grid grid-cols-1 overflow-hidden md:grid-cols-[1.1fr_1fr]">
       <div className="p-6 md:p-8">
         <div className="flex items-center justify-between gap-2">
           <p className="font-medium">Robotics club regional event</p>
@@ -52,10 +52,7 @@ export function GapDemo() {
           </p>
         </div>
         <div>
-          <div className="flex h-3 overflow-hidden rounded-full bg-secondary">
-            <div className="bg-slate-400" style={{ width: `${(PERSONAL / TOTAL) * 100}%` }} />
-            <motion.div className="bg-primary" animate={{ width: `${(reduced / TOTAL) * 100}%` }} transition={{ duration: 0.5 }} />
-          </div>
+          <GapBar total={TOTAL} legend={false} segments={[{ key: "own", label: "Personal", value: PERSONAL, color: GAP_COLORS.own }, { key: "saved", label: "Reduced", value: reduced, color: GAP_COLORS.school }]} />
           <div className="mt-2 flex justify-between text-xs text-muted-foreground">
             <span>Personal {aed(PERSONAL)} · reduced {aed(reduced)}</span>
             <span>Total {aed(TOTAL)}</span>

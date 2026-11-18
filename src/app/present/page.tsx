@@ -50,7 +50,7 @@ const H = ({ children, kicker }: { children: React.ReactNode; kicker: string }) 
 
 function Problem() {
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-2">
+    <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
       <div>
         <H kicker="01 · The problem">Small costs close big doors.</H>
         <p className="text-lg leading-relaxed text-muted-foreground">
@@ -91,7 +91,7 @@ function Limitations() {
   return (
     <div>
       <H kicker="02 · Existing solution limitations">Good tools — built for different jobs.</H>
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {rows.map((r) => (
           <Card key={r.n} className="p-5">
             <p className="font-semibold">{r.n}</p>
@@ -187,7 +187,7 @@ function Journey({ sb, setSb }: { sb: AppState; setSb: (fn: (s: AppState) => App
   return (
     <div>
       <H kicker="05 · Live student journey">One request, three roles, one shared record.</H>
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
         <div className="space-y-2">
           {steps.map((s, i) => (
             <Button key={s.label} className="w-full justify-start" variant={s.done ? "soft" : i === next ? "default" : "outline"} disabled={i !== next} onClick={s.run}>
@@ -232,7 +232,7 @@ function ImpactSection() {
   return (
     <div>
       <H kicker="06 · Measurable social impact">The BridgeFund Impact Multiplier.</H>
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr]">
         <Card className="p-6">
           <p className="text-sm text-muted-foreground">Financial barriers resolved ÷ sponsor funding used</p>
           <div className="mt-4 flex flex-wrap items-baseline gap-3 text-2xl font-semibold tabular md:text-3xl">
@@ -291,7 +291,7 @@ function Business() {
   return (
     <div>
       <H kicker="07 · Business model and scalability">Students never pay. Institutions and programmes do.</H>
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="space-y-4 p-6">
           <p className="font-semibold">Revenue</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
@@ -336,7 +336,7 @@ function Vision() {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <H kicker="08 · Future vision">No student should miss an opportunity over a gap this small.</H>
-      <div className="grid gap-3 text-start sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 text-start sm:grid-cols-3">
         {[
           { t: "Next term", b: "A pilot with a small group of Abu Dhabi schools, verified manually." },
           { t: "Year one", b: "Dubai and Sharjah, local CSR sponsors and published pilot results." },
@@ -429,7 +429,7 @@ function Presentation() {
         </nav>
         <div className="ms-auto flex items-center gap-2">
           <button type="button" onClick={() => setRunning((r) => !r)} className={cn("flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs tabular", over ? "border-amber-300 text-warning" : "text-muted-foreground")} aria-label={running ? "Pause timer" : "Resume timer"} title="Pause or resume the timer">
-            <Timer className="h-3.5 w-3.5" /> {mmss(elapsed)} / {mmss(TOTAL)}
+            <Timer className="h-3.5 w-3.5" /> {mmss(elapsed)}<span className="hidden sm:inline"> / {mmss(TOTAL)}</span>
           </button>
           <Button variant="ghost" size="icon" onClick={toggleFs} aria-label={fs ? "Exit fullscreen" : "Enter fullscreen"}>
             {fs ? <Minimize /> : <Expand />}

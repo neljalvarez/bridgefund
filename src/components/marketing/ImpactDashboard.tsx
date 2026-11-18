@@ -46,7 +46,7 @@ function EmirateMap({ data, selected, onSelect }: { data: { emirate: Emirate; am
           >
             <span className="truncate text-[11px] font-medium leading-tight sm:text-xs">{d.emirate}</span>
             <span className="truncate text-xs font-semibold tabular sm:text-sm">{aed(d.amount)}</span>
-            <span className="hidden truncate text-[11px] text-muted-foreground sm:block">
+            <span className="hidden truncate text-[11px] text-foreground/75 sm:block">
               {d.resolved}/{d.requests} resolved
             </span>
           </button>
@@ -111,7 +111,7 @@ function Dashboard() {
         <StatCard label="Impact multiplier" value={fmtMultiplier(m.multiplier)} tone="primary" hint="Resolved ÷ sponsor funds" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_1fr]">
         <Card>
           <CardHeader>
             <CardTitle>Impact by emirate</CardTitle>

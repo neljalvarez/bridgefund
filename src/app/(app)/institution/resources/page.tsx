@@ -134,7 +134,7 @@ export default function InventoryPage() {
             <DialogTitle>Add a lending item</DialogTitle>
             <DialogDescription>Students will be able to reserve it straight away.</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <Label htmlFor="ri-name">Item name</Label>
               <Input id="ri-name" className="mt-1.5" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Scientific calculator" />

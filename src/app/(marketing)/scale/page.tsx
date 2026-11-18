@@ -36,7 +36,7 @@ export default function ScalePage() {
 
       <section className="border-b">
         <div className="container py-14 md:py-20">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {LAYERS.map((l) => (
               <Card key={l.t} className="p-5">
                 <l.icon className="h-5 w-5 text-primary" />
@@ -49,14 +49,14 @@ export default function ScalePage() {
       </section>
 
       <section className="border-b bg-card">
-        <div className="container grid gap-10 py-14 md:py-20 lg:grid-cols-[1fr_1.4fr]">
+        <div className="container grid grid-cols-1 gap-10 py-14 md:py-20 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <Badge variant="accent">
               <MapPin /> Proposed launch market
             </Badge>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">{LAUNCH_MARKET.country}</h2>
             <p className="mt-3 text-muted-foreground">
-              The demo follows Mariam, a fictional Grade 11 student in Abu Dhabi. National STEM competitions and official cost-saving programmes — student transport passes, free public libraries, university aid — already exist; BridgeFund connects them (<Link href="/student/waivers" className="text-primary hover:underline">see the directory</Link>).
+              The demo follows Mariam, a fictional Grade 11 student in Abu Dhabi. National STEM competitions and official cost-saving programmes — student transport passes, free public libraries, university aid — already exist; BridgeFund connects them (<Link href="/student/waivers" className="font-medium text-primary underline underline-offset-2">see the directory</Link>).
             </p>
             <dl className="mt-6 space-y-3 text-sm">
               <div>
@@ -120,7 +120,7 @@ export default function ScalePage() {
       <section className="border-b">
         <div className="container py-14 md:py-20">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How we expand</h2>
-          <ol className="mt-8 grid gap-4 md:grid-cols-4">
+          <ol className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
             {STEPS.map((s, i) => (
               <li key={s.t} className="rounded-xl border p-5">
                 <span className="text-sm font-semibold text-primary tabular">0{i + 1}</span>

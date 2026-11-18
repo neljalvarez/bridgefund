@@ -87,7 +87,7 @@ export default function TrackerPage() {
           <TabsTrigger value="list">Opportunities</TabsTrigger>
         </TabsList>
         <TabsContent value="calendar">
-          <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
             <Card>
               <CardHeader className="flex-row items-center justify-between space-y-0">
                 <CardTitle>{cursor.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</CardTitle>
@@ -184,7 +184,7 @@ export default function TrackerPage() {
         </TabsContent>
       </Tabs>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Documents required</CardTitle>

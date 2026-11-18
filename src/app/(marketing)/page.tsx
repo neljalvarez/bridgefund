@@ -16,7 +16,7 @@ export default function LandingPage() {
     <>
       <section className="relative overflow-hidden">
         <div className="bg-grid absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" aria-hidden />
-        <div className="container grid items-center gap-12 py-16 md:py-28 lg:grid-cols-[1.1fr_1fr]">
+        <div className="container grid grid-cols-1 items-center gap-12 py-16 md:py-28 lg:grid-cols-[1.1fr_1fr]">
           <Hero />
           <HeroPreview />
         </div>
@@ -25,7 +25,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="scroll-mt-20 border-t py-20 md:py-24">
         <div className="container">
           <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">How it works</h2>
-          <ol className="mx-auto mt-14 grid max-w-5xl gap-10 md:grid-cols-3">
+          <ol className="mx-auto mt-14 grid grid-cols-1 max-w-5xl gap-10 md:grid-cols-3">
             {STEPS.map((s, i) => (
               <li key={s.title} className="text-center">
                 <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border bg-card text-primary">
@@ -55,7 +55,7 @@ export default function LandingPage() {
       <section id="impact" className="scroll-mt-20 border-t py-20 md:py-24">
         <div className="container">
           <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">Every sponsor dirham goes further</h2>
-          <dl className="mx-auto mt-14 grid max-w-4xl gap-10 text-center sm:grid-cols-3">
+          <dl className="mx-auto mt-14 grid grid-cols-1 max-w-4xl gap-10 text-center sm:grid-cols-3">
             {[
               { v: "AED 150", l: "asked, not AED 450", s: "for Mariam's STEM competition" },
               { v: "3.00x", l: "impact multiplier", s: "barriers resolved per sponsor dirham" },

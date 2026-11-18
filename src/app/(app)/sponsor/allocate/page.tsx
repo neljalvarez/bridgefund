@@ -118,7 +118,7 @@ export default function ImpactPlannerPage() {
       {needs.length === 0 ? (
         <EmptyState title="No open verified needs" description="New needs appear here once institutions verify them." />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
           <Card className="h-fit lg:sticky lg:top-20">
             <CardHeader>
               <CardTitle>Budget</CardTitle>
@@ -160,7 +160,7 @@ export default function ImpactPlannerPage() {
           </Card>
 
           <div className="min-w-0 space-y-4">
-            <div className="grid gap-3 md:grid-cols-3" role="radiogroup" aria-label="Allocation approach">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3" role="radiogroup" aria-label="Allocation approach">
               {ORDER.map((a) => {
                 const p = plans[a];
                 const on = a === approach;
@@ -222,7 +222,7 @@ export default function ImpactPlannerPage() {
                     const amt = amounts[id] ?? 0;
                     const cat = alloc.find((a) => a.id === id)?.category;
                     return (
-                      <li key={id} className={cn("grid gap-3 px-5 py-4 md:grid-cols-[2rem_1fr_9.5rem] md:items-start", amt <= 0 && "opacity-70")}>
+                      <li key={id} className={cn("grid gap-3 px-5 py-4 md:grid-cols-[2rem_1fr_9.5rem] md:items-start", amt <= 0 && "bg-muted/40")}>
                         <span className="text-sm font-semibold text-muted-foreground">#{i + 1}</span>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">

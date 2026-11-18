@@ -94,7 +94,7 @@ export default function InstitutionOverview() {
             Export feedback CSV
           </button>
         </CardHeader>
-        <div className="grid divide-y border-t sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-px border-t bg-border sm:grid-cols-2 lg:grid-cols-3">
           {[
             { t: "Verify student expenses", m: `${queue.length} waiting`, href: "/institution/requests" },
             { t: "Approve assistance", m: `${queue.filter((r) => !needsReview(state, r)).length} ready · ${queue.filter((r) => needsReview(state, r)).length} need a closer look`, href: "/institution/requests" },
@@ -103,7 +103,7 @@ export default function InstitutionOverview() {
             { t: "Collect student feedback", m: state.feedback.length ? `${state.feedback.length} responses · avg ${(state.feedback.reduce((a, f) => a + f.rating, 0) / state.feedback.length).toFixed(1)}/5` : "No responses yet", href: "/pilot#dashboard" },
             { t: "Confirm participation", m: `${scoped.filter((r) => r.status === "Completed" && !r.outcome).length} completed, outcome not recorded`, href: "/institution/requests?tab=completed" },
           ].map((x) => (
-            <Link key={x.t} href={x.href} className="group px-5 py-4 transition-colors hover:bg-muted/50 sm:border-e sm:[&:nth-child(2n)]:border-e-0 lg:[&:nth-child(2n)]:border-e lg:[&:nth-child(3n)]:border-e-0">
+            <Link key={x.t} href={x.href} className="group bg-card px-5 py-4 transition-colors first:rounded-none last:rounded-b-xl hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
               <p className="text-sm font-medium">{x.t}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">{x.m}</p>
             </Link>

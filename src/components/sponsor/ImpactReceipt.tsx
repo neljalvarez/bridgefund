@@ -58,7 +58,7 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
         </div>
       </div>
 
-      <div className="grid gap-6 p-6 sm:grid-cols-[1fr_auto]">
+      <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-[1fr_auto]">
         <div>
           <p className="text-xs text-muted-foreground">Educational expense covered</p>
           <p className="mt-1 text-xl font-semibold tracking-tight">{d.r.purpose}</p>
@@ -70,7 +70,7 @@ export function ImpactReceipt({ state, contribution: c }: { state: AppState; con
         </div>
       </div>
 
-      <dl className="grid gap-5 border-t p-6 text-sm sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-5 border-t p-6 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-xs text-muted-foreground">Anonymous recipient reference</dt>
           <dd className="mt-1 font-mono">{d.anon}</dd>

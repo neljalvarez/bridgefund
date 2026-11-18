@@ -87,20 +87,20 @@ export default function MarketplacePage() {
   return (
     <>
       <PageHeader
-        title="Opportunity marketplace"
+        title="Verified needs"
         description="Checked by schools and already reduced by savings. You fund only what remains."
         actions={
           <>
             <DemoBadge>Fictional students</DemoBadge>
             <Button asChild>
               <Link href="/sponsor/allocate">
-                <PieChart /> Impact planner
+                <PieChart /> Budget planner
               </Link>
             </Button>
           </>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="space-y-4">
           <Button variant="outline" className="w-full lg:hidden" onClick={() => setShowFilters(!showFilters)} aria-expanded={showFilters}>
             <SlidersHorizontal /> {showFilters ? "Hide filters" : "Show filters"}
@@ -152,7 +152,7 @@ export default function MarketplacePage() {
           {list.length === 0 ? (
             <EmptyState title="No needs match these filters" description="Widen the gap or deadline range, or clear filters." action={<Button variant="outline" onClick={clear}>Clear filters</Button>} />
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {list.map((r) => (
                 <NeedCard key={r.id} r={r} />
               ))}

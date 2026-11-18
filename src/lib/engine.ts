@@ -85,16 +85,6 @@ export interface EnginePlan {
   remainingByExpense: Record<string, number>;
 }
 
-export const PHASE_LABELS: Record<PhaseKind, string> = {
-  waiver: "Fee waiver",
-  alternative: "Free alternative",
-  discount: "Discount",
-  borrow: "Equipment borrowing",
-  institutional: "Institutional assistance",
-  grant: "Educational grant",
-  sponsor: "Sponsor funding",
-};
-
 const round = (n: number) => Math.round(n * 100) / 100;
 const money = (n: number) => `AED ${round(n).toLocaleString("en-AE")}`;
 

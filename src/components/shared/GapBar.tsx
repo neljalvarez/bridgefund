@@ -1,0 +1,64 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { aed } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { AnimatedNumber } from "./kit";
+import { useT } from "@/lib/store";
+
+export interface GapSegment {
+  key: string;
+  label: string;
+  value: number;
+  /** Tailwind background class for the bar and legend dot. */
+  color: string;
+}
+
+/**
+ * BridgeFund's signature visual: the cost of an opportunity as one bar,
+ * filled by the student's funds, then savings, then sponsors — the empty part is the gap.
+ */
+export function GapBar({ total, segments, className, legend = true, size = "md" }: { total: number; segments: GapSegment[]; className?: string; legend?: boolean; size?: "sm" | "md" | "lg" }) {
+  const tr = useT();
+  const covered = segments.reduce((a, s) => a + s.value, 0);
+  const remaining = Math.max(total - covered, 0);
+  const pct = (v: number) => (total > 0 ? `${Math.min((v / total) * 100, 100)}%` : "0%");
+  return (
+    <div className={className}>
+      <div
+        className={cn("flex overflow-hidden rounded-full bg-secondary", size === "sm" ? "h-2" : size === "lg" ? "h-5" : "h-3.5")}
+        role="img"
+        aria-label={`${segments.map((s) => `${s.label} ${aed(s.value)}`).join(", ")}; ${aed(remaining)} still missing of ${aed(total)}`}
+      >
+        {segments.map((s) => (
+          <motion.div key={s.key} className={cn("h-full", s.color)} initial={false} animate={{ width: pct(s.value) }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
+        ))}
+      </div>
+      {legend && (
+        <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted-foreground">
+          {segments.map((s) => (
+            <li key={s.key} className="flex items-center gap-1.5">
+              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", s.color)} aria-hidden />
+              {s.label}
+              <AnimatedNumber value={s.value} className="font-medium text-foreground" />
+            </li>
+          ))}
+          <li className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-dashed border-muted-foreground/60 bg-secondary" aria-hidden />
+            {tr("Still missing")}
+            <AnimatedNumber value={remaining} className={cn("font-medium", remaining > 0 ? "text-warning" : "text-primary")} />
+          </li>
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** The standard colour order used everywhere a gap is explained. */
+export const GAP_COLORS = {
+  own: "bg-slate-400 dark:bg-slate-500",
+  borrow: "bg-emerald-200 dark:bg-emerald-900",
+  savings: "bg-emerald-300 dark:bg-emerald-800",
+  school: "bg-emerald-500 dark:bg-emerald-600",
+  sponsor: "bg-primary",
+} as const;

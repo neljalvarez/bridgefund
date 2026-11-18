@@ -45,7 +45,7 @@ export function BusinessSimulator() {
   const m24 = s.rows[s.rows.length - 1];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[340px_1fr]">
       <Card className="h-fit lg:sticky lg:top-20">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
@@ -112,7 +112,7 @@ export function BusinessSimulator() {
           ].map((x) => (
             <Card key={x.l} className="p-4">
               <p className="text-[13px] font-medium text-muted-foreground">{x.l}</p>
-              <p className={cn("mt-2 text-2xl font-semibold tracking-tight tabular", x.tone)}>{x.v}</p>
+              <p className={cn("mt-2 text-lg font-semibold tracking-tight tabular-nums sm:text-2xl", x.tone)}>{x.v}</p>
               <p className="mt-1 text-xs text-muted-foreground">{x.h}</p>
             </Card>
           ))}

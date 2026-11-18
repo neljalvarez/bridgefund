@@ -89,7 +89,7 @@ export default function CalculatorPage() {
         }
       />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {scenarios.map((s) => {
           const r = results.find((x) => x.id === s.id)!;
           const isBest = best?.id === s.id;

@@ -38,7 +38,7 @@ export default function SponsorDashboard() {
           <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{sponsor.name}</h1>
         </div>
         <Select value={sponsor.id} onValueChange={(v) => dispatch(setSponsor(v), { info: `Switched to ${state.sponsors.find((s) => s.id === v)?.name}` })}>
-          <SelectTrigger className="w-full sm:w-[240px]" aria-label="Sponsor account">
+          <SelectTrigger className="w-full sm:w-[300px]" aria-label="Sponsor account">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

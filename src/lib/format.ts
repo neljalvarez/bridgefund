@@ -14,7 +14,6 @@ export function setDisplayCurrency(code: string) {
   const c = CURRENCIES.find((x) => x.code === code) ?? CURRENCIES[0];
   display = { code: c.code, rate: c.rate };
 }
-export const displayCurrency = () => display.code;
 
 /** Formats an AED amount (in the selected display currency, AED by default), e.g. "AED 1,250". */
 export const aed = (n: number, cents?: boolean) => {
@@ -39,7 +38,6 @@ export const isoDaysFromNow = (days: number, base = new Date()) => {
 export const daysUntil = (iso: string) => daysBetween(new Date(), iso);
 export const fmtDate = (iso: string, opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }) => new Date(iso).toLocaleDateString(LOCALE, { timeZone: TIME_ZONE, ...opts });
 export const fmtDateLong = (iso: string) => fmtDate(iso, { day: "numeric", month: "long", year: "numeric" });
-export const fmtDateNumeric = (iso: string) => fmtDate(iso, { day: "2-digit", month: "2-digit", year: "numeric" });
 export const fmtDateTime = (iso: string) => new Date(iso).toLocaleString(LOCALE, { timeZone: TIME_ZONE, day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
 export const relDays = (iso: string) => {
@@ -119,4 +117,3 @@ export const STATUS_TONE: Record<RequestStatus, "neutral" | "info" | "warning" |
 };
 
 export const PENDING_STATUSES: RequestStatus[] = ["Submitted", "Under Review", "Additional Information Required"];
-export const FUNDABLE_STATUSES: RequestStatus[] = ["Verified", "Partially Funded"];

@@ -31,7 +31,7 @@ export function VerificationPanel({ r }: { r: FundingRequest }) {
   const payments = state.payments.filter((p) => p.requestId === r.id);
 
   return (
-    <div className="grid gap-5 rounded-lg border bg-muted/20 p-4 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-5 rounded-lg border bg-muted/20 p-4 lg:grid-cols-2">
       <div>
         <p className="mb-2 flex items-center gap-1.5 text-[13px] font-medium">
           <ShieldCheck className="h-4 w-4 text-primary" /> Verification checklist

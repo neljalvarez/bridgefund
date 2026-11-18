@@ -110,13 +110,13 @@ export function StrategyComparisonView({ cmp, selected, onSelect }: { cmp: Compa
   const best = { cost: sorted((s) => s.studentPays * 1000 + s.sponsorNeeded), speed: sorted((s) => s.daysToSecure * 1000 + s.sponsorNeeded), independence: sorted((s) => s.externalDependency * 1000 + s.studentPays) };
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {cmp.strategies.map((s) => (
           <StrategyCard key={s.id} s={s} recommended={cmp.recommended === s.id} selected={selected === s.id} onSelect={onSelect ? () => onSelect(s.id) : undefined} daysLeft={cmp.daysLeft} best={best} />
         ))}
       </div>
       <Card>
-        <CardContent className="grid gap-6 p-5 md:grid-cols-[1.4fr_1fr]">
+        <CardContent className="grid grid-cols-1 gap-6 p-5 md:grid-cols-[1.4fr_1fr]">
           <div>
             <p className="flex items-center gap-1.5 text-sm font-medium">
               <Gauge className="h-4 w-4 text-primary" /> Trade-offs

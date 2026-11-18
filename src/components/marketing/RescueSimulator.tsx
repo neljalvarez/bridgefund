@@ -46,7 +46,7 @@ export function RescueSimulator() {
   }, [v]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[340px_1fr]">
       <Card className="h-fit lg:sticky lg:top-20">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <CardTitle>Assumptions</CardTitle>
@@ -73,7 +73,7 @@ export function RescueSimulator() {
 
       <div className="min-w-0 space-y-6">
         <DemoBadge>Simulation estimates — not real outcomes</DemoBadge>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Card className="p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Scenario A · Traditional crowdfunding</p>
             <p className="mt-2 text-3xl font-semibold tabular">{aed(r.crowdDonorsNeeded)}</p>
@@ -99,7 +99,7 @@ export function RescueSimulator() {
           ].map((s) => (
             <Card key={s.l} className="p-4">
               <p className="text-[13px] font-medium text-muted-foreground">{s.l}</p>
-              <p className="mt-2 text-2xl font-semibold tracking-tight tabular">{s.v}</p>
+              <p className="mt-2 text-lg font-semibold tracking-tight tabular-nums sm:text-2xl">{s.v}</p>
               <p className="mt-1 text-xs text-muted-foreground">{s.h}</p>
             </Card>
           ))}

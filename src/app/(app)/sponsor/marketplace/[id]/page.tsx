@@ -36,7 +36,7 @@ export default function NeedDetailPage() {
       <Link href="/sponsor/marketplace" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Marketplace
       </Link>
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -110,7 +110,7 @@ export default function NeedDetailPage() {
                 <p className="text-sm text-muted-foreground">Amount remaining</p>
                 <p className="text-4xl font-semibold tracking-tight tabular">{aed(remaining)}</p>
               </div>
-              <Progress value={r.amount ? (r.funded / r.amount) * 100 : 100} />
+              <Progress aria-label="Share of the need funded" value={r.amount ? (r.funded / r.amount) * 100 : 100} />
               <p className="text-sm text-muted-foreground">
                 {aed(r.funded)} of {aed(r.amount)} funded
               </p>

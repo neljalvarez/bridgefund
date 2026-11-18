@@ -22,7 +22,7 @@ export default function BusinessPage() {
           <p className="text-sm font-medium text-primary">Business model</p>
           <h1 className="mt-2 max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">Sustainable, and free for students</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">Schools and partners pay. Students never do.</p>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
               { icon: ShieldCheck, t: "Students never pay", b: "Asking for help is always free." },
               { icon: Ban, t: "No loans or interest", b: "No lending, no hidden fees." },
@@ -43,7 +43,7 @@ export default function BusinessPage() {
       <section className="border-b bg-card">
         <div className="container py-16 md:py-20">
           <h2 className="text-3xl font-semibold tracking-tight">How it earns</h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">
             {STREAMS.map((s, i) => (
               <Card key={s.title} className="p-6">
                 <div className="flex items-start gap-4">
@@ -76,7 +76,7 @@ export default function BusinessPage() {
       </section>
 
       <section className="border-b">
-        <div className="container grid gap-10 py-16 md:grid-cols-2 md:py-20">
+        <div className="container grid grid-cols-1 gap-10 py-16 md:grid-cols-2 md:py-20">
           <div>
             <h2 className="text-3xl font-semibold tracking-tight">Why institutions would pay</h2>
             <p className="mt-4 text-muted-foreground">Hardship funds already exist. BridgeFund makes them go further.</p>

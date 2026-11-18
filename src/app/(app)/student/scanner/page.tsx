@@ -124,7 +124,7 @@ function Scanner() {
           </Button>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_1fr]">
         <Card>
           <CardContent className="p-6">
             <ol className="mb-8 grid grid-cols-6 gap-1.5" aria-label="Scanner progress">
@@ -175,7 +175,7 @@ function Scanner() {
                     {step === 0 && (
                       <div className="mt-2 space-y-4">
                         <h2 className="text-xl font-semibold">What opportunity are you pursuing?</h2>
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <div>
                             <Label>Type of opportunity</Label>
                             <Select value={f.category} onValueChange={(v) => set({ category: v as OpportunityCategory })}>
@@ -239,7 +239,7 @@ function Scanner() {
                     {step === 4 && (
                       <div className="mt-2 space-y-4">
                         <h2 className="text-xl font-semibold">What can you already afford?</h2>
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <div>
                             <Label htmlFor="funds">Available personal funds (AED)</Label>
                             <Input id="funds" className="mt-1.5 tabular" inputMode="decimal" value={f.funds} onChange={(e) => set({ funds: e.target.value.replace(/[^\d.]/g, "") })} placeholder="0" autoFocus />

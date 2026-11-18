@@ -38,20 +38,20 @@ export default function MatchingPage() {
       />
       <Tabs value={kind} onValueChange={(v) => setKind(v as typeof kind)} className="mb-4">
         <TabsList className="h-auto flex-wrap">
-          <TabsTrigger value="all">All ({matches.length})</TabsTrigger>
+          <TabsTrigger value="all" aria-controls={undefined}>All ({matches.length})</TabsTrigger>
           {(Object.keys(KIND) as MatchKind[]).map((k) => (
-            <TabsTrigger key={k} value={k}>
+            <TabsTrigger key={k} value={k} aria-controls={undefined}>
               {KIND[k].label} ({matches.filter((m) => m.kind === k).length})
             </TabsTrigger>
           ))}
         </TabsList>
       </Tabs>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]">
         {list.length === 0 ? (
           <EmptyState title="No open matches" description="Every current need is either covered or has no matching resource." />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {list.map((m) => {
               const st = studentOf(state, m.studentId);
               const K = KIND[m.kind];

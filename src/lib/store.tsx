@@ -1,36 +1,32 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { MotionConfig } from "framer-motion";
 import { toast } from "sonner";
 import type { AppState } from "./types";
 import type { Action } from "./actions";
-import { createSeedState, STATE_VERSION } from "./seed";
+import { createSeedState } from "./seed";
 import { setDisplayCurrency } from "./format";
 import { DIR, t, type Locale } from "./i18n";
 
-const KEY = "bridgefund-state";
+import { parseState, STORAGE_KEY as KEY } from "./persist";
 
 type Feedback = { success?: string; info?: string; error?: string; description?: string };
 
 interface StoreValue {
   state: AppState;
   dispatch: (action: Action, feedback?: Feedback) => void;
-  reset: () => void;
+  reset: (opts?: { silent?: boolean }) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
 
 function load(): AppState {
   try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as AppState;
-      if (parsed.version === STATE_VERSION) return parsed;
-    }
+    return parseState(localStorage.getItem(KEY)) ?? createSeedState();
   } catch {
-    /* corrupted storage — start fresh */
+    return createSeedState(); // storage blocked (private mode) — run in memory
   }
-  return createSeedState();
 }
 
 /** Demo state lives in localStorage. Nothing is sent to a server. */
@@ -50,29 +46,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === KEY && e.newValue) {
-        try {
-          setState(JSON.parse(e.newValue));
-        } catch {
-          /* ignore */
-        }
-      }
+      if (e.key !== KEY) return;
+      const next = parseState(e.newValue);
+      if (next) setState(next);
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const dispatch = useCallback<StoreValue["dispatch"]>((action, fb) => {
-    setState((s) => (s ? action(s) : s));
+    let failed = false;
+    setState((s) => {
+      if (!s) return s;
+      try {
+        return action(s);
+      } catch (err) {
+        console.error("[BridgeFund] action failed", err);
+        failed = true;
+        return s; // never leave the demo in a half-updated state
+      }
+    });
+    if (failed) {
+      toast.error("That didn't work", { description: "Nothing was changed. Try again, or reset the demo." });
+      return;
+    }
     if (fb?.success) toast.success(fb.success, { description: fb.description });
     else if (fb?.info) toast(fb.info, { description: fb.description });
     else if (fb?.error) toast.error(fb.error, { description: fb.description });
   }, []);
 
-  const reset = useCallback(() => {
+  const reset = useCallback((opts?: { silent?: boolean }) => {
     // Reset demo data, but keep preferences and anything real the user entered (pilot results, feedback).
     setState((s) => ({ ...createSeedState(), onboarded: true, profile: s?.profile ?? createSeedState().profile, display: s?.display ?? createSeedState().display, pilot: s?.pilot ?? createSeedState().pilot, feedback: s?.feedback ?? [] }));
-    toast("Demo reset", { description: "All demonstration data has been restored." });
+    if (!opts?.silent) toast.success("Demo reset", { description: "All demonstration data has been restored." });
   }, []);
 
   if (state) setDisplayCurrency(state.display.currency); // display-only conversion; calculations stay in AED
@@ -82,7 +88,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     document.documentElement.dir = DIR[locale];
   }, [locale]);
   const value = useMemo(() => (state ? { state, dispatch, reset } : null), [state, dispatch, reset]);
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={value}>
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+    </StoreContext.Provider>
+  );
 }
 
 export function useStore() {

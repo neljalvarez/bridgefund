@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ChartCard title="Most common financial barriers" description="Expense items by category">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barriers} layout="vertical" margin={{ left: 20 }}>

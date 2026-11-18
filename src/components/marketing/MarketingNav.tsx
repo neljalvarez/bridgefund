@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ChevronDown, Menu, Moon, PlayCircle, Presentation, Sun } from "lucide-react";
+import { ChevronDown, Compass, Menu, Moon, PlayCircle, Presentation, Sun } from "lucide-react";
+import { JudgeMode } from "@/components/app/JudgeMode";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -63,18 +64,18 @@ export function MarketingNav() {
           <Menu2 label="More" items={COMPANY} />
         </nav>
         <div className="ms-auto flex items-center gap-2">
-          <LanguageToggle className="hidden sm:inline-flex" />
-          <Button variant="ghost" size="icon" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
+          <LanguageToggle className="hidden lg:inline-flex" />
+          <Button variant="ghost" size="icon" className="hidden sm:inline-flex" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
             {dark ? <Sun /> : <Moon />}
           </Button>
-          <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
-            <Link href="/present">
-              <Presentation /> Present
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" className="hidden sm:inline-flex">
+          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
             <Link href="/signin">Sign In</Link>
           </Button>
+          <JudgeMode>
+            <Button size="sm" aria-label="Judge mode">
+              <Compass /> <span className="hidden sm:inline">Judge mode</span>
+            </Button>
+          </JudgeMode>
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
             <Menu />
           </Button>

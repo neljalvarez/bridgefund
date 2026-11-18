@@ -59,7 +59,7 @@ export function NeedCard({ r }: { r: FundingRequest }) {
             </p>
           </div>
         </div>
-        <Progress value={r.amount ? (r.funded / r.amount) * 100 : 0} className="mt-3" />
+        <Progress aria-label="Share of the need funded" value={r.amount ? (r.funded / r.amount) * 100 : 0} className="mt-3" />
         <p className="mt-1.5 text-xs text-muted-foreground">
           {aed(r.funded)} of {aed(r.amount)} verified requirement funded
         </p>

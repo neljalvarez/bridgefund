@@ -51,12 +51,12 @@ export function HeroPreview() {
         </div>
         <ul className="mt-5 space-y-2">
           {STEPS.map((s, i) => (
-            <li key={s.label} className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-opacity duration-500 ${i < n ? "opacity-100" : "opacity-40"}`}>
+            <li key={s.label} className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors duration-500 ${i < n ? "bg-card" : "border-dashed bg-transparent text-muted-foreground"}`}>
               <span className={`flex h-7 w-7 items-center justify-center rounded-md ${i < n ? "bg-primary-light text-primary" : "bg-muted text-muted-foreground"}`}>
                 <s.icon className="h-3.5 w-3.5" />
               </span>
               <span className="flex-1">{s.label}</span>
-              <span className="tabular text-muted-foreground">−{aed(s.amount)}</span>
+              <span className={`tabular ${i < n ? "font-medium text-primary" : "text-muted-foreground"}`}>−{aed(s.amount)}</span>
               {i < n && <Check className="h-4 w-4 text-primary" />}
             </li>
           ))}

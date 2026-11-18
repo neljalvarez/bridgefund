@@ -61,7 +61,7 @@ function RequestCard({ r }: { r: FundingRequest }) {
             </div>
           )}
           <StatusTrack status={r.status} />
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <p className="mb-2 text-[13px] font-medium">Financial breakdown</p>
               <RequestBreakdown r={r} state={state} />
@@ -69,7 +69,7 @@ function RequestCard({ r }: { r: FundingRequest }) {
             <div className="space-y-5">
               <div>
                 <p className="mb-2 text-[13px] font-medium">Funding progress</p>
-                <Progress value={r.amount ? (r.funded / r.amount) * 100 : 100} />
+                <Progress aria-label="Share of the need funded" value={r.amount ? (r.funded / r.amount) * 100 : 100} />
                 <p className="mt-1.5 text-xs text-muted-foreground">
                   {aed(r.funded)} of {aed(r.amount)} requested
                 </p>

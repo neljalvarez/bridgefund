@@ -115,7 +115,7 @@ export default function WhyPage() {
       <section className="border-b">
         <div className="container py-14 md:py-20">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">How approaches compare</h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {ALTERNATIVES.map((a) => (
               <Card key={a.name} className="p-5">
                 <h3 className="font-semibold">{a.name}</h3>
@@ -167,7 +167,7 @@ export default function WhyPage() {
       <section className="border-b bg-card">
         <div className="container py-14 md:py-20">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">What&apos;s different</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {DIFFERENTIATION.map((d) => (
               <div key={d.t} className="flex gap-3 rounded-xl border bg-background p-5">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">

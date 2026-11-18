@@ -82,7 +82,7 @@ export default function PilotPage() {
       <section className="border-b bg-card">
         <div className="container py-14 md:py-20">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Proposed timeline</h2>
-          <ol className="mt-8 grid gap-4 md:grid-cols-4">
+          <ol className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
             {TIMELINE.map((x) => (
               <li key={x.w} className="rounded-xl border bg-background p-5">
                 <p className="text-sm font-semibold text-primary">{x.w}</p>
@@ -99,7 +99,7 @@ export default function PilotPage() {
       <section className="border-b">
         <div className="container py-14 md:py-20">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">After the pilot</h2>
-          <ol className="mt-8 grid gap-4 md:grid-cols-4">
+          <ol className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
             {[
               { p: "1", t: "Abu Dhabi", b: "Pilot schools, then more ADEK schools if results hold." },
               { p: "2", t: "Dubai", b: "Private school groups and university outreach offices." },

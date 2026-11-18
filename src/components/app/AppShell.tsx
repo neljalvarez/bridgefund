@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Building2, LogOut, Menu, Moon, PlayCircle, Presentation, RotateCcw, Search, Settings, Sun } from "lucide-react";
+import { Building2, Compass, LogOut, Menu, Moon, PlayCircle, RotateCcw, Search, Settings, Sun } from "lucide-react";
+import { JudgeMode } from "./JudgeMode";
 import type { Role } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { setInstitution, setRole } from "@/lib/actions";
@@ -12,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/shared/Logo";
 import { ACCOUNT_NAV, ROLE_META, ROLE_NAV } from "./nav";
@@ -54,12 +54,12 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
     <nav aria-label={`${ROLE_META[role].label} navigation`} className="flex flex-1 flex-col gap-4 overflow-y-auto">
       {ROLE_NAV[role].map((g) => (
         <div key={g.section}>
-          <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">{tr(g.section)}</p>
+          <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{tr(g.section)}</p>
           <ul className="space-y-0.5">{g.items.map((i) => link(i.href, i.label, i.icon, i.href === ROLE_META[role].home))}</ul>
         </div>
       ))}
       <div className="mt-auto">
-        <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">{tr("Account")}</p>
+        <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{tr("Account")}</p>
         <ul className="space-y-0.5">{ACCOUNT_NAV.map((i) => link(i.href, i.label, i.icon, false, i.href === "/notifications" ? unread : undefined))}</ul>
       </div>
     </nav>
@@ -112,7 +112,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { dark, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [resetOpen, setResetOpen] = useState(false);
   const areaRole = (["student", "sponsor", "institution"] as Role[]).find((r) => pathname.startsWith(`/${r}`));
   const role = areaRole ?? state.role;
 
@@ -155,19 +154,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
             <div className="ms-auto flex items-center gap-1.5">
               <RoleSwitcher className="hidden md:flex" />
-              <Button asChild size="sm" className="ms-1 hidden sm:inline-flex">
-                <Link href="/demo">
-                  <PlayCircle /> {tr("Launch Interactive Demo")}
-                </Link>
-              </Button>
-              <LanguageToggle className="hidden md:inline-flex" />
+              <JudgeMode>
+                <Button size="sm" className="ms-1" aria-label={tr("Judge mode")}>
+                  <Compass /> <span className="hidden sm:inline">{tr("Judge mode")}</span>
+                </Button>
+              </JudgeMode>
+              <LanguageToggle className="hidden xl:inline-flex" />
               <FeedbackButton />
-              <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex" aria-label="Presentation mode" title="Presentation mode">
-                <Link href="/present">
-                  <Presentation />
-                </Link>
-              </Button>
-              <Button variant="ghost" size="icon" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
+              <Button variant="ghost" size="icon" className="hidden sm:inline-flex" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
                 {dark ? <Sun /> : <Moon />}
               </Button>
               <NotificationCenter />
@@ -191,7 +185,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <DropdownMenuItem onSelect={() => router.push("/demo")}>
                     <PlayCircle /> Launch interactive demo
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setResetOpen(true)}>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      reset();
+                      router.push(ROLE_META[role].home);
+                    }}
+                  >
                     <RotateCcw /> Reset demo data
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -209,29 +208,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
-      <Dialog open={resetOpen} onOpenChange={setResetOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reset demo data?</DialogTitle>
-            <DialogDescription>Every student, request, balance and reservation returns to its starting point. Your profile preferences are kept.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setResetOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                reset();
-                setResetOpen(false);
-                router.push(ROLE_META[role].home);
-              }}
-            >
-              <RotateCcw /> Reset demo
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -254,7 +230,7 @@ export function ShellSkeleton() {
         <div className="h-14 border-b" />
         <div className="mx-auto max-w-[1240px] space-y-6 px-6 py-8">
           <div className="h-8 w-64 animate-pulse rounded-md bg-muted" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/70" />
             ))}

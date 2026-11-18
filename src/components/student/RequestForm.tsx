@@ -99,7 +99,7 @@ export function RequestForm({ open, onOpenChange }: { open: boolean; onOpenChang
               </SelectContent>
             </Select>
           </div>
-          <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr]">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[2fr_1fr_1fr]">
             <div>
               <Label htmlFor="rf-purpose">Educational purpose</Label>
               <Input id="rf-purpose" className="mt-1.5" value={purpose} onChange={(e) => setPurpose(e.target.value)} aria-invalid={!!errors.purpose} placeholder="e.g. Chemistry practical exam fee" />
@@ -126,7 +126,7 @@ export function RequestForm({ open, onOpenChange }: { open: boolean; onOpenChang
             <Textarea id="rf-why" className="mt-1.5" value={explanation} onChange={(e) => setExplanation(e.target.value)} aria-invalid={!!errors.explanation} placeholder="A sentence or two is enough. Share only what you're comfortable with." />
             <FieldError>{errors.explanation}</FieldError>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <p className="mb-1.5 text-sm font-medium">Supporting documents</p>
               <ul className="space-y-1.5">

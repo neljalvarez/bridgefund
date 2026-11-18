@@ -22,7 +22,7 @@
     --accent-foreground: 220 43% 11%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --warning: 32 95% 44%;
+    --warning: 28 90% 37%;
     --warning-foreground: 0 0% 100%;
     --border: 218 17% 91%;
     --input: 218 17% 88%;
@@ -51,8 +51,8 @@
     --muted-foreground: 218 15% 66%;
     --accent: 218 33% 17%;
     --accent-foreground: 210 40% 96%;
-    --destructive: 0 72% 58%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 80% 66%;
+    --destructive-foreground: 0 0% 8%;
     --warning: 35 92% 55%;
     --warning-foreground: 30 80% 10%;
     --border: 218 33% 18%;
@@ -86,6 +86,7 @@
 @layer utilities {
   .tabular {
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .text-balance {
     text-wrap: balance;
@@ -113,6 +114,10 @@
 }
 
 /* Right-to-left (Arabic) */
+/* Keep amounts like "−AED 200" in reading order inside Arabic text. */
+[dir="rtl"] span.tabular {
+  unicode-bidi: plaintext;
+}
 [dir="rtl"] .lucide-arrow-right,
 [dir="rtl"] .lucide-arrow-left,
 [dir="rtl"] .lucide-chevron-right,
