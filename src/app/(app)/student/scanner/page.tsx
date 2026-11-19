@@ -68,7 +68,7 @@ function Scanner() {
     }
     if (i === 3) {
       if (!f.expenses.length) e.expenses = "Add at least one required expense.";
-      else if (f.expenses.some((x) => !x.label.trim() || !(x.amount > 0))) e.expenses = "Every expense needs a description and an amount above $0.";
+      else if (f.expenses.some((x) => !x.label.trim() || !(x.amount > 0))) e.expenses = "Every expense needs a description and an amount above AED 0.";
     }
     if (i === 4 && f.funds !== "" && isNaN(Number(f.funds))) e.funds = "Enter a number — AED 0 is fine.";
     setErrors(e);
@@ -131,7 +131,7 @@ function Scanner() {
               {STEPS.map((s, i) => (
                 <li key={s}>
                   <button type="button" disabled={i > step && !done} onClick={() => { setDone(false); setStep(i); }} className="w-full text-start disabled:cursor-default" aria-current={i === step && !done ? "step" : undefined}>
-                    <span className={cn("block h-1 rounded-full", i < step || done ? "bg-primary" : i === step ? "bg-primary/50" : "bg-secondary")} />
+                    <span className={cn("block h-1 rounded-sm", i < step || done ? "bg-primary" : i === step ? "bg-primary/50" : "bg-secondary")} />
                     <span className={cn("mt-1.5 hidden text-[11px] sm:block", i === step && !done ? "font-medium text-foreground" : "text-muted-foreground")}>{s}</span>
                   </button>
                 </li>
@@ -141,7 +141,7 @@ function Scanner() {
             {done ? (
               <div className="space-y-5">
                 <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-primary-light text-primary">
                     <Check className="h-5 w-5" />
                   </span>
                   <div>
@@ -321,7 +321,7 @@ function Scanner() {
                         <span>{EXPENSE_LABEL[c as keyof typeof EXPENSE_LABEL]}</span>
                         <span className="tabular">{aed(v)}</span>
                       </div>
-                      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
+                      <div className="mt-1 h-1.5 overflow-hidden rounded-sm bg-secondary">
                         <motion.div className="h-full bg-primary" animate={{ width: `${total ? (v / total) * 100 : 0}%` }} />
                       </div>
                     </li>

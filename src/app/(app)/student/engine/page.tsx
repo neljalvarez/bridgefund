@@ -37,9 +37,9 @@ function Stepper({ step, reached, go }: { step: number; reached: number; go: (n:
         return (
           <li key={label}>
             <button type="button" disabled={n > reached} onClick={() => go(n)} aria-current={current ? "step" : undefined} className="group w-full text-start disabled:cursor-default focus-visible:outline-none">
-              <span className={cn("block h-1 rounded-full transition-colors", done || current ? "bg-primary" : "bg-secondary")} />
+              <span className={cn("block h-1 rounded-sm transition-colors", done || current ? "bg-primary" : "bg-secondary")} />
               <span className={cn("mt-2 flex items-center gap-1.5 text-xs sm:text-sm", current ? "font-medium text-foreground" : done ? "text-foreground" : "text-muted-foreground")}>
-                <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold", done ? "bg-primary text-primary-foreground" : current ? "border-2 border-primary text-primary" : "border text-muted-foreground")}>
+                <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-[11px] font-semibold", done ? "bg-primary text-primary-foreground" : current ? "border-2 border-primary text-primary" : "border text-muted-foreground")}>
                   {done ? <Check className="h-3 w-3" /> : n}
                 </span>
                 <span className={cn("truncate", !current && "hidden sm:inline")}>{tr(label)}</span>
@@ -186,8 +186,8 @@ function Journey() {
                       <span className="min-w-0">
                         {e.label} {!e.confirmed && <span className="text-xs text-muted-foreground">(estimate)</span>}
                       </span>
-                      <span className="col-span-2 row-start-2 h-1.5 overflow-hidden rounded-full bg-secondary sm:col-span-1 sm:row-start-auto" aria-hidden>
-                        <motion.span className="block h-full rounded-full bg-slate-400 dark:bg-slate-500" initial={{ width: 0 }} animate={{ width: `${(e.amount / plan.totalCost) * 100}%` }} transition={{ duration: 0.6, delay: 0.1 + i * 0.08 }} />
+                      <span className="col-span-2 row-start-2 h-1.5 overflow-hidden rounded-sm bg-secondary sm:col-span-1 sm:row-start-auto" aria-hidden>
+                        <motion.span className="block h-full bg-stone" initial={{ width: 0 }} animate={{ width: `${(e.amount / plan.totalCost) * 100}%` }} transition={{ duration: 0.6, delay: 0.1 + i * 0.08 }} />
                       </span>
                       <span className="text-end font-medium tabular">{aed(e.amount)}</span>
                     </motion.div>
@@ -276,8 +276,8 @@ function Journey() {
                       ))}
                   </CardContent>
                 </Card>
-                <div className="rounded-xl border border-primary/25 bg-primary-light/50 p-5 dark:bg-primary/10">
-                  <p className="text-[13px] font-medium text-primary">{tr("You'll request")}</p>
+                <div className="rounded-xl border border-primary/25 bg-primary-light p-5">
+                  <p className="eyebrow text-primary">{tr("You'll request")}</p>
                   <p className="mt-1 text-4xl font-semibold tracking-tight tabular">{aed(chosen.sponsorNeeded)}</p>
                   <p className="mt-1 text-sm text-muted-foreground">instead of {aed(plan.initialGap)}</p>
                   <p className="mt-4 flex gap-2 text-xs text-muted-foreground">
@@ -386,9 +386,10 @@ export default function GetAssistancePage() {
   const tr = useT();
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{tr("Get assistance")}</h1>
-        <p className="mt-1 text-[15px] text-muted-foreground">{tr("From cost to covered in five steps.")}</p>
+      <div className="mb-8 border-b pb-6">
+        <p className="eyebrow text-primary">BridgeEngine</p>
+        <h1 className="mt-1 text-[2rem] leading-[1.1] md:text-[2.5rem]">{tr("Get assistance")}</h1>
+        <p className="mt-2 text-[15px] text-muted-foreground">{tr("From cost to covered in five steps.")}</p>
       </div>
       <Suspense>
         <Journey />

@@ -6,7 +6,7 @@ import { Hydrated, useStore } from "@/lib/store";
 import { publicImpact } from "@/lib/publicImpact";
 import { fmtMultiplier } from "@/lib/impact";
 import { EMIRATES, type Emirate } from "@/lib/uae";
-import { OPP_LABEL, aed } from "@/lib/format";
+import { OPP_LABEL, aed, aedAxis } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,7 +46,7 @@ function EmirateMap({ data, selected, onSelect }: { data: { emirate: Emirate; am
           >
             <span className="truncate text-[11px] font-medium leading-tight sm:text-xs">{d.emirate}</span>
             <span className="truncate text-xs font-semibold tabular sm:text-sm">{aed(d.amount)}</span>
-            <span className="hidden truncate text-[11px] text-foreground/75 sm:block">
+            <span className="hidden truncate text-[11px] text-foreground sm:block">
               {d.resolved}/{d.requests} resolved
             </span>
           </button>
@@ -153,7 +153,7 @@ function Dashboard() {
               <BarChart data={m.byCategory} margin={{ left: -4 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" interval={0} {...axis} fontSize={11} />
-                <YAxis {...axis} width={80} tickFormatter={(v) => aed(v)} />
+                <YAxis {...axis} width={72} tickFormatter={(v) => aedAxis(v)} />
                 <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar dataKey="Reductions" stackId="a" fill="hsl(var(--chart-2))" maxBarSize={44} />

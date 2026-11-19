@@ -43,10 +43,10 @@ export default function StudentDashboard() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-6 flex items-end justify-between gap-4">
+      <div className="mb-8 flex items-end justify-between gap-4 border-b pb-6">
         <div>
-          <p className="text-sm text-muted-foreground">{tr("Hi")} {student.firstName}</p>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{tr("Your dashboard")}</h1>
+          <p className="eyebrow text-primary">{tr("Hi")} {student.firstName}</p>
+          <h1 className="mt-1 text-[2rem] leading-[1.1] md:text-[2.5rem]">{tr("Your dashboard")}</h1>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/student/scanner">
@@ -64,7 +64,7 @@ export default function StudentDashboard() {
         </p>
       )}
       {risks.length > 0 && (
-        <p className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-warning/40 bg-warning-soft px-4 py-3 text-sm text-warning">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span className="flex-1">
             <strong>{risks[0].p.opp.title}</strong> could miss its deadline ({relDays(risks[0].p.opp.deadline)}).

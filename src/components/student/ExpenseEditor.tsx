@@ -66,7 +66,7 @@ export function ExpenseEditor({ expenses, onChange, idPrefix = "exp" }: { expens
           <Plus /> Add expense
         </Button>
         {QUICK.map((q) => (
-          <button key={q.label} type="button" onClick={() => add(q.label, q.category)} className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">
+          <button key={q.label} type="button" onClick={() => add(q.label, q.category)} className="rounded-sm border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">
             + {q.label}
           </button>
         ))}

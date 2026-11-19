@@ -42,9 +42,9 @@ export default function InstitutionOverview() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-6">
-        <p className="text-sm text-muted-foreground">{instName}</p>
-        <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{tr("Your dashboard")}</h1>
+      <div className="mb-8 border-b pb-6">
+        <p className="eyebrow text-primary">{instName}</p>
+        <h1 className="mt-1 text-[2rem] leading-[1.1] md:text-[2.5rem]">{tr("Your dashboard")}</h1>
       </div>
 
       <DashboardFocus

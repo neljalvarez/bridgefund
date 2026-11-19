@@ -19,7 +19,7 @@ export default function BusinessPage() {
     <>
       <section className="border-b">
         <div className="container py-16 md:py-24">
-          <p className="text-sm font-medium text-primary">Business model</p>
+          <p className="eyebrow text-primary">Business model</p>
           <h1 className="mt-2 max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">Sustainable, and free for students</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">Schools and partners pay. Students never do.</p>
           <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -66,7 +66,7 @@ export default function BusinessPage() {
 
       <section id="simulator" className="scroll-mt-20 border-b">
         <div className="container py-16 md:py-20">
-          <p className="text-sm font-medium text-primary">Business model simulator</p>
+          <p className="eyebrow text-primary">Business model simulator</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight">Test the assumptions yourself.</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">Change any assumption. Every figure is hypothetical.</p>
           <div className="mt-10">

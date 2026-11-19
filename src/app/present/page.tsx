@@ -43,7 +43,7 @@ const TOTAL = SECTIONS.reduce((a, s) => a + s.seconds, 0);
 
 const H = ({ children, kicker }: { children: React.ReactNode; kicker: string }) => (
   <div className="mb-6">
-    <p className="text-sm font-medium text-primary">{kicker}</p>
+    <p className="eyebrow text-primary">{kicker}</p>
     <h2 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">{children}</h2>
   </div>
 );
@@ -98,7 +98,7 @@ function Limitations() {
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.t}</p>
           </Card>
         ))}
-        <Card className="flex flex-col justify-center border-primary/40 bg-primary-light/40 p-5 dark:bg-primary/10">
+        <Card className="flex flex-col justify-center border-primary/40 bg-primary-light p-5">
           <p className="font-semibold text-primary">The missing piece</p>
           <p className="mt-2 text-sm leading-relaxed">Nobody reduces the cost first, verifies the need, and funds exactly what remains — before the deadline.</p>
         </Card>
@@ -420,7 +420,7 @@ function Presentation() {
           <ol className="flex gap-1">
             {SECTIONS.map((s, n) => (
               <li key={s.title}>
-                <button type="button" onClick={() => go(n)} aria-current={n === i ? "step" : undefined} className={cn("rounded-md px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", n === i ? "bg-primary-light font-medium text-primary dark:bg-primary/15" : "text-muted-foreground hover:text-foreground")}>
+                <button type="button" onClick={() => go(n)} aria-current={n === i ? "step" : undefined} className={cn("rounded-md px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", n === i ? "bg-primary-light font-medium text-primary" : "text-muted-foreground hover:text-foreground")}>
                   {n + 1}. {s.short}
                 </button>
               </li>
@@ -428,7 +428,7 @@ function Presentation() {
           </ol>
         </nav>
         <div className="ms-auto flex items-center gap-2">
-          <button type="button" onClick={() => setRunning((r) => !r)} className={cn("flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs tabular", over ? "border-amber-300 text-warning" : "text-muted-foreground")} aria-label={running ? "Pause timer" : "Resume timer"} title="Pause or resume the timer">
+          <button type="button" onClick={() => setRunning((r) => !r)} className={cn("flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs tabular", over ? "border-warning text-warning" : "text-muted-foreground")} aria-label={running ? "Pause timer" : "Resume timer"} title="Pause or resume the timer">
             <Timer className="h-3.5 w-3.5" /> {mmss(elapsed)}<span className="hidden sm:inline"> / {mmss(TOTAL)}</span>
           </button>
           <Button variant="ghost" size="icon" onClick={toggleFs} aria-label={fs ? "Exit fullscreen" : "Enter fullscreen"}>

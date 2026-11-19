@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { remainingOf } from "@/lib/actions";
 import { inInstitutionScope, oppOf } from "@/lib/selectors";
-import { EXPENSE_LABEL, OPP_LABEL, daysUntil, sum, aed } from "@/lib/format";
+import { EXPENSE_LABEL, OPP_LABEL, daysUntil, sum, aed, aedAxis } from "@/lib/format";
 import { daysBetween } from "@/lib/allocation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
               <BarChart data={multByCat} margin={{ left: -10 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" interval={0} {...axis} />
-                <YAxis {...axis} tickFormatter={(v) => aed(v)} width={70} />
+                <YAxis {...axis} tickFormatter={(v) => aedAxis(v)} width={72} />
                 <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
                 <Bar dataKey="resolved" name="Barriers resolved" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} maxBarSize={36} />
                 <Bar dataKey="sponsor" name="Sponsor funding used" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} maxBarSize={36} />
@@ -191,7 +191,7 @@ export default function AnalyticsPage() {
             <BarChart data={weeks}>
               <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
               <XAxis dataKey="name" {...axis} />
-              <YAxis {...axis} tickFormatter={(v) => `$${v}`} />
+              <YAxis {...axis} width={72} tickFormatter={(v) => aedAxis(v)} />
               <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
               <Bar dataKey="value" name="Remaining" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} maxBarSize={40} />
             </BarChart>

@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader, StatCard, StatusBadge } from "@/components/shared/kit";
 
 type Kind = "Opportunity" | "Funding" | "Waiver" | "Pickup";
-const DOT: Record<Kind, string> = { Opportunity: "bg-primary", Funding: "bg-amber-500", Waiver: "bg-sky-500", Pickup: "bg-slate-400" };
+const DOT: Record<Kind, string> = { Opportunity: "bg-primary", Funding: "bg-chart-3", Waiver: "bg-sage-deep", Pickup: "bg-stone" };
 const key = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export default function TrackerPage() {
@@ -126,7 +126,7 @@ export default function TrackerPage() {
                         aria-label={`${d.toDateString()}${evs.length ? `, ${evs.length} event${evs.length > 1 ? "s" : ""}` : ""}`}
                         className={cn("flex aspect-square flex-col items-center justify-between rounded-lg border p-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", selected === k ? "border-primary bg-primary-light/60" : "border-transparent hover:bg-muted")}
                       >
-                        <span className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[13px] tabular", isToday && "bg-primary text-primary-foreground")}>{d.getDate()}</span>
+                        <span className={cn("flex h-6 w-6 items-center justify-center rounded-sm text-[13px] tabular", isToday && "bg-primary text-primary-foreground")}>{d.getDate()}</span>
                         <span className="flex gap-0.5">
                           {evs.slice(0, 3).map((e) => (
                             <span key={e.id} className={cn("h-1.5 w-1.5 rounded-full", DOT[e.kind])} />

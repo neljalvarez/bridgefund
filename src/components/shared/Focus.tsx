@@ -39,18 +39,18 @@ export function DashboardFocus({ figures, action }: { figures: Figure[]; action:
       <Card className="grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {figures.map((f) => (
           <div key={f.label} className="p-5 md:p-6">
-            <p className="text-[13px] font-medium text-muted-foreground">{tr(f.label)}</p>
-            <p className={cn("mt-2 text-3xl font-semibold tracking-tight md:text-4xl", f.tone === "primary" && "text-primary", f.tone === "warning" && "text-warning")}>
-              {typeof f.value === "number" ? <AnimatedNumber value={f.value} money={f.money ?? true} /> : f.value}
+            <p className="eyebrow text-muted-foreground">{tr(f.label)}</p>
+            <p className={cn("mt-3 font-mono text-[2rem] font-medium leading-none tracking-[-0.03em] md:text-[2.5rem]", f.tone === "primary" && "text-primary", f.tone === "warning" && "text-warning")}>
+              {typeof f.value === "number" ? <AnimatedNumber value={f.value} money={f.money ?? true} /> : <bdi>{f.value}</bdi>}
             </p>
-            {f.sub && <p className="mt-1.5 text-sm text-muted-foreground">{f.sub}</p>}
+            {f.sub && <p className="mt-2.5 text-sm text-muted-foreground">{f.sub}</p>}
           </div>
         ))}
       </Card>
-      <div className="flex flex-col gap-4 rounded-xl border border-primary/25 bg-primary-light/50 p-5 dark:bg-primary/10 sm:flex-row sm:items-center sm:justify-between md:p-6">
+      <div className="flex flex-col gap-4 rounded-lg border border-s-[3px] border-s-primary bg-card p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
         <div className="min-w-0">
-          <p className="text-[13px] font-medium text-primary">{tr("Next step")}</p>
-          <p className="mt-0.5 text-lg font-semibold tracking-tight">{action.title}</p>
+          <p className="eyebrow text-primary">{tr("Next step")}</p>
+          <p className="mt-1.5 font-display text-xl font-medium leading-snug">{action.title}</p>
           {action.text && <p className="mt-0.5 text-sm text-muted-foreground">{action.text}</p>}
         </div>
         <div className="shrink-0">{Btn}</div>

@@ -32,10 +32,10 @@ export default function SponsorDashboard() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-8 flex flex-col gap-3 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">Sponsor</p>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">{sponsor.name}</h1>
+          <p className="eyebrow text-primary">Sponsor</p>
+          <h1 className="mt-1 text-[2rem] leading-[1.1] md:text-[2.5rem]">{sponsor.name}</h1>
         </div>
         <Select value={sponsor.id} onValueChange={(v) => dispatch(setSponsor(v), { info: `Switched to ${state.sponsors.find((s) => s.id === v)?.name}` })}>
           <SelectTrigger className="w-full sm:w-[300px]" aria-label="Sponsor account">

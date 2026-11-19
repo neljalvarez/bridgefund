@@ -149,7 +149,7 @@ export default function WhyPage() {
                       {row.capability}
                     </th>
                     {row.values.map((v, i) => (
-                      <td key={i} className={`px-3 py-3 ${tone(v)} ${i === 5 ? "bg-primary-light/40 dark:bg-primary/10" : ""}`}>
+                      <td key={i} className={`px-3 py-3 ${tone(v)} ${i === 5 ? "bg-primary-light" : ""}`}>
                         {v}
                       </td>
                     ))}

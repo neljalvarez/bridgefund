@@ -78,8 +78,8 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {r.priority && <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-700 dark:bg-red-950 dark:text-red-300">Priority</span>}
-          {openIssues > 0 && PENDING.includes(r.status) && <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-300">{openIssues} check{openIssues === 1 ? "" : "s"} open</span>}
+          {r.priority && <span className="rounded-md bg-destructive-soft px-1.5 py-0.5 text-[11px] font-medium text-destructive">Priority</span>}
+          {openIssues > 0 && PENDING.includes(r.status) && <span className="rounded-md bg-warning-soft px-1.5 py-0.5 text-[11px] font-medium text-warning">{openIssues} check{openIssues === 1 ? "" : "s"} open</span>}
           <UrgencyBadge label={urgencyOf(r.deadline).label} />
           <span className="min-w-[5.5rem] text-end font-semibold tabular">{aed(remaining)}</span>
           <StatusBadge status={r.status} />
@@ -88,7 +88,7 @@ export function ReviewCard({ r, defaultOpen, highlight }: { r: FundingRequest; d
       </button>
       {open && (
         <div className="space-y-5 border-t p-4">
-          {r.status === "Additional Information Required" && <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">Waiting for the student: “{r.infoRequested}”</p>}
+          {r.status === "Additional Information Required" && <p className="rounded-md border-s-2 border-warning bg-warning-soft px-3 py-2 text-sm text-warning">Waiting for the student: “{r.infoRequested}”</p>}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="md:col-span-1">
               <p className="mb-2 text-[13px] font-medium">Financial breakdown</p>

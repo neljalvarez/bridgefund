@@ -52,7 +52,7 @@ export function MarketingNav() {
   const { dark, toggle } = useTheme();
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-40 border-b bg-background">
       <div className="container flex h-16 items-center gap-6">
         <Logo />
         <nav aria-label="Main" className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex">

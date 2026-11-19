@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
 import { useStore } from "@/lib/store";
 import { currentSponsor } from "@/lib/actions";
 import { oppOf } from "@/lib/selectors";
-import { OPP_LABEL, sum, aed } from "@/lib/format";
+import { OPP_LABEL, sum, aed, aedAxis } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/shared/kit";
@@ -79,7 +79,7 @@ export default function SponsorImpactPage() {
                 <BarChart data={byCategory} margin={{ left: -10 }}>
                   <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `$${v}`} />
+                  <YAxis tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" width={72} tickFormatter={(v) => aedAxis(v)} />
                   <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
                   <Bar dataKey="value" radius={[6, 6, 0, 0]} fill="hsl(var(--chart-1))" maxBarSize={48} />
                 </BarChart>

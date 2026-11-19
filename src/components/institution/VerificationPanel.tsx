@@ -93,7 +93,7 @@ export function VerificationPanel({ r }: { r: FundingRequest }) {
           {(r.flags ?? []).length === 0 && <p className="text-xs text-muted-foreground">No flags raised.</p>}
           <ul className="space-y-1.5">
             {(r.flags ?? []).map((f) => (
-              <li key={f.id} className={cn("flex items-start justify-between gap-2 rounded-md px-2.5 py-1.5 text-xs", f.resolved ? "bg-muted text-muted-foreground line-through" : "bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-200")}>
+              <li key={f.id} className={cn("flex items-start justify-between gap-2 rounded-md px-2.5 py-1.5 text-xs", f.resolved ? "bg-muted text-muted-foreground line-through" : "bg-warning-soft text-warning")}>
                 <span>
                   {f.note} <span className="opacity-70">· {f.by === "system" ? "automatic check" : "staff"}</span>
                 </span>

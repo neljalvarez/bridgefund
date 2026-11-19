@@ -105,7 +105,7 @@ export function RescueSimulator() {
           ))}
         </div>
         {Number.isFinite(r.extraOpportunities) && r.extraOpportunities > 0 && (
-          <p className="rounded-lg border-s-2 border-primary bg-primary-light/60 px-4 py-3 text-sm dark:bg-primary/10">
+          <p className="rounded-lg border-s-2 border-primary bg-primary-light/60 px-4 py-3 text-sm">
             The same {aed(v.sponsorBudget)} budget could support an estimated <strong>{r.extraOpportunities} more</strong> opportunit{r.extraOpportunities === 1 ? "y" : "ies"} like this one when costs are reduced before fundraising — assuming similar students qualify for similar reductions.
           </p>
         )}

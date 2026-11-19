@@ -9,7 +9,7 @@ import { saveScenarios } from "@/lib/actions";
 import { currentStudent } from "@/lib/selectors";
 import { runBridgeEngine } from "@/lib/engine";
 import { ALTERNATIVES, GRANTS, WAIVERS } from "@/lib/knowledge";
-import { EXPENSE_LABEL, OPP_CATEGORIES, OPP_LABEL, uid, aed } from "@/lib/format";
+import { EXPENSE_LABEL, OPP_CATEGORIES, OPP_LABEL, uid, aed, aedAxis } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -184,7 +184,7 @@ export default function CalculatorPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={results} layout="vertical" margin={{ left: 10, right: 16 }}>
                 <CartesianGrid horizontal={false} stroke="hsl(var(--border))" />
-                <XAxis type="number" tickFormatter={(v) => `$${v}`} fontSize={12} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
+                <XAxis type="number" tickFormatter={(v) => aedAxis(v)} fontSize={12} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
                 <YAxis type="category" dataKey="name" width={170} fontSize={12} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} tickFormatter={(v: string) => (v.length > 26 ? `${v.slice(0, 25)}…` : v)} />
                 <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltip />} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />

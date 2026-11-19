@@ -26,7 +26,7 @@ export function GapBar({ total, segments, className, legend = true, size = "md" 
   return (
     <div className={className}>
       <div
-        className={cn("flex overflow-hidden rounded-full bg-secondary", size === "sm" ? "h-2" : size === "lg" ? "h-5" : "h-3.5")}
+        className={cn("flex overflow-hidden rounded-sm bg-secondary ring-1 ring-inset ring-border", size === "sm" ? "h-2" : size === "lg" ? "h-4" : "h-3")}
         role="img"
         aria-label={`${segments.map((s) => `${s.label} ${aed(s.value)}`).join(", ")}; ${aed(remaining)} still missing of ${aed(total)}`}
       >
@@ -38,13 +38,13 @@ export function GapBar({ total, segments, className, legend = true, size = "md" 
         <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted-foreground">
           {segments.map((s) => (
             <li key={s.key} className="flex items-center gap-1.5">
-              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", s.color)} aria-hidden />
+              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-sm", s.color)} aria-hidden />
               {s.label}
               <AnimatedNumber value={s.value} className="font-medium text-foreground" />
             </li>
           ))}
           <li className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-dashed border-muted-foreground/60 bg-secondary" aria-hidden />
+            <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-dashed border-muted-foreground bg-secondary" aria-hidden />
             {tr("Still missing")}
             <AnimatedNumber value={remaining} className={cn("font-medium", remaining > 0 ? "text-warning" : "text-primary")} />
           </li>
@@ -56,9 +56,9 @@ export function GapBar({ total, segments, className, legend = true, size = "md" 
 
 /** The standard colour order used everywhere a gap is explained. */
 export const GAP_COLORS = {
-  own: "bg-slate-400 dark:bg-slate-500",
-  borrow: "bg-emerald-200 dark:bg-emerald-900",
-  savings: "bg-emerald-300 dark:bg-emerald-800",
-  school: "bg-emerald-500 dark:bg-emerald-600",
+  own: "bg-stone",
+  borrow: "bg-sage",
+  savings: "bg-sage",
+  school: "bg-sage-deep",
   sponsor: "bg-primary",
 } as const;

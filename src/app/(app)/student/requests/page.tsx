@@ -45,7 +45,7 @@ function RequestCard({ r }: { r: FundingRequest }) {
       {open && (
         <CardContent className="space-y-5 border-t pt-5">
           {r.status === "Additional Information Required" && (
-            <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40" role="alert">
+            <div className="space-y-3 rounded-md border border-warning/40 bg-warning-soft p-4" role="alert">
               <p className="flex items-start gap-2 text-sm">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
                 <span>

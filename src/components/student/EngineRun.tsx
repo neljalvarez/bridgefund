@@ -132,7 +132,7 @@ export function FindingRow({
           className={cn(
             "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
             sponsor
-              ? "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+              ? "bg-warning-soft text-warning"
               : "bg-primary-light text-primary",
           )}
         >
@@ -287,7 +287,7 @@ export function EngineRun({
               </span>
             </div>
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-secondary">
+          <div className="mt-4 h-2 overflow-hidden rounded-sm bg-secondary">
             <motion.div
               className="h-full bg-primary"
               animate={{
@@ -318,7 +318,7 @@ export function EngineRun({
               <div className="flex items-center gap-3">
                 <span
                   className={cn(
-                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border text-xs font-semibold",
                     state === "done" && ph.findings.length
                       ? "border-primary bg-primary text-primary-foreground"
                       : state === "done"

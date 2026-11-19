@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROLE_META } from "@/components/app/nav";
 
-const EMAIL: Record<Role, string> = { student: "amina.demo@bridgefund.example", sponsor: "giving@juniper.example", institution: "verify@northfield.example" };
+const EMAIL: Record<Role, string> = { student: "mariam.demo@bridgefund.example", sponsor: "giving@ghaf-fund.example", institution: "verify@ghaf-grove.example" };
 
 function SignIn() {
   const { dispatch } = useStore();

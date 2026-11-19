@@ -1,5 +1,6 @@
 "use client";
 
+import { aedAxis } from "@/lib/format";
 import { useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { RotateCcw } from "lucide-react";
@@ -128,7 +129,7 @@ export function BusinessSimulator() {
               <LineChart data={growth} margin={{ left: 0, right: 10 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" {...axis} interval={3} />
-                <YAxis {...axis} width={70} tickFormatter={(x) => fmt(x)} />
+                <YAxis {...axis} width={72} tickFormatter={(x) => aedAxis(x)} />
                 <Tooltip content={<ChartTooltip format={fmt} />} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Line dataKey="Conservative" stroke="hsl(var(--chart-4))" strokeWidth={scenario === "conservative" ? 3 : 1.5} dot={false} />
@@ -151,7 +152,7 @@ export function BusinessSimulator() {
               <AreaChart data={pnl} margin={{ left: 0, right: 10 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" {...axis} interval={3} />
-                <YAxis {...axis} width={70} tickFormatter={(x) => fmt(x)} />
+                <YAxis {...axis} width={72} tickFormatter={(x) => aedAxis(x)} />
                 <Tooltip content={<ChartTooltip format={fmt} />} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" />

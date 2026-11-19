@@ -1,6 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+// Self-hosted type (no external font requests): editorial serif, humanist sans, mono figures, Arabic.
+import "@fontsource-variable/newsreader/opsz.css";
+import "@fontsource-variable/newsreader/opsz-italic.css";
+import "@fontsource-variable/dm-sans/opsz.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
+import "@fontsource/ibm-plex-mono/latin-600.css";
+import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
+import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
+import "@fontsource/noto-naskh-arabic/arabic-500.css";
+import "@fontsource/noto-naskh-arabic/arabic-600.css";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
@@ -14,8 +24,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
-    { media: "(prefers-color-scheme: dark)", color: "#090E18" },
+    { media: "(prefers-color-scheme: light)", color: "#EDE7DA" },
+    { media: "(prefers-color-scheme: dark)", color: "#242426" },
   ],
 };
 
@@ -23,7 +33,7 @@ const themeScript = `try{if(localStorage.getItem('bf-theme')==='dark'){document.
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

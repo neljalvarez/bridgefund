@@ -66,7 +66,7 @@ export function StatusTrack({ status }: { status: RequestStatus }) {
         const current = i === idx && status !== "Completed";
         return (
           <li key={s} className="min-w-0" aria-current={current ? "step" : undefined}>
-            <span className={cn("block h-1.5 rounded-full", done ? "bg-primary" : current ? (info ? "bg-warning" : "bg-primary/50") : "bg-secondary")} />
+            <span className={cn("block h-1.5 rounded-sm", done ? "bg-primary" : current ? (info ? "bg-warning" : "bg-primary/50") : "bg-secondary")} />
             <span className={cn("mt-1.5 flex items-center gap-1 truncate text-[11px]", current ? "font-medium text-foreground" : "text-muted-foreground")}>
               {done && <Check className="h-3 w-3 shrink-0 text-primary" />}
               {s}

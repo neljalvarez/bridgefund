@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
+import { Lattice } from "@/components/shared/Motifs";
 
 const COLS = [
   { title: "Product", links: [["How it works", "/#how-it-works"], ["Interactive demo", "/demo"], ["Rescue simulator", "/simulator"], ["Impact", "/impact"]] },
@@ -10,14 +11,18 @@ const COLS = [
 export function Footer() {
   return (
     <footer className="border-t bg-card">
+      <div className="relative h-14 overflow-hidden border-b text-border" aria-hidden>
+        <Lattice />
+      </div>
       <div className="container grid grid-cols-1 gap-10 py-14 md:grid-cols-[1.5fr_repeat(3,1fr)]">
         <div>
           <Logo />
-          <p className="mt-3 max-w-xs text-sm text-muted-foreground">Small gaps. Big futures.</p>
+          <p className="mt-4 max-w-xs font-display text-lg italic text-muted-foreground">Small gaps. Big futures.</p>
+          <p className="eyebrow mt-6 text-muted-foreground">Built for the UAE · Abu Dhabi first</p>
         </div>
         {COLS.map((c) => (
           <div key={c.title}>
-            <p className="text-sm font-semibold">{c.title}</p>
+            <p className="eyebrow text-foreground">{c.title}</p>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {c.links.map(([l, h]) => (
                 <li key={h}>

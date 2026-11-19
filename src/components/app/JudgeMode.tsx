@@ -59,12 +59,12 @@ export function JudgeMode({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <p className="px-6 pb-2 pt-6 text-xs font-medium uppercase tracking-wider text-muted-foreground">Explore freely</p>
+        <p className="eyebrow px-6 pb-2 pt-6 text-muted-foreground">Explore freely</p>
         <ul className="grid grid-cols-1 gap-px overflow-hidden border-y bg-border sm:grid-cols-2">
           {AREAS.map((a) => (
             <li key={a.title} className="bg-card">
               <button type="button" onClick={() => go(a.href, a.role)} className="flex w-full items-start gap-3 px-6 py-3.5 text-start transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-none">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary dark:bg-primary/15">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">
                   <a.icon className="h-4 w-4" aria-hidden />
                 </span>
                 <span className="min-w-0 flex-1">

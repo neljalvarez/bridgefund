@@ -45,7 +45,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
             <p className="mt-0.5 min-h-[2.5rem] text-[13px] text-muted-foreground">{s.tagline}</p>
           </div>
           {onSelect && (
-            <span className={cn("mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border", selected && "border-primary bg-primary text-primary-foreground")}>{selected && <Check className="h-3 w-3" />}</span>
+            <span className={cn("mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border", selected && "border-primary bg-primary text-primary-foreground")}>{selected && <Check className="h-3 w-3" />}</span>
           )}
         </div>
         <div className="mt-4 grid grid-cols-3 gap-3 border-t pt-4">
@@ -61,7 +61,7 @@ function StrategyCard({ s, recommended, selected, onSelect, daysLeft, best }: { 
             <span>External funding dependency</span>
             <span className="tabular">{pct(s.externalDependency)}</span>
           </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
+          <div className="mt-1 h-1.5 overflow-hidden rounded-sm bg-secondary">
             <div className="h-full bg-warning/70" style={{ width: pct(s.externalDependency) }} />
           </div>
         </div>

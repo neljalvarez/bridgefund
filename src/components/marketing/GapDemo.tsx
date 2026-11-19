@@ -25,14 +25,14 @@ export function GapDemo() {
     <Card className="grid grid-cols-1 overflow-hidden md:grid-cols-[1.1fr_1fr]">
       <div className="p-6 md:p-8">
         <div className="flex items-center justify-between gap-2">
-          <p className="font-medium">Robotics club regional event</p>
+          <p className="font-display text-xl">Robotics club regional event</p>
           <DemoBadge>Example</DemoBadge>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">Costs {aed(TOTAL)}. The student has {aed(PERSONAL)}.</p>
-        <ul className="mt-6 space-y-2.5">
+        <ul className="mt-6 divide-y border-y">
           {SOURCES.map((s) => (
             <li key={s.id}>
-              <label className="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors has-[[data-state=checked]]:border-primary/40 has-[[data-state=checked]]:bg-primary-light/40">
+              <label className="flex cursor-pointer items-center gap-3 px-1 py-3 transition-colors hover:bg-background/60">
                 <Switch checked={!!on[s.id]} onCheckedChange={(v) => setOn({ ...on, [s.id]: v })} aria-label={s.label} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium">{s.label}</span>
@@ -44,10 +44,10 @@ export function GapDemo() {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col justify-center gap-6 border-t bg-muted/30 p-6 md:border-s md:border-t-0 md:p-8">
+      <div className="flex flex-col justify-center gap-6 border-t bg-background p-6 md:border-s md:border-t-0 md:p-8">
         <div>
-          <p className="text-sm text-muted-foreground">Sponsors are asked for</p>
-          <p className="text-5xl font-semibold tracking-tight">
+          <p className="eyebrow text-muted-foreground">Sponsors are asked for</p>
+          <p className="mt-3 text-5xl font-medium md:text-6xl">
             <AnimatedNumber value={gap} />
           </p>
         </div>

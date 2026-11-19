@@ -1,78 +1,104 @@
 import Link from "next/link";
-import { HandCoins, ScanSearch, Scissors } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { DemoBadge } from "@/components/shared/kit";
 import { HeroPreview } from "@/components/marketing/HeroPreview";
 import { Hero } from "@/components/marketing/Hero";
 import { GapDemo } from "@/components/marketing/GapDemo";
+import { BridgeSpans, Lattice, SectionMark } from "@/components/shared/Motifs";
 
 const STEPS = [
-  { icon: ScanSearch, title: "Find the gap", body: "List the costs. See exactly what's missing." },
-  { icon: Scissors, title: "Cut the cost", body: "Waivers, discounts and borrowed equipment come first." },
-  { icon: HandCoins, title: "Fund the rest", body: "The school verifies it. Sponsors cover only what's left." },
+  { title: "Find the gap", body: "List the costs. See exactly what's missing." },
+  { title: "Cut the cost", body: "Waivers, discounts and borrowed equipment come first." },
+  { title: "Fund the rest", body: "The school verifies it. Sponsors cover only what's left." },
+];
+
+const SPANS = [
+  { key: "own", label: "Her savings", value: 150, tone: "text-stone" },
+  { key: "kit", label: "Borrowed kit", value: 200, tone: "text-sage-deep" },
+  { key: "school", label: "School support", value: 100, tone: "text-sage" },
+  { key: "sponsor", label: "Sponsor", value: 150, tone: "text-primary" },
 ];
 
 export default function LandingPage() {
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div className="bg-grid absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" aria-hidden />
-        <div className="container grid grid-cols-1 items-center gap-12 py-16 md:py-28 lg:grid-cols-[1.1fr_1fr]">
+      <section className="relative overflow-hidden border-b">
+        {/* lattice screen behind the product sheet, like light through a mashrabiya */}
+        <div className="absolute inset-y-0 end-0 hidden w-[44%] border-s text-border/80 lg:block" aria-hidden>
+          <Lattice />
+        </div>
+        <div className="container relative grid grid-cols-1 items-center gap-14 py-16 md:py-24 lg:grid-cols-[1.15fr_1fr]">
           <Hero />
-          <HeroPreview />
+          <div className="lg:ps-10">
+            <HeroPreview />
+          </div>
         </div>
       </section>
 
-      <section id="how-it-works" className="scroll-mt-20 border-t py-20 md:py-24">
+      <section className="border-b py-16 md:py-24">
         <div className="container">
-          <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">How it works</h2>
-          <ol className="mx-auto mt-14 grid grid-cols-1 max-w-5xl gap-10 md:grid-cols-3">
+          <SectionMark n="01">The idea</SectionMark>
+          <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <h2 className="text-[2.1rem] leading-[1.1] md:text-5xl">
+              A gap is a span. <em className="text-primary">Bridge it</em> in sections.
+            </h2>
+            <div>
+              <BridgeSpans spans={SPANS} total={600} />
+              <p className="mt-6 max-w-xl text-muted-foreground">
+                Mariam&apos;s AED 600 competition cost, drawn as a bridge. Each arch is one source of money, sized to its amount. Sponsors carry one span — not the whole crossing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="scroll-mt-20 border-b py-16 md:py-24">
+        <div className="container">
+          <SectionMark n="02">How it works</SectionMark>
+          <ol className="mt-10 grid grid-cols-1 border-t md:grid-cols-3">
             {STEPS.map((s, i) => (
-              <li key={s.title} className="text-center">
-                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border bg-card text-primary">
-                  <s.icon className="h-5 w-5" strokeWidth={1.75} />
-                </span>
-                <p className="mt-5 text-sm font-medium text-muted-foreground">Step {i + 1}</p>
-                <h3 className="mt-1 text-lg font-semibold">{s.title}</h3>
-                <p className="mx-auto mt-2 max-w-[16rem] text-muted-foreground">{s.body}</p>
+              <li key={s.title} className="border-b py-8 md:border-b-0 md:border-e md:px-8 md:first:ps-0 md:last:border-e-0">
+                <p className="tabular text-sm text-primary">0{i + 1}</p>
+                <h3 className="mt-4 text-[1.75rem] leading-tight">{s.title}</h3>
+                <p className="mt-3 max-w-xs text-muted-foreground">{s.body}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      <section className="border-t bg-card py-20 md:py-24">
+      <section className="border-b bg-card py-16 md:py-24">
         <div className="container">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Try it</h2>
-            <p className="mt-3 text-muted-foreground">Switch savings on and watch the sponsor ask shrink.</p>
+          <SectionMark n="03">Try it</SectionMark>
+          <div className="mb-10 mt-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <h2 className="text-[2.1rem] leading-[1.1] md:text-5xl">Switch savings on. Watch the ask shrink.</h2>
           </div>
-          <div className="mx-auto max-w-5xl">
-            <GapDemo />
-          </div>
+          <GapDemo />
         </div>
       </section>
 
-      <section id="impact" className="scroll-mt-20 border-t py-20 md:py-24">
+      <section id="impact" className="scroll-mt-20 py-16 md:py-24">
         <div className="container">
-          <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">Every sponsor dirham goes further</h2>
-          <dl className="mx-auto mt-14 grid grid-cols-1 max-w-4xl gap-10 text-center sm:grid-cols-3">
+          <SectionMark n="04">Impact</SectionMark>
+          <h2 className="mt-8 max-w-3xl text-[2.1rem] leading-[1.1] md:text-5xl">Every sponsor dirham goes further.</h2>
+          <dl className="mt-12 grid grid-cols-1 border-t sm:grid-cols-3">
             {[
               { v: "AED 150", l: "asked, not AED 450", s: "for Mariam's STEM competition" },
               { v: "3.00x", l: "impact multiplier", s: "barriers resolved per sponsor dirham" },
-              { v: "3x", l: "more students", s: "from the same AED 1,000 budget" },
+              { v: "3×", l: "more students", s: "from the same AED 1,000 budget" },
             ].map((x) => (
-              <div key={x.l}>
+              <div key={x.l} className="border-b py-8 sm:border-b-0 sm:border-e sm:px-8 sm:first:ps-0 sm:last:border-e-0">
                 <dt className="sr-only">{x.l}</dt>
-                <dd className="text-5xl font-semibold tracking-tight text-primary tabular">{x.v}</dd>
-                <dd className="mt-2 font-medium">{x.l}</dd>
-                <dd className="text-sm text-muted-foreground">{x.s}</dd>
+                <dd className="tabular text-5xl font-medium text-primary md:text-6xl">{x.v}</dd>
+                <dd className="mt-4 font-medium">{x.l}</dd>
+                <dd className="mt-1 text-sm text-muted-foreground">{x.s}</dd>
               </div>
             ))}
           </dl>
-          <div className="mt-12 flex flex-col items-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
             <DemoBadge>Simulated example with fictional data</DemoBadge>
-            <Link href="/impact" className="text-sm font-medium text-primary hover:underline">
-              Explore the impact dashboard →
+            <Link href="/impact" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline">
+              Explore the impact dashboard <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

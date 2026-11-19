@@ -11,7 +11,7 @@ export function RoleSwitcher({ className, onSwitch, stacked }: { className?: str
   const { state, dispatch } = useStore();
   const router = useRouter();
   return (
-    <div role="radiogroup" aria-label="View as" className={cn("flex rounded-lg border bg-muted/60 p-0.5", stacked && "flex-col", className)}>
+    <div role="radiogroup" aria-label="View as" className={cn("flex rounded-md border bg-card p-0.5", stacked && "flex-col", className)}>
       {(Object.keys(ROLE_META) as Role[]).map((r) => {
         const m = ROLE_META[r];
         const active = state.role === r;
@@ -27,14 +27,14 @@ export function RoleSwitcher({ className, onSwitch, stacked }: { className?: str
               onSwitch?.();
             }}
             className={cn(
-              "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              active ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+              "flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
               stacked && "justify-start py-2",
             )}
           >
             <m.icon className="h-3.5 w-3.5" aria-hidden />
             {m.label}
-            {stacked && <span className="ms-auto text-xs font-normal text-muted-foreground">{m.persona}</span>}
+            {stacked && <span className={cn("ms-auto text-xs font-normal", active ? "text-background" : "text-muted-foreground")}>{m.persona}</span>}
           </button>
         );
       })}

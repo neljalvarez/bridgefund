@@ -15,6 +15,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/shared/Logo";
+import { Lattice } from "@/components/shared/Motifs";
 import { ACCOUNT_NAV, ROLE_META, ROLE_NAV } from "./nav";
 import { RoleSwitcher } from "./RoleSwitcher";
 import { CommandSearch } from "./CommandSearch";
@@ -39,13 +40,13 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
           onClick={onNavigate}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13.5px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            active ? "bg-primary-light text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            "group relative flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            active ? "bg-card font-medium text-foreground before:absolute before:inset-y-1 before:start-0 before:w-[2px] before:bg-primary" : "text-muted-foreground hover:bg-card/60 hover:text-foreground",
           )}
         >
-          <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden />
+          <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} strokeWidth={1.6} aria-hidden />
           {tr(label)}
-          {!!badge && <span className="ms-auto rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">{badge}</span>}
+          {!!badge && <span className="tabular ms-auto rounded-sm bg-primary px-1.5 text-[10px] font-medium text-primary-foreground">{badge}</span>}
         </Link>
       </li>
     );
@@ -54,12 +55,12 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
     <nav aria-label={`${ROLE_META[role].label} navigation`} className="flex flex-1 flex-col gap-4 overflow-y-auto">
       {ROLE_NAV[role].map((g) => (
         <div key={g.section}>
-          <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{tr(g.section)}</p>
+          <p className="eyebrow mb-1.5 px-2.5 text-muted-foreground">{tr(g.section)}</p>
           <ul className="space-y-0.5">{g.items.map((i) => link(i.href, i.label, i.icon, i.href === ROLE_META[role].home))}</ul>
         </div>
       ))}
       <div className="mt-auto">
-        <p className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{tr("Account")}</p>
+        <p className="eyebrow mb-1.5 px-2.5 text-muted-foreground">{tr("Account")}</p>
         <ul className="space-y-0.5">{ACCOUNT_NAV.map((i) => link(i.href, i.label, i.icon, false, i.href === "/notifications" ? unread : undefined))}</ul>
       </div>
     </nav>
@@ -69,8 +70,8 @@ function SidebarNav({ role, onNavigate }: { role: Role; onNavigate?: () => void 
 function InstitutionPicker() {
   const { state, dispatch } = useStore();
   return (
-    <div className="rounded-lg border bg-card p-2.5">
-      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-md border bg-card p-2.5">
+      <p className="eyebrow mb-1.5 flex items-center gap-1.5 text-muted-foreground">
         <Building2 className="h-3 w-3" /> Signed in as
       </p>
       <Select value={state.currentInstitutionId} onValueChange={(v) => dispatch(setInstitution(v), { info: v === "all" ? "Viewing the whole partner network" : `Switched to ${state.institutions.find((i) => i.id === v)?.name}` })}>
@@ -96,9 +97,14 @@ function SidebarBody({ role, onNavigate }: { role: Role; onNavigate?: () => void
       <Logo href="/" className="px-1.5" />
       {role === "institution" && <InstitutionPicker />}
       <SidebarNav role={role} onNavigate={onNavigate} />
-      <div className="rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Demonstration environment</p>
-        <p className="mt-0.5">All people, organisations and transactions are fictional. No real money moves.</p>
+      <div className="overflow-hidden rounded-md border text-xs text-muted-foreground">
+        <div className="relative h-5 border-b text-border" aria-hidden>
+          <Lattice size={20} />
+        </div>
+        <div className="p-3">
+          <p className="eyebrow text-foreground">Demonstration</p>
+          <p className="mt-1">All people, organisations and transactions are fictional. No real money moves.</p>
+        </div>
       </div>
     </div>
   );
@@ -124,7 +130,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="no-print fixed inset-y-0 start-0 z-30 hidden w-64 border-e bg-card/60 px-3 py-5 lg:block">
+      <aside className="no-print fixed inset-y-0 start-0 z-30 hidden w-64 border-e bg-background px-3 py-5 lg:block">
         <SidebarBody role={role} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -138,7 +144,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Sheet>
 
       <div className="lg:ps-64 print:ps-0">
-        <header className="no-print sticky top-0 z-20 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+        <header className="no-print sticky top-0 z-20 border-b bg-background">
           <div className="flex h-14 items-center gap-2 px-4 md:px-6">
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
               <Menu />
@@ -146,11 +152,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="flex h-9 w-full max-w-sm items-center gap-2 rounded-md border bg-card px-3 text-sm text-muted-foreground shadow-sm transition-colors hover:border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-9 w-full max-w-sm items-center gap-2 rounded-md border bg-card px-3 text-sm text-muted-foreground transition-colors hover:border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Search className="h-4 w-4" aria-hidden />
               <span className="truncate">{tr("Search…")}</span>
-              <kbd className="ms-auto hidden rounded border bg-muted px-1.5 font-mono text-[10px] sm:inline">⌘K</kbd>
+              <kbd className="ms-auto hidden rounded-sm border px-1.5 font-mono text-[10px] sm:inline">⌘K</kbd>
             </button>
             <div className="ms-auto flex items-center gap-1.5">
               <RoleSwitcher className="hidden md:flex" />

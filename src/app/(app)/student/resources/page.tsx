@@ -121,7 +121,7 @@ function Rescue() {
                     </span>
                     <span className="font-medium text-primary">Saves {aed(r.retailValue)}</span>
                   </div>
-                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary">
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-sm bg-secondary">
                     <div className={cn("h-full", r.available ? "bg-primary" : "bg-warning")} style={{ width: `${(r.available / r.total) * 100}%` }} />
                   </div>
                   <Button className="mt-4" variant={r.available ? "default" : "outline"} disabled={!r.available} onClick={() => setReserving(r)}>

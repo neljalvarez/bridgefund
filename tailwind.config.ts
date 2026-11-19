@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 
+/** Every colour resolves to a CSS variable defined in src/app/globals.css (light + dark). */
 const c = (v: string) => `hsl(var(--${v}) / <alpha-value>)`;
 
 const config: Config = {
@@ -8,6 +9,20 @@ const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     container: { center: true, padding: "1.5rem", screens: { "2xl": "1280px" } },
+    // Architectural restraint: corners never exceed 8px; "full" only for dots and avatars.
+    borderRadius: { none: "0", sm: "2px", DEFAULT: "4px", md: "4px", lg: "var(--radius)", xl: "8px", "2xl": "8px", "3xl": "8px", full: "9999px" },
+    // No soft drop shadows — surfaces separate by hairlines. Floating layers get one quiet shadow.
+    boxShadow: {
+      none: "none",
+      sm: "none",
+      DEFAULT: "none",
+      md: "none",
+      inner: "none",
+      card: "none",
+      lg: "0 18px 40px -24px rgb(36 30 28 / 0.35)",
+      xl: "0 18px 40px -24px rgb(36 30 28 / 0.35)",
+      elevated: "0 18px 40px -24px rgb(36 30 28 / 0.35)",
+    },
     extend: {
       colors: {
         border: c("border"),
@@ -19,20 +34,22 @@ const config: Config = {
         secondary: { DEFAULT: c("secondary"), foreground: c("secondary-foreground") },
         muted: { DEFAULT: c("muted"), foreground: c("muted-foreground") },
         accent: { DEFAULT: c("accent"), foreground: c("accent-foreground") },
-        destructive: { DEFAULT: c("destructive"), foreground: c("destructive-foreground") },
-        warning: { DEFAULT: c("warning"), foreground: c("warning-foreground") },
+        destructive: { DEFAULT: c("destructive"), foreground: c("destructive-foreground"), soft: c("destructive-soft") },
+        warning: { DEFAULT: c("warning"), foreground: c("warning-foreground"), soft: c("warning-soft") },
+        success: { DEFAULT: c("success"), soft: c("success-soft") },
+        info: { DEFAULT: c("info"), soft: c("info-soft") },
+        sage: { DEFAULT: c("sage"), foreground: c("sage-foreground"), deep: c("sage-deep") },
+        stone: c("stone"),
+        sand: c("sand"),
         card: { DEFAULT: c("card"), foreground: c("card-foreground") },
         popover: { DEFAULT: c("popover"), foreground: c("popover-foreground") },
-        chart: { 1: c("chart-1"), 2: c("chart-2"), 3: c("chart-3"), 4: c("chart-4"), 5: c("chart-5") },
+        chart: { 1: c("chart-1"), 2: c("chart-2"), 3: c("chart-3"), 4: c("chart-4"), 5: c("chart-5"), 6: c("chart-6") },
       },
-      borderRadius: { lg: "var(--radius)", md: "calc(var(--radius) - 2px)", sm: "calc(var(--radius) - 4px)" },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "Inter", "system-ui", "\"Noto Sans Arabic\"", "\"Segoe UI\"", "Tahoma", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
-      },
-      boxShadow: {
-        card: "0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.04)",
-        elevated: "0 12px 32px -12px rgb(16 24 40 / 0.18), 0 2px 6px -2px rgb(16 24 40 / 0.06)",
+        sans: ["var(--font-sans)"],
+        serif: ["var(--font-serif)"],
+        display: ["var(--font-serif)"],
+        mono: ["var(--font-mono)"],
       },
       keyframes: {
         "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },

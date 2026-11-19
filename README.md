@@ -48,13 +48,53 @@ The role switcher in the app header (Student · Sponsor · Institution) also cha
 6. **Business model** (`/business#simulator`): change subscriptions, CSR programmes and licences; watch break-even move.
 7. **Institution → Audit log** and **/pilot**: export the audit trail, pilot metrics and anonymous feedback as CSV.
 
+## Design system — "Gulf Modernism"
+
+BridgeFund's visual identity draws on contemporary UAE architecture: limestone surfaces, terracotta, sage, hairline rules and drawing-sheet annotation. Every colour, radius and typeface is a token, so the whole app changes from one place.
+
+**Where it lives:** colours, overlay, fonts and radius in `src/app/globals.css` (`:root` and `.dark`); Tailwind names for them in `tailwind.config.ts`; motifs in `src/components/shared/Motifs.tsx` and `Logo.tsx`.
+
+| Token | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `--background` | `#EDE7DA` | `#242426` | Page |
+| `--card` | `#F8F4EB` | `#303031` | Cards, inputs, dialogs |
+| `--primary` | `#9C362D` | `#EC896F` | Accent, primary actions, sponsor span |
+| `--foreground` | `#302A2C` | `#F0E8D8` | Text |
+| `--muted-foreground` | `#6A625B`¹ | `#B7ADA1` | Secondary text |
+| `--stone` | `#746C64` | `#B7ADA1` | Secondary marks (student's own funds) |
+| `--border` | `#BFB5A5` | `#57514B` | Hairlines |
+| `--sage` / `--sage-deep` | `#A4B9AF` / `#4A6A5E` | `#718D83` / `#9FC0B3` | Secondary accent, savings |
+| `--success` / `--warning` / `--destructive` | `#3B6B4C` / `#855508` / `#B42318` | `#8CC4A0` / `#E5B45A` / `#F47C7C` | Reserved for status only, each with a `-soft` background |
+| `--chart-1…6` | terracotta, sage, ochre, stone, sand, sage-light | lighter equivalents | Charts |
+
+¹ The brief's `#746C64` measures 4.19:1 on the `#EDE7DA` background, just under WCAG AA for body text. Secondary text therefore uses `#6A625B` (4.85:1). `#746C64` is kept as `--stone` for graphics and large text. Form-field borders use a deeper `--input` (`#8C8270` / `#857E76`) so fields reach the 3:1 non-text contrast minimum.
+
+**Type** (all self-hosted through Fontsource, so there are no runtime font requests):
+- **Newsreader** for headlines (`h1`–`h3`, `.font-display`).
+- **DM Sans** for body text and navigation.
+- **IBM Plex Mono** for every financial figure (`.tabular`), plus small uppercase `.eyebrow` labels in the style of drawing-sheet annotations.
+- **Arabic:** Noto Naskh Arabic for headlines and IBM Plex Sans Arabic for body text, chosen automatically by the font stacks.
+
+**Shape:** radii are capped at 8px (`sm` 2px, `md` 4px, `lg` 6px, `xl`+ 8px), and `full` is used only for dots and avatars. There are no soft drop shadows, gradients, glass or blur: surfaces separate by hairlines, and only floating layers (menus, dialogs) get one quiet shadow.
+
+**Motifs:**
+- **Logo:** a hairline arch-bridge elevation.
+- **`BridgeSpans`:** the funding gap drawn as a bridge, with one arch per source of money sized to its amount. It appears on the landing page and in the demo, and on the success screen.
+- **`Lattice`:** an eight-point-star mashrabiya pattern in hairlines. It sits behind the hero, on the page intros, in the footer and in the sidebar.
+- **`SectionMark`:** numbered section rules.
+
+**Modes:**
+- Light and dark cross-fade when toggled, unless the user prefers reduced motion.
+- `color-scheme` follows the active mode.
+- Recharts axes use the mono face with compact AED labels.
+
 ## Core innovations
 
 | Innovation | Where | Why it matters |
 | --- | --- | --- |
 | **Reduce before you fund** — BridgeEngine | `/student/engine`, `src/lib/engine.ts`, `optimizer.ts` | Checks waivers, free alternatives, discounts, borrowing, school support and grants *before* sponsors, then builds three strategies (lowest out-of-pocket, fastest, least external dependency). Sponsors are asked for AED 150, not AED 450. |
 | **Impact Multiplier** | Demo, dashboards, `/impact` | Barriers resolved ÷ sponsor money used. Students' own money is never counted as impact. |
-| **The gap bar** | Demo, BridgeEngine, landing | One bar that fills — own funds, savings, school, sponsor — so anyone understands the gap at a glance. |
+| **The gap, drawn as a bridge** | Landing, demo, BridgeEngine | Each arch is one source of money, sized to its amount (and a gap bar that fills step by step in BridgeEngine), so anyone understands the breakdown at a glance. |
 | **Real UAE directory** | `/student/waivers`, `src/lib/uae.ts` | 12 real opportunities and 6 real cost-help programmes from official pages, with links; unpublished fees shown as *Not published*. |
 | **Verification before visibility** | Institution requests | Schools confirm enrolment, costs, guardian consent and duplicates before a need reaches sponsors; a person approves, never an algorithm. |
 | **Privacy by design** | Sponsor pages | Sponsors see an anonymous ID and emirate; documents stay with the verifying school; money goes to providers, never as cash. |
@@ -70,7 +110,7 @@ npm install
 npm run dev            # → http://localhost:3000
 ```
 
-Node.js 18.18+ (Node 22 recommended). No API keys, database, paid services or environment variables. Fonts are bundled (no Google Fonts request), so the app works offline once installed.
+Node.js 18.18+ (Node 22 recommended). No API keys, database, paid services or environment variables. Fonts are self-hosted from npm (Fontsource), so there are no font requests to Google and the app works offline once installed.
 
 | Script | Purpose |
 | --- | --- |
@@ -314,7 +354,7 @@ scripts/e2e.py            Browser end-to-end suite (Playwright for Python)
 | i18n | `next-intl` with locally reviewed translations. |
 
 ## Tech stack
-Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui (Radix primitives) · Lucide icons · Framer Motion · Recharts · Sonner · cmdk · Geist.
+Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui (Radix primitives) · Lucide icons · Framer Motion · Recharts · Sonner · cmdk · Fontsource (Newsreader, DM Sans, IBM Plex Mono, IBM Plex Sans Arabic, Noto Naskh Arabic).
 
 ## Principles
 - Students never pay to request essential assistance.

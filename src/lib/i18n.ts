@@ -40,6 +40,8 @@ const AR: Record<string, string> = {
   "Search…": "بحث…",
   "Launch Interactive Demo": "تشغيل العرض التفاعلي",
   "Judge mode": "وضع لجنة التحكيم",
+  "Education access · Abu Dhabi first": "الوصول إلى التعليم · أبوظبي أولًا",
+  Free: "مجاني",
   "Still missing": "لا يزال ناقصًا",
   "Your funds": "أموالك",
   "Savings found": "توفير تم إيجاده",

@@ -117,3 +117,6 @@ export const STATUS_TONE: Record<RequestStatus, "neutral" | "info" | "warning" |
 };
 
 export const PENDING_STATUSES: RequestStatus[] = ["Submitted", "Under Review", "Additional Information Required"];
+
+/** Short AED labels for chart axes, e.g. "AED 25K". */
+export const aedAxis = (n: number) => `AED ${new Intl.NumberFormat(LOCALE, { notation: "compact", maximumFractionDigits: 1 }).format(n)}`;
