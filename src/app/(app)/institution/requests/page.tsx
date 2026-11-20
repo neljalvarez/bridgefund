@@ -33,7 +33,7 @@ function Dashboard() {
       <PageHeader eyebrow={instName} title="Requests" description="Verify needs, confirm savings and allocate funds." />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_300px]">
         <Tabs value={tab} onValueChange={setTab} className="min-w-0">
-          <TabsList className="h-auto max-w-full flex-wrap justify-start">
+          <TabsList className="h-auto max-w-full flex-wrap justify-start" data-tour="verify-tabs">
             <TabsTrigger value="queue">
               To review <Badge variant="neutral">{queue.length}</Badge>
             </TabsTrigger>

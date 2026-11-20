@@ -95,14 +95,16 @@ function Rescue() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
         {list.length === 0 ? (
-          <EmptyState title="No resources match" description="Try another category or location." />
+          <div data-tour="resources-empty">
+            <EmptyState title="No resources match" description="Try another category or location." />
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {list.map((r) => {
+            {list.map((r, i) => {
               const Icon = RESOURCE_ICON[r.type];
               const inst = institutionOf(state, r.institutionId);
               return (
-                <Card key={r.id} className={cn("flex flex-col p-5", focus === r.id && "ring-2 ring-primary/40")}>
+                <Card key={r.id} data-tour={i === 0 ? "resource-card" : undefined} className={cn("flex flex-col p-5", focus === r.id && "ring-2 ring-primary/40")}>
                   <div className="flex items-start gap-3">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">
                       <Icon className="h-5 w-5" />

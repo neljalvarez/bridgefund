@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Moon, RotateCcw, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
+import { GraduationCap, Moon, RotateCcw, Sun } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { setDisplay, setProfile } from "@/lib/actions";
 import { CURRENCIES } from "@/lib/regions";
@@ -18,6 +18,11 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FieldError, PageHeader } from "@/components/shared/kit";
 import { useTheme } from "@/components/app/useTheme";
+import { startTour } from "@/components/app/OnboardingTour";
+import { readTour, TOUR_UI, TOURS } from "@/lib/tour";
+import { ROLE_META } from "@/components/app/nav";
+import { useRouter } from "next/navigation";
+import type { Role } from "@/lib/types";
 
 export default function SettingsPage() {
   const { state, dispatch, reset } = useStore();
@@ -138,6 +143,7 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+        <TutorialsCard />
         <Card>
           <CardHeader>
             <CardTitle>Demonstration data</CardTitle>
@@ -174,5 +180,47 @@ export default function SettingsPage() {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+/** Restart any role's walkthrough. Tutorial progress is stored separately from demo data. */
+function TutorialsCard() {
+  const { state } = useStore();
+  const router = useRouter();
+  const locale = state.display.locale;
+  const [done, setDone] = useState<ReturnType<typeof readTour>["done"]>({});
+  useEffect(() => setDone(readTour().done), []);
+  const status = (r: Role) => (done[r] === "completed" ? (locale === "ar" ? "مكتملة" : "Completed") : done[r] === "skipped" ? (locale === "ar" ? "تم تخطيها" : "Skipped") : locale === "ar" ? "لم تبدأ" : "Not started");
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{locale === "ar" ? "الجولات التعريفية" : "Tutorials"}</CardTitle>
+        <CardDescription>{locale === "ar" ? "جولة قصيرة لكل دور. لا تغيّر أي بيانات." : "A one-minute walkthrough for each role. Tutorials never change any data."}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="divide-y border-y">
+          {(Object.keys(TOURS) as Role[]).map((r) => (
+            <li key={r} className="flex items-center justify-between gap-3 py-3">
+              <span className="min-w-0">
+                <span className="block text-sm font-medium">{TOUR_UI.roles[r][locale]}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {TOURS[r].steps.length} {locale === "ar" ? "خطوات" : "steps"} · {status(r)}
+                </span>
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  startTour(r);
+                  router.push(ROLE_META[r].home);
+                }}
+              >
+                <GraduationCap /> {TOUR_UI.restart[locale]}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 }

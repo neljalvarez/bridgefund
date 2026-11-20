@@ -31,6 +31,8 @@ Open the landing page and press **Watch the 90-second demo** (or **Judge mode �
 
 Starting the demo always restores clean data first, so it behaves identically every time; buttons are debounced against double-clicks.
 
+> First visit to a dashboard opens a short welcome for that role's tutorial. Judges can press **Start tutorial** for a one-minute guided tour, or **Skip**; it can be restarted any time from **Help (?)**.
+
 ### 2 · Judge mode (any page)
 The **Judge mode** button in every header opens one panel with:
 - **90-second demo** and **3-minute presentation** (`/present`, 8 sections, keyboard and fullscreen).
@@ -47,6 +49,31 @@ The role switcher in the app header (Student · Sponsor · Institution) also cha
 5. **Impact** (`/impact`): click an emirate on the map; every figure is computed from request records.
 6. **Business model** (`/business#simulator`): change subscriptions, CSR programmes and licences; watch break-even move.
 7. **Institution → Audit log** and **/pilot**: export the audit trail, pilot metrics and anonymous feedback as CSV.
+
+## Onboarding tutorials
+
+The first time someone opens a dashboard, a short welcome offers a **one-minute guided tour for that role**, with **Start tutorial** and **Skip**. Each step dims the page and spotlights one real part of the interface, with a small tooltip beside it. On phones the tooltip docks to the bottom of the screen.
+
+| Role | Steps | What it covers |
+| --- | --- | --- |
+| Student | 6 | Dashboard → Opportunity finder → Barrier scanner → BridgeEngine → Borrow equipment → My requests, told through Mariam's AED 600 competition |
+| School | 6 | Dashboard → Verification queue → Lending inventory → School support (needs matching) → Sponsor offers to approve → Impact analytics |
+| Sponsor | 5 | Dashboard → Verified needs → Budget planner → a **practice contribution** that changes nothing → My impact |
+
+- **Navigation:** Back, Next, Skip and Finish buttons, with "Step 2 of 6" and a progress bar. Tours move between pages automatically. If you leave a step's page, the tour pauses and offers **Resume**. Progress survives a reload.
+- **Interaction:** clicks outside the spotlight are blocked. Only highlighted controls that never change data can be used (for example the opportunity filters).
+- **Data:** tours read demo data but never write it. The test suite checks that requests, balances, stock and contributions are identical before and after all three tours.
+- **Keyboard and screen readers:**
+  - → and ← move between steps (mirrored in Arabic), and Esc leaves the tour.
+  - Tab stays inside the tutorial, and focus moves to the tooltip on each step.
+  - The tooltip is a labelled dialog with a live step counter.
+- **Saving and restarting:**
+  - Completion is saved **per role** in localStorage under `bridgefund-tour`, separate from demo data. A demo reset therefore doesn't bring the tours back.
+  - To run a tour again, use **Restart tutorial** in the header **Help (?)** menu, or in **Settings → Tutorials** for any role.
+- **Display:** English and Arabic, both layout directions, light and dark mode, and reduced-motion support.
+- **Help icons:** small **(?)** buttons beside unfamiliar terms (Remaining gap, Verified needs, Impact multiplier, Needs matching, Budget planner and others) give a one-line plain-language explanation (`src/lib/help.ts`).
+
+Code: steps and copy are in `src/lib/tour.ts`, and the spotlight engine is `src/components/app/OnboardingTour.tsx`. Elements are tagged with `data-tour="…"`.
 
 ## Design system — "Gulf Modernism"
 
@@ -119,9 +146,9 @@ Node.js 18.18+ (Node 22 recommended). No API keys, database, paid services or en
 | `npm start` | Serve the production build |
 | `npm run typecheck` | TypeScript check |
 | `npm test` | 34 unit tests (Node ≥ 22.6): BridgeEngine and the AED demo maths, the scripted demo end to end, seed integrity (every request, contribution and sponsor balance reconciles), partial and complete funding, reservations, deadlines, guardian consent, verification, matching, persistence, CSV reports, simulators |
-| `python3 scripts/e2e.py` | Browser end-to-end suite (needs `pip install playwright && playwright install chromium` and the app on port 3100): demo, judge mode, journey, verification, funding, reservations, exports, feedback, corrupted-storage recovery, Arabic RTL, keyboard, and a 34-page mobile overflow sweep |
+| `python3 scripts/e2e.py` | Browser end-to-end suite (needs `pip install playwright && playwright install chromium` and the app on port 3100): demo, judge mode, journey, verification, funding, reservations, exports, feedback, corrupted-storage recovery, Arabic RTL, keyboard, a 34-page mobile overflow sweep, and all three onboarding tutorials (welcome, spotlight blocking, interactive step, reload and pause/resume, practice contribution, restart from Help and Settings, mobile, Arabic, data left unchanged) |
 
-Demo data lives in the browser's `localStorage` under `bridgefund-state` (schema version 6). Saved data is validated on load; anything corrupted or from an older version is replaced with fresh demo data.
+Demo data lives in the browser's `localStorage` under `bridgefund-state` (schema version 6); tutorial progress is kept separately under `bridgefund-tour`. Saved data is validated on load; anything corrupted or from an older version is replaced with fresh demo data.
 
 ## Deployment (Vercel)
 
@@ -307,6 +334,8 @@ src/
     seed.ts               15 students, 10 institutions, 3 sponsors, 16 requests, 10 lendable resources (all fictional)
     demo.ts               The scripted 90-second demo (one pure action per step)
     persist.ts            Validates saved data before it is restored
+    tour.ts               Onboarding tours (steps, English/Arabic copy, progress storage)
+    help.ts               Plain-language explanations behind the (?) help icons
     engine.ts             BridgeEngine seven-step analysis
     optimizer.ts          BridgeEngine 2.0 strategy optimisation
     plan.ts               Builds engine/optimiser inputs from state

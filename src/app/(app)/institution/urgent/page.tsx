@@ -141,7 +141,7 @@ export default function UrgentPage() {
         )}
       </section>
 
-      <section className="mt-8" aria-labelledby="pledges">
+      <section className="mt-8" aria-labelledby="pledges" data-tour="pledges">
         <h2 id="pledges" className="mb-3 text-base font-semibold">
           Sponsor allocations awaiting review
         </h2>

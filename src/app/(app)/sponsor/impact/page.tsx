@@ -42,7 +42,7 @@ export default function SponsorImpactPage() {
   return (
     <>
       <PageHeader title="My impact" description={`What ${sponsor.name}'s contributions resolved.`} />
-      <Card>
+      <Card data-tour="sponsor-impact">
         <CardContent className="grid grid-cols-1 gap-4 p-5 md:grid-cols-[auto_1fr_auto] md:items-center">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Impact multiplier</p>

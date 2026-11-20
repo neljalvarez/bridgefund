@@ -46,7 +46,7 @@ export default function InventoryPage() {
         <StatCard label="Value saved for students" value={sum(state.reservations.filter((rv) => rv.status !== "Cancelled" && resources.some((r) => r.id === rv.resourceId)).map((rv) => state.resources.find((r) => r.id === rv.resourceId)!.retailValue))} tone="primary" />
       </div>
 
-      <Card className="mt-6">
+      <Card className="mt-6" data-tour="inventory">
         <CardContent className="p-0">
           <Table>
             <TableHeader>

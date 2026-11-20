@@ -125,7 +125,7 @@ function Scanner() {
         }
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_1fr]">
-        <Card>
+        <Card data-tour="scanner">
           <CardContent className="p-6">
             <ol className="mb-8 grid grid-cols-6 gap-1.5" aria-label="Scanner progress">
               {STEPS.map((s, i) => (

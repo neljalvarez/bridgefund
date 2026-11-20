@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AnimatedNumber } from "./kit";
+import { HelpTip } from "./HelpTip";
 import { useT } from "@/lib/store";
 
 export interface Figure {
@@ -35,11 +36,13 @@ export function DashboardFocus({ figures, action }: { figures: Figure[]; action:
     </Button>
   );
   return (
-    <section aria-label="Summary" className="space-y-4">
+    <section aria-label="Summary" className="space-y-4" data-tour="focus">
       <Card className="grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {figures.map((f) => (
           <div key={f.label} className="p-5 md:p-6">
-            <p className="eyebrow text-muted-foreground">{tr(f.label)}</p>
+            <p className="eyebrow flex items-center gap-1 text-muted-foreground">
+              {tr(f.label)} <HelpTip term={f.label} />
+            </p>
             <p className={cn("mt-3 font-mono text-[2rem] font-medium leading-none tracking-[-0.03em] md:text-[2.5rem]", f.tone === "primary" && "text-primary", f.tone === "warning" && "text-warning")}>
               {typeof f.value === "number" ? <AnimatedNumber value={f.value} money={f.money ?? true} /> : <bdi>{f.value}</bdi>}
             </p>

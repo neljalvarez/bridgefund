@@ -48,7 +48,7 @@ export default function OpportunitiesPage() {
   return (
     <>
       <PageHeader title="Opportunities" description="Real UAE programmes, and the help that cuts their cost." />
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap" data-tour="opp-filters">
         <Filter value={emirate} onChange={setEmirate} label="Emirate">
           <SelectItem value="all">All emirates</SelectItem>
           {EMIRATES.map((e) => (

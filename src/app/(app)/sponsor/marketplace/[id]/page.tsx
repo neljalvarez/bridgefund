@@ -101,7 +101,7 @@ export default function NeedDetailPage() {
           </Card>
         </div>
         <aside>
-          <Card className="lg:sticky lg:top-20">
+          <Card className="lg:sticky lg:top-20" data-tour="contribute">
             <CardContent className="space-y-4 p-5">
               <p className="flex items-center gap-1.5 text-xs font-medium text-primary">
                 <BadgeCheck className="h-3.5 w-3.5" /> Verified by {inst?.name}

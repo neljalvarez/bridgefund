@@ -21,6 +21,7 @@ import { EngineRun } from "@/components/student/EngineRun";
 import { StrategyComparisonView } from "@/components/student/StrategyComparison";
 import { RequestBreakdown, StatusTrack } from "@/components/shared/RequestBreakdown";
 import { AnimatedNumber } from "@/components/shared/kit";
+import { HelpTip } from "@/components/shared/HelpTip";
 import { GapBar, GAP_COLORS } from "@/components/shared/GapBar";
 
 const STEPS = ["Costs", "Solutions", "Savings", "Request", "Track"] as const;
@@ -349,7 +350,7 @@ function GapMeter({ total, own, savings, sponsor, label }: { total: number; own:
   const tr = useT();
   const left = Math.max(total - own - savings - sponsor, 0);
   return (
-    <div className="mb-8 grid grid-cols-1 gap-5 rounded-2xl border bg-card p-5 sm:grid-cols-[200px_1fr] sm:items-center md:p-6">
+    <div className="mb-8 grid grid-cols-1 gap-5 rounded-lg border bg-card p-5 sm:grid-cols-[200px_1fr] sm:items-center md:p-6" data-tour="gap-meter">
       <div>
         <p className="text-[13px] font-medium text-muted-foreground">{tr(label)}</p>
         <p className={cn("mt-1 text-4xl font-semibold tracking-tight md:text-5xl", left === 0 && "text-primary")} aria-live="polite">
@@ -388,7 +389,9 @@ export default function GetAssistancePage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-8 border-b pb-6">
         <p className="eyebrow text-primary">BridgeEngine</p>
-        <h1 className="mt-1 text-[2rem] leading-[1.1] md:text-[2.5rem]">{tr("Get assistance")}</h1>
+        <h1 className="mt-1 flex items-center gap-2 text-[2rem] leading-[1.1] md:text-[2.5rem]">
+          {tr("Get assistance")} <HelpTip term="Get assistance" className="mt-1" />
+        </h1>
         <p className="mt-2 text-[15px] text-muted-foreground">{tr("From cost to covered in five steps.")}</p>
       </div>
       <Suspense>

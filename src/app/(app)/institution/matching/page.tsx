@@ -49,15 +49,17 @@ export default function MatchingPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]">
         {list.length === 0 ? (
-          <EmptyState title="No open matches" description="Every current need is either covered or has no matching resource." />
+          <div data-tour="matching-empty">
+            <EmptyState title="No open matches" description="Every current need is either covered or has no matching resource." />
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {list.map((m) => {
+            {list.map((m, i) => {
               const st = studentOf(state, m.studentId);
               const K = KIND[m.kind];
               const req = state.requests.find((r) => r.id === m.requestId);
               return (
-                <Card key={m.key} className="flex flex-col">
+                <Card key={m.key} data-tour={i === 0 ? "match-card" : undefined} className="flex flex-col">
                   <CardContent className="flex flex-1 flex-col gap-3 p-5">
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="accent">

@@ -146,11 +146,15 @@ export default function RequestsPage() {
         }
       />
       {mine.length === 0 ? (
-        <EmptyState title="No requests yet" description="Start with Get assistance — savings come first." action={<Button asChild><Link href="/student/engine">Open BridgeEngine</Link></Button>} />
+        <div data-tour="requests-empty">
+          <EmptyState title="No requests yet" description="Start with Get assistance — savings come first." action={<Button asChild><Link href="/student/engine">Open BridgeEngine</Link></Button>} />
+        </div>
       ) : (
         <div className="space-y-4">
-          {mine.map((r) => (
-            <RequestCard key={r.id} r={r} />
+          {mine.map((r, i) => (
+            <div key={r.id} data-tour={i === 0 ? "request-card" : undefined}>
+              <RequestCard r={r} />
+            </div>
           ))}
         </div>
       )}

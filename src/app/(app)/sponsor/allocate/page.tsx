@@ -119,7 +119,7 @@ export default function ImpactPlannerPage() {
         <EmptyState title="No open verified needs" description="New needs appear here once institutions verify them." />
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
-          <Card className="h-fit lg:sticky lg:top-20">
+          <Card className="h-fit lg:sticky lg:top-20" data-tour="budget">
             <CardHeader>
               <CardTitle>Budget</CardTitle>
             </CardHeader>

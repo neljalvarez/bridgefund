@@ -150,11 +150,13 @@ export default function MarketplacePage() {
             </Select>
           </div>
           {list.length === 0 ? (
-            <EmptyState title="No needs match these filters" description="Widen the gap or deadline range, or clear filters." action={<Button variant="outline" onClick={clear}>Clear filters</Button>} />
+            <div data-tour="needs-empty"><EmptyState title="No needs match these filters" description="Widen the gap or deadline range, or clear filters." action={<Button variant="outline" onClick={clear}>Clear filters</Button>} /></div>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {list.map((r) => (
-                <NeedCard key={r.id} r={r} />
+              {list.map((r, i) => (
+                <div key={r.id} className="grid" data-tour={i === 0 ? "need-card" : undefined}>
+                  <NeedCard r={r} />
+                </div>
               ))}
             </div>
           )}

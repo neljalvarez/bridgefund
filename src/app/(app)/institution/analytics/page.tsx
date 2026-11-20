@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
       <div className="mb-4">
         <DemoBadge>Aggregated demonstration data</DemoBadge>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6" data-tour="analytics-stats">
         <StatCard label="Requests analysed" value={reqs.length} money={false} />
         <StatCard label="Average funding gap" value={avgGap} hint="Before BridgeEngine" />
         <StatCard label="Average sponsor ask" value={avgAsk} tone="primary" hint={avgGap ? `${Math.round((1 - avgAsk / avgGap) * 100)}% smaller` : undefined} />

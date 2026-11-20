@@ -7,6 +7,7 @@ import type { RequestStatus } from "@/lib/types";
 import { STATUS_TONE, aed } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { HelpTip } from "./HelpTip";
 import { cn } from "@/lib/utils";
 
 export function AnimatedNumber({ value, money = true, className }: { value: number; money?: boolean; className?: string }) {
@@ -30,7 +31,9 @@ export function StatCard({ label, value, money = true, hint, icon, tone }: { lab
   return (
     <Card className="p-4">
       <div className="flex items-center justify-between gap-2">
-        <p className="eyebrow text-muted-foreground">{label}</p>
+        <p className="eyebrow flex items-center gap-1 text-muted-foreground">
+          {label} <HelpTip term={label} />
+        </p>
         {icon && <span className="text-muted-foreground [&_svg]:size-4">{icon}</span>}
       </div>
       <p className={cn("mt-2 text-2xl font-medium", tone === "primary" && "text-primary", tone === "warning" && "text-warning")}>
@@ -69,7 +72,10 @@ export function PageHeader({ title, description, actions, eyebrow }: { title: st
     <div className="mb-8 flex flex-col gap-4 border-b pb-6 md:flex-row md:items-end md:justify-between">
       <div className="max-w-2xl">
         {eyebrow && <div className="eyebrow mb-2 text-primary">{eyebrow}</div>}
-        <h1 className="text-[2rem] leading-[1.1] md:text-[2.5rem]">{title}</h1>
+        <h1 className="flex items-center gap-2 text-[2rem] leading-[1.1] md:text-[2.5rem]">
+          {title}
+          <HelpTip term={title} className="mt-1" />
+        </h1>
         {description && <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

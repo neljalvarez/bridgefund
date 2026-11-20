@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Building2, Compass, LogOut, Menu, Moon, PlayCircle, RotateCcw, Search, Settings, Sun } from "lucide-react";
+import { Building2, Compass, GraduationCap, HelpCircle, LogOut, Menu, Moon, PlayCircle, RotateCcw, Search, Settings, Sun } from "lucide-react";
+import { OnboardingTour, startTour } from "./OnboardingTour";
+import { TOUR_UI } from "@/lib/tour";
 import { JudgeMode } from "./JudgeMode";
 import type { Role } from "@/lib/types";
 import { useStore } from "@/lib/store";
@@ -166,6 +168,28 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Button>
               </JudgeMode>
               <LanguageToggle className="hidden xl:inline-flex" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label={tr("Help")} title={tr("Help")}>
+                    <HelpCircle />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel>{tr("Help")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      startTour(role);
+                      router.push(ROLE_META[role].home);
+                    }}
+                  >
+                    <GraduationCap /> {TOUR_UI.restart[state.display.locale]} · {TOUR_UI.roles[role][state.display.locale]}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push("/demo")}>
+                    <PlayCircle /> {tr("Watch the 90-second demo")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <FeedbackButton />
               <Button variant="ghost" size="icon" className="hidden sm:inline-flex" onClick={toggle} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
                 {dark ? <Sun /> : <Moon />}
@@ -214,6 +238,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      <OnboardingTour />
     </div>
   );
 }
